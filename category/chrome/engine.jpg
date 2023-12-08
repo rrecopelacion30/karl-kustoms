@@ -1,0 +1,769 @@
+ted by `commit()`
+   *
+   * @param doc - Document to create. Requires a `_type` property.
+   */
+  create<R extends Record<string, Any> = Record<string, Any>>(doc: SanityDocumentStub<R>): this
+  /**
+   * Creates a new Sanity document. If a document with the same `_id` already exists, the create operation will be ignored.
+   * The operation is added to the current transaction, ready to be commited by `commit()`
+   *
+   * @param doc - Document to create if it does not already exist. Requires `_id` and `_type` properties.
+   */
+  createIfNotExists<R extends Record<string, Any> = Record<string, Any>>(
+    doc: IdentifiedSanityDocumentStub<R>
+  ): this
+  /**
+   * Creates a new Sanity document, or replaces an existing one if the same `_id` is already used.
+   * The operation is added to the current transaction, ready to be commited by `commit()`
+   *
+   * @param doc - Document to create or replace. Requires `_id` and `_type` properties.
+   */
+  createOrReplace<R extends Record<string, Any> = Record<string, Any>>(
+    doc: IdentifiedSanityDocumentStub<R>
+  ): this
+  /**
+   * Deletes the document with the given document ID
+   * The operation is added to the current transaction, ready to be commited by `commit()`
+   *
+   * @param documentId - Document ID to delete
+   */
+  delete(documentId: string): this
+  /**
+   * Gets the current transaction ID, if any
+   */
+  transactionId(): string | undefined
+  /**
+   * Set the ID of this transaction.
+   *
+   * @param id - Transaction ID
+   */
+  transactionId(id: string): this
+  /**
+   * Return a plain JSON representation of the transaction
+   */
+  serialize(): Mutation[]
+  /**
+   * Return a plain JSON representation of the transaction
+   */
+  toJSON(): Mutation[]
+  /**
+   * Clears the transaction of all operations
+   */
+  reset(): this
+  protected _add(mut: Mutation): this
+}
+
+/** @public */
+export declare type ChannelErrorEvent = {
+  type: 'channelError'
+  message: string
+}
+
+/** @public */
+export declare interface ClientConfig {
+  projectId?: string
+  dataset?: string
+  /** @defaultValue true */
+  useCdn?: boolean
+  token?: string
+  /** @defaultValue 'raw' */
+  perspective?: ClientPerspective
+  apiHost?: string
+  apiVersion?: string
+  proxy?: string
+  requestTagPrefix?: string
+  ignoreBrowserTokenWarning?: boolean
+  withCredentials?: boolean
+  allowReconfigure?: boolean
+  timeout?: number
+  /** Number of retries for requests. Defaults to 5. */
+  maxRetries?: number
+  /**
+   * The amount of time, in milliseconds, to wait before retrying, given an attemptNumber (starting at 0).
+   *
+   * Defaults to exponential back-off, starting at 100ms, doubling for each attempt, together with random
+   * jitter between 0 and 100 milliseconds. More specifically the following algorithm is used:
+   *
+   *   Delay = 100 * 2^attemptNumber + randomNumberBetween0and100
+   */
+  retryDelay?: (attemptNumber: number) => number
+  /**
+   * @deprecated Don't use
+   */
+  useProjectHostname?: boolean
+  /**
+   * @deprecated Don't use
+   */
+  requester?: Requester
+  /**
+   * Adds a `resultSourceMap` key to the API response, with the type `ContentSourceMap`
+   */
+  resultSourceMap?: boolean
+}
+
+/** @public */
+export declare class ClientError extends Error {
+  response: ErrorProps['response']
+  statusCode: ErrorProps['statusCode']
+  responseBody: ErrorProps['responseBody']
+  details: ErrorProps['details']
+  constructor(res: Any)
+}
+
+/** @public */
+export declare type ClientPerspective = 'previewDrafts' | 'published' | 'raw'
+
+/** @public */
+export declare interface ContentSourceMap {
+  mappings: ContentSourceMapMappings
+  documents: ContentSourceMapDocuments
+  paths: ContentSourceMapPaths
+}
+
+/** @public */
+export declare interface ContentSourceMapDocument {
+  _id: string
+}
+
+/** @public */
+export declare type ContentSourceMapDocuments = (
+  | ContentSourceMapDocument
+  | ContentSourceMapRemoteDocument
+)[]
+
+/**
+ * DocumentValueSource is a path to a value within a document
+ * @public
+ */
+export declare interface ContentSourceMapDocumentValueSource {
+  type: 'documentValue'
+  document: number
+  path: number
+}
+
+/**
+ * When a value is not from a source, its a literal
+ * @public
+ */
+export declare interface ContentSourceMapLiteralSource {
+  type: 'literal'
+}
+
+/** @public */
+export declare type ContentSourceMapMapping = ContentSourceMapValueMapping
+
+/** @public */
+export declare type ContentSourceMapMappings = Record<string, ContentSourceMapMapping>
+
+/** @public */
+export declare type ContentSourceMapPaths = string[]
+
+/** @public */
+export declare interface ContentSourceMapRemoteDocument extends ContentSourceMapDocument {
+  _projectId: string
+  _dataset: string
+}
+
+/** @public */
+export declare type ContentSourceMapSource =
+  | ContentSourceMapDocumentValueSource
+  | ContentSourceMapLiteralSource
+  | ContentSourceMapUnknownSource
+
+/**
+ * When a field source is unknown
+ * @public
+ */
+export declare interface ContentSourceMapUnknownSource {
+  type: 'unknown'
+}
+
+/**
+ * ValueMapping is a mapping when for value that is from a single source value
+ * It may refer to a field within a document or a literal value
+ * @public
+ */
+export declare interface ContentSourceMapValueMapping {
+  type: 'value'
+  source: ContentSourceMapSource
+}
+
+/** @public */
+export declare const createClient: (config: ClientConfig) => SanityClient
+
+/** @internal */
+export declare interface CurrentSanityUser {
+  id: string
+  name: string
+  email: string
+  profileImage: string | null
+  role: string
+}
+
+/** @internal */
+export declare type DatasetAclMode = 'public' | 'private' | 'custom'
+
+/** @internal */
+export declare type DatasetResponse = {
+  datasetName: string
+  aclMode: DatasetAclMode
+}
+
+/** @internal */
+export declare class DatasetsClient {
+  #private
+  constructor(client: SanityClient, httpRequest: HttpRequest)
+  /**
+   * Create a new dataset with the given name
+   *
+   * @param name - Name of the dataset to create
+   * @param options - Options for the dataset
+   */
+  create(
+    name: string,
+    options?: {
+      aclMode?: DatasetAclMode
+    }
+  ): Promise<DatasetResponse>
+  /**
+   * Edit a dataset with the given name
+   *
+   * @param name - Name of the dataset to edit
+   * @param options - New options for the dataset
+   */
+  edit(
+    name: string,
+    options?: {
+      aclMode?: DatasetAclMode
+    }
+  ): Promise<DatasetResponse>
+  /**
+   * Delete a dataset with the given name
+   *
+   * @param name - Name of the dataset to delete
+   */
+  delete(name: string): Promise<{
+    deleted: true
+  }>
+  /**
+   * Fetch a list of datasets for the configured project
+   */
+  list(): Promise<DatasetsResponse>
+}
+
+/** @internal */
+export declare type DatasetsResponse = {
+  name: string
+  aclMode: DatasetAclMode
+}[]
+
+/**
+ * @public
+ * @deprecated Use the named export `createClient` instead of the `default` export
+ */
+declare function deprecatedCreateClient(config: ClientConfig): SanityClient
+export default deprecatedCreateClient
+
+/** @public */
+export declare type DisconnectEvent = {
+  type: 'disconnect'
+  reason: string
+}
+
+/** @public */
+export declare interface ErrorProps {
+  message: string
+  response: Any
+  statusCode: number
+  responseBody: Any
+  details: Any
+}
+
+/** @public */
+export declare type FilteredResponseQueryOptions = RequestOptions & {
+  filterResponse?: true
+}
+
+/** @internal */
+export declare type FirstDocumentIdMutationOptions = BaseMutationOptions & {
+  returnFirst?: true
+  returnDocuments: false
+}
+
+/** @internal */
+export declare type FirstDocumentMutationOptions = BaseMutationOptions & {
+  returnFirst?: true
+  returnDocuments?: true
+}
+
+/** @public */
+export declare type HttpRequest = {
+  defaultRequester: Requester
+  (options: RequestOptions, requester: Requester): ReturnType<Requester>
+}
+
+/** @public */
+export declare type HttpRequestEvent<T = unknown> = ResponseEvent<T> | ProgressEvent_2
+
+/** @public */
+export declare type IdentifiedSanityDocumentStub<
+  T extends Record<string, Any> = Record<string, Any>
+> = {
+  [P in keyof T]: T[P]
+} & {
+  _id: string
+} & SanityDocumentStub
+
+/** @public */
+export declare interface InitializedClientConfig extends ClientConfig {
+  apiHost: string
+  apiVersion: string
+  useProjectHostname: boolean
+  useCdn: boolean
+  /**
+   * @deprecated Internal, don't use
+   */
+  isDefaultApi: boolean
+  /**
+   * @deprecated Internal, don't use
+   */
+  url: string
+  /**
+   * @deprecated Internal, don't use
+   */
+  cdnUrl: string
+}
+
+/** @internal */
+export declare type InsertPatch =
+  | {
+      before: string
+      items: Any[]
+    }
+  | {
+      after: string
+      items: Any[]
+    }
+  | {
+      replace: string
+      items: Any[]
+    }
+
+/**
+ * Set up a listener that will be notified when mutations occur on documents matching the provided query/filter.
+ *
+ * @param query - GROQ-filter to listen to changes for
+ * @param params - Optional query parameters
+ * @param options - Listener options
+ * @internal
+ */
+export declare function _listen<R extends Record<string, Any> = Record<string, Any>>(
+  this: SanityClient | ObservableSanityClient,
+  query: string,
+  params?: QueryParams
+): Observable<MutationEvent_2<R>>
+
+/**
+ * Set up a listener that will be notified when mutations occur on documents matching the provided query/filter.
+ *
+ * @param query - GROQ-filter to listen to changes for
+ * @param params - Optional query parameters
+ * @param options - Listener options
+ * @internal
+ */
+export declare function _listen<R extends Record<string, Any> = Record<string, Any>>(
+  this: SanityClient | ObservableSanityClient,
+  query: string,
+  params?: QueryParams,
+  options?: ListenOptions
+): Observable<ListenEvent<R>>
+
+/** @public */
+export declare type ListenEvent<R extends Record<string, Any>> =
+  | MutationEvent_2<R>
+  | ChannelErrorEvent
+  | DisconnectEvent
+  | ReconnectEvent
+  | WelcomeEvent
+
+/** @public */
+export declare type ListenEventName = 'mutation' | 'welcome' | 'reconnect'
+
+/** @public */
+export declare interface ListenOptions {
+  includeResult?: boolean
+  includePreviousRevision?: boolean
+  visibility?: 'sync' | 'async' | 'query'
+  events?: ListenEventName[]
+  effectFormat?: 'mendoza'
+  tag?: string
+}
+
+/** @internal */
+export declare interface MultipleMutationResult {
+  transactionId: string
+  documentIds: string[]
+  results: {
+    id: string
+    operation: MutationOperation
+  }[]
+}
+
+/** @public */
+export declare type Mutation<R extends Record<string, Any> = Record<string, Any>> =
+  | {
+      create: SanityDocumentStub<R>
+    }
+  | {
+      createOrReplace: IdentifiedSanityDocumentStub<R>
+    }
+  | {
+      createIfNotExists: IdentifiedSanityDocumentStub<R>
+    }
+  | {
+      delete: MutationSelection
+    }
+  | {
+      patch: PatchMutationOperation
+    }
+
+/** @internal */
+export declare interface MutationError {
+  error: {
+    type: 'mutationError'
+    description: string
+    items?: MutationErrorItem[]
+  }
+}
+
+/** @internal */
+export declare interface MutationErrorItem {
+  error: {
+    type: string
+    description: string
+    value?: unknown
+  }
+}
+
+/** @public */
+declare type MutationEvent_2<R extends Record<string, Any> = Record<string, Any>> = {
+  type: 'mutation'
+  documentId: string
+  eventId: string
+  identity: string
+  mutations: Mutation[]
+  previousRev?: string
+  resultRev?: string
+  result?: SanityDocument<R>
+  previous?: SanityDocument<R> | null
+  effects?: {
+    apply: unknown[]
+    revert: unknown[]
+  }
+  timestamp: string
+  transactionId: string
+  transition: 'update' | 'appear' | 'disappear'
+  visibility: 'query' | 'transaction'
+}
+export {MutationEvent_2 as MutationEvent}
+
+/** @internal */
+export declare type MutationOperation = 'create' | 'delete' | 'update' | 'none'
+
+/** @internal */
+export declare type MutationSelection =
+  | {
+      query: string
+      params?: QueryParams
+    }
+  | {
+      id: string | string[]
+    }
+
+/** @internal */
+export declare class ObservableAssetsClient {
+  #private
+  constructor(client: ObservableSanityClient, httpRequest: HttpRequest)
+  /**
+   * Uploads a file asset to the configured dataset
+   *
+   * @param assetType - Asset type (file)
+   * @param body - Asset content - can be a browser File instance, a Blob, a Node.js Buffer instance or a Node.js ReadableStream.
+   * @param options - Options to use for the upload
+   */
+  upload(
+    assetType: 'file',
+    body: UploadBody,
+    options?: UploadClientConfig
+  ): Observable<
+    HttpRequestEvent<{
+      document: SanityAssetDocument
+    }>
+  >
+  /**
+   * Uploads an image asset to the configured dataset
+   *
+   * @param assetType - Asset type (image)
+   * @param body - Asset content - can be a browser File instance, a Blob, a Node.js Buffer instance or a Node.js ReadableStream.
+   * @param options - Options to use for the upload
+   */
+  upload(
+    assetType: 'image',
+    body: UploadBody,
+    options?: UploadClientConfig
+  ): Observable<
+    HttpRequestEvent<{
+      document: SanityImageAssetDocument
+    }>
+  >
+  /**
+   * Uploads a file or an image asset to the configured dataset
+   *
+   * @param assetType - Asset type (file/image)
+   * @param body - Asset content - can be a browser File instance, a Blob, a Node.js Buffer instance or a Node.js ReadableStream.
+   * @param options - Options to use for the upload
+   */
+  upload(
+    assetType: 'file' | 'image',
+    body: UploadBody,
+    options?: UploadClientConfig
+  ): Observable<
+    HttpRequestEvent<{
+      document: SanityAssetDocument | SanityImageAssetDocument
+    }>
+  >
+}
+
+/** @internal */
+export declare class ObservableDatasetsClient {
+  #private
+  constructor(client: ObservableSanityClient, httpRequest: HttpRequest)
+  /**
+   * Create a new dataset with the given name
+   *
+   * @param name - Name of the dataset to create
+   * @param options - Options for the dataset
+   */
+  create(
+    name: string,
+    options?: {
+      aclMode?: DatasetAclMode
+    }
+  ): Observable<DatasetResponse>
+  /**
+   * Edit a dataset with the given name
+   *
+   * @param name - Name of the dataset to edit
+   * @param options - New options for the dataset
+   */
+  edit(
+    name: string,
+    options?: {
+      aclMode?: DatasetAclMode
+    }
+  ): Observable<DatasetResponse>
+  /**
+   * Delete a dataset with the given name
+   *
+   * @param name - Name of the dataset to delete
+   */
+  delete(name: string): Observable<{
+    deleted: true
+  }>
+  /**
+   * Fetch a list of datasets for the configured project
+   */
+  list(): Observable<DatasetsResponse>
+}
+
+/** @public */
+export declare class ObservablePatch extends BasePatch {
+  #private
+  constructor(
+    selection: PatchSelection,
+    operations?: PatchOperations,
+    client?: ObservableSanityClient
+  )
+  /**
+   * Clones the patch
+   */
+  clone(): ObservablePatch
+  /**
+   * Commit the patch, returning an observable that produces the first patched document
+   *
+   * @param options - Options for the mutation operation
+   */
+  commit<R extends Record<string, Any> = Record<string, Any>>(
+    options: FirstDocumentMutationOptions
+  ): Observable<SanityDocument<R>>
+  /**
+   * Commit the patch, returning an observable that produces an array of the mutated documents
+   *
+   * @param options - Options for the mutation operation
+   */
+  commit<R extends Record<string, Any> = Record<string, Any>>(
+    options: AllDocumentsMutationOptions
+  ): Observable<SanityDocument<R>[]>
+  /**
+   * Commit the patch, returning an observable that produces a mutation result object
+   *
+   * @param options - Options for the mutation operation
+   */
+  commit(options: FirstDocumentIdMutationOptions): Observable<SingleMutationResult>
+  /**
+   * Commit the patch, returning an observable that produces a mutation result object
+   *
+   * @param options - Options for the mutation operation
+   */
+  commit(options: AllDocumentIdsMutationOptions): Observable<MultipleMutationResult>
+  /**
+   * Commit the patch, returning an observable that produces the first patched document
+   *
+   * @param options - Options for the mutation operation
+   */
+  commit<R extends Record<string, Any> = Record<string, Any>>(
+    options?: BaseMutationOptions
+  ): Observable<SanityDocument<R>>
+}
+
+/** @public */
+export declare type ObservablePatchBuilder = (patch: ObservablePatch) => ObservablePatch
+
+/** @internal */
+export declare class ObservableProjectsClient {
+  #private
+  constructor(client: ObservableSanityClient, httpRequest: HttpRequest)
+  /**
+   * Fetch a list of projects the authenticated user has access to
+   */
+  list(): Observable<SanityProject[]>
+  /**
+   * Fetch a project by project ID
+   *
+   * @param projectId - ID of the project to fetch
+   */
+  getById(projectId: string): Observable<SanityProject>
+}
+
+/** @public */
+export declare class ObservableSanityClient {
+  #private
+  assets: ObservableAssetsClient
+  datasets: ObservableDatasetsClient
+  projects: ObservableProjectsClient
+  users: ObservableUsersClient
+  /**
+   * Instance properties
+   */
+  listen: typeof _listen
+  constructor(httpRequest: HttpRequest, config?: ClientConfig)
+  /**
+   * Clone the client - returns a new instance
+   */
+  clone(): ObservableSanityClient
+  /**
+   * Returns the current client configuration
+   */
+  config(): InitializedClientConfig
+  /**
+   * Reconfigure the client. Note that this _mutates_ the current client.
+   */
+  config(newConfig?: Partial<ClientConfig>): this
+  /**
+   * Clone the client with a new (partial) configuration.
+   *
+   * @param newConfig - New client configuration properties, shallowly merged with existing configuration
+   */
+  withConfig(newConfig?: Partial<ClientConfig>): ObservableSanityClient
+  /**
+   * Perform a GROQ-query against the configured dataset.
+   *
+   * @param query - GROQ-query to perform
+   */
+  fetch<R = Any>(query: string): Observable<R>
+  /**
+   * Perform a GROQ-query against the configured dataset.
+   *
+   * @param query - GROQ-query to perform
+   * @param params - Query parameters
+   */
+  fetch<R = Any, Q = QueryParams>(query: string, params: Q): Observable<R>
+  /**
+   * Perform a GROQ-query against the configured dataset.
+   *
+   * @param query - GROQ-query to perform
+   * @param params - Query parameters
+   * @param options - Request options
+   */
+  fetch<R = Any, Q = QueryParams>(
+    query: string,
+    params: Q | undefined,
+    options: FilteredResponseQueryOptions
+  ): Observable<R>
+  /**
+   * Perform a GROQ-query against the configured dataset.
+   *
+   * @param query - GROQ-query to perform
+   * @param params - Query parameters
+   * @param options - Request options
+   */
+  fetch<R = Any, Q = QueryParams>(
+    query: string,
+    params: Q | undefined,
+    options: UnfilteredResponseQueryOptions
+  ): Observable<RawQueryResponse<R>>
+  /**
+   * Fetch a single document with the given ID.
+   *
+   * @param id - Document ID to fetch
+   * @param options - Request options
+   */
+  getDocument<R extends Record<string, Any> = Record<string, Any>>(
+    id: string,
+    options?: {
+      tag?: string
+    }
+  ): Observable<SanityDocument<R> | undefined>
+  /**
+   * Fetch multiple documents in one request.
+   * Should be used sparingly - performing a query is usually a better option.
+   * The order/position of documents is preserved based on the original array of IDs.
+   * If any of the documents are missing, they will be replaced by a `null` entry in the returned array
+   *
+   * @param ids - Document IDs to fetch
+   * @param options - Request options
+   */
+  getDocuments<R extends Record<string, Any> = Record<string, Any>>(
+    ids: string[],
+    options?: {
+      tag?: string
+    }
+  ): Observable<(SanityDocument<R> | null)[]>
+  /**
+   * Create a document. Requires a `_type` property. If no `_id` is provided, it will be generated by the database.
+   * Returns an observable that resolves to the created document.
+   *
+   * @param document - Document to create
+   * @param options - Mutation options
+   */
+  create<R extends Record<string, Any> = Record<string, Any>>(
+    document: SanityDocumentStub<R>,
+    options: FirstDocumentMutationOptions
+  ): Observable<SanityDocument<R>>
+  /**
+   * Create a document. Requires a `_type` property. If no `_id` is provided, it will be generated by the database.
+   * Returns an observable that resolves to an array containing the created document.
+   *
+   * @param document - Document to create
+   * @param options - Mutation options
+   */
+  create<R extends Record<string, Any> = Record<string, Any>>(
+    document: SanityDocumentStub<R>,
+    options: AllDocumentsMutationOptions
+  ): Observable<SanityDocument<R>[]>
+  /**
+   * Create a document. Requires a `_type` property. If no `_id` is provided, it will be generated by the database.
+   * Returns an observable that resolves to a mutation result object containing the ID of the created document.
+   *
+   * @param document - Document to create
+   * @param

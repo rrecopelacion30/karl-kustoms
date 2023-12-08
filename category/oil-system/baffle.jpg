@@ -1,0 +1,141 @@
+asTabindex = element.hasAttribute("tabindex");
+    var hasTabIndex = element.hasAttribute("tabIndex");
+    if (!hasTabindex && !hasTabIndex) {
+        return false;
+    }
+    // older Firefox and Internet Explorer don't support tabindex on SVG elements
+    var isSvgElement = element.ownerSVGElement || element.nodeName.toLowerCase() === "svg";
+    if (isSvgElement && !supports.focusSvgTabindexAttribute) {
+        return false;
+    }
+    // @browser-issue Gecko https://bugzilla.mozilla.org/show_bug.cgi?id=1128054
+    if (supports.focusInvalidTabindex) {
+        return true;
+    }
+    // an element matches the tabindex selector even if its value is invalid
+    var tabindex = element.getAttribute(hasTabindex ? "tabindex" : "tabIndex");
+    // IE11 parses tabindex="" as the value "-32768"
+    // @browser-issue Trident https://connect.microsoft.com/IE/feedback/details/1072965
+    if (tabindex === "-32768") {
+        return false;
+    }
+    return Boolean(tabindex && validIntegerPattern.test(tabindex));
+}
+function tabindexValue(element) {
+    if (!isValidTabindex(element)) {
+        return null;
+    }
+    // Edge 14 has a capitalization problem on SVG elements,
+    // see https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/9282058/
+    var hasTabindex = element.hasAttribute("tabindex");
+    var attributeName = hasTabindex ? "tabindex" : "tabIndex";
+    // @browser-issue Gecko https://bugzilla.mozilla.org/show_bug.cgi?id=1128054
+    var tabindex = parseInt(element.getAttribute(attributeName), 10);
+    return isNaN(tabindex) ? -1 : tabindex;
+}
+// this is a shared utility file for focus-relevant.js and tabbable.js
+// separate testing of this file's functions is not necessary,
+// as they're implicitly tested by way of the consumers
+function isUserModifyWritable(style) {
+    // https://www.w3.org/TR/1999/WD-css3-userint-19990916#user-modify
+    // https://github.com/medialize/ally.js/issues/17
+    var userModify = style.webkitUserModify || "";
+    return Boolean(userModify && userModify.indexOf("write") !== -1);
+}
+function hasCssOverflowScroll(style) {
+    return [
+        style.getPropertyValue("overflow"),
+        style.getPropertyValue("overflow-x"),
+        style.getPropertyValue("overflow-y")
+    ].some(function(overflow) {
+        return overflow === "auto" || overflow === "scroll";
+    });
+}
+function hasCssDisplayFlex(style) {
+    return style.display.indexOf("flex") > -1;
+}
+function isScrollableContainer(element, nodeName, parentNodeName, parentStyle) {
+    if (nodeName !== "div" && nodeName !== "span") {
+        // Internet Explorer advances scrollable containers and bodies to focusable
+        // only if the scrollable container is <div> or <span> - this does *not*
+        // happen for <section>, <article>, …
+        return false;
+    }
+    if (parentNodeName && parentNodeName !== "div" && parentNodeName !== "span" && !hasCssOverflowScroll(parentStyle)) {
+        return false;
+    }
+    return element.offsetHeight < element.scrollHeight || element.offsetWidth < element.scrollWidth;
+}
+var supports$1 = void 0;
+function isFocusRelevantRules() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}, context = _ref.context, _ref$except = _ref.except, except = _ref$except === undefined ? {
+        flexbox: false,
+        scrollable: false,
+        shadow: false
+    } : _ref$except;
+    if (!supports$1) {
+        supports$1 = _supports();
+    }
+    var element = contextToElement({
+        label: "is/focus-relevant",
+        resolveDocument: true,
+        context: context
+    });
+    if (!except.shadow && element.shadowRoot) {
+        // a ShadowDOM host receives focus when the focus moves to its content
+        return true;
+    }
+    var nodeName = element.nodeName.toLowerCase();
+    if (nodeName === "input" && element.type === "hidden") {
+        // input[type="hidden"] supports.cannot be focused
+        return false;
+    }
+    if (nodeName === "input" || nodeName === "select" || nodeName === "button" || nodeName === "textarea") {
+        return true;
+    }
+    if (nodeName === "legend" && supports$1.focusRedirectLegend) {
+        // specifics filtered in is/focusable
+        return true;
+    }
+    if (nodeName === "label") {
+        // specifics filtered in is/focusable
+        return true;
+    }
+    if (nodeName === "area") {
+        // specifics filtered in is/focusable
+        return true;
+    }
+    if (nodeName === "a" && element.hasAttribute("href")) {
+        return true;
+    }
+    if (nodeName === "object" && element.hasAttribute("usemap")) {
+        // object[usemap] is not focusable in any browser
+        return false;
+    }
+    if (nodeName === "object") {
+        var svgType = element.getAttribute("type");
+        if (!supports$1.focusObjectSvg && svgType === "image/svg+xml") {
+            // object[type="image/svg+xml"] is not focusable in Internet Explorer
+            return false;
+        } else if (!supports$1.focusObjectSwf && svgType === "application/x-shockwave-flash") {
+            // object[type="application/x-shockwave-flash"] is not focusable in Internet Explorer 9
+            return false;
+        }
+    }
+    if (nodeName === "iframe" || nodeName === "object") {
+        // browsing context containers
+        return true;
+    }
+    if (nodeName === "embed" || nodeName === "keygen") {
+        // embed is considered focus-relevant but not focusable
+        // see https://github.com/medialize/ally.js/issues/82
+        return true;
+    }
+    if (element.hasAttribute("contenteditable")) {
+        // also see CSS property user-modify below
+        return true;
+    }
+    if (nodeName === "audio" && (supports$1.focusAudioWithoutControls || element.hasAttribute("controls"))) {
+        return true;
+    }
+    if (nodeName === "video" && (supports$1.focusVideoWithoutCont

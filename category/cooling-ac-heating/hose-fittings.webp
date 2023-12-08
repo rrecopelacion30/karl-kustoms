@@ -1,0 +1,593 @@
+l */
+export declare function isValidationInfoMarker(
+  marker: ValidationMarker
+): marker is ValidationMarker & {
+  level: 'info'
+}
+
+/** @internal */
+export declare function isValidationWarning(
+  node: FormNodeValidation
+): node is FormNodeValidation & {
+  level: 'warning'
+}
+
+/** @internal */
+export declare function isValidationWarningMarker(
+  marker: ValidationMarker
+): marker is ValidationMarker & {
+  level: 'warning'
+}
+
+/** @public */
+export declare interface KeyedObject {
+  [key: string]: unknown
+  _key: string
+}
+
+/** @public */
+export declare type KeyedSegment = {
+  _key: string
+}
+
+/** @beta */
+export declare type MaybeAllowUnknownProps<TStrict extends StrictDefinition> = TStrict extends false
+  ? {
+      options?: {
+        [index: string]: any
+      }
+      [index: string]: any
+    }
+  : unknown
+
+/** @beta */
+export declare type MaybePreview<
+  Select extends Record<string, string> | undefined,
+  PrepareValue extends Record<keyof Select, any> | undefined
+> = Select extends Record<string, string>
+  ? PrepareValue extends Record<keyof Select, any>
+    ? PreviewConfig<Select, PrepareValue>
+    : never
+  : never
+
+/**
+ * A pair of mendoza patches that can either be _applied_ (to perform the effect),
+ * or _reverted_ (to undo the effect). Requires the exact, previous version of the
+ * document when applying - any difference might have unexpected consequences.
+ *
+ * @internal
+ */
+export declare interface MendozaEffectPair {
+  apply: MendozaPatch
+  revert: MendozaPatch
+}
+
+/**
+ * A mendoza patch. These are not human-readable patches, but are optimized to
+ * take as little space as possible, while still being represented by plain JSON.
+ * See {@link https://www.sanity.io/blog/mendoza}
+ *
+ * @internal
+ */
+export declare type MendozaPatch = unknown[]
+
+/** @public */
+export declare interface MultiFieldSet {
+  name: string
+  title?: string
+  description?: string
+  single?: false
+  group?: string | string[]
+  options?: CollapseOptions & {
+    columns?: number
+  }
+  fields: ObjectField[]
+  hidden?: ConditionalProperty
+  readOnly?: ConditionalProperty
+}
+
+/** @internal */
+export declare interface MultipleMutationResult {
+  transactionId: string
+  documentIds: string[]
+  results: {
+    id: string
+  }[]
+}
+
+/** @internal */
+export declare type Mutation =
+  | CreateMutation
+  | CreateOrReplaceMutation
+  | CreateIfNotExistsMutation
+  | DeleteMutation
+  | PatchMutation
+
+/** @internal */
+export declare type MutationOperationName =
+  | 'create'
+  | 'createOrReplace'
+  | 'createIfNotExists'
+  | 'delete'
+  | 'patch'
+
+/** @internal */
+export declare type MutationSelection =
+  | {
+      query: string
+      params?: Record<string, unknown>
+    }
+  | {
+      id: string
+    }
+
+/** @beta */
+export declare type NarrowPreview<
+  TType extends string,
+  TAlias extends IntrinsicTypeName | undefined,
+  TSelect extends Record<string, string> | undefined,
+  TPrepareValue extends Record<keyof TSelect, any> | undefined
+> = DefineSchemaType<TType, TAlias> extends {
+  preview?: Record<string, any>
+}
+  ? {
+      preview?: MaybePreview<TSelect, TPrepareValue>
+    }
+  : unknown
+
+/** @public */
+export declare interface NumberDefinition extends BaseSchemaDefinition {
+  type: 'number'
+  options?: NumberOptions
+  placeholder?: string
+  validation?: ValidationBuilder<NumberRule, number>
+  initialValue?: InitialValueProperty<any, number>
+}
+
+/** @public */
+export declare interface NumberOptions extends EnumListProps<number> {}
+
+/** @public */
+export declare interface NumberRule extends RuleDef<NumberRule, number> {
+  min: (minNumber: number | FieldReference) => NumberRule
+  max: (maxNumber: number | FieldReference) => NumberRule
+  lessThan: (limit: number | FieldReference) => NumberRule
+  greaterThan: (limit: number | FieldReference) => NumberRule
+  integer: () => NumberRule
+  precision: (limit: number | FieldReference) => NumberRule
+  positive: () => NumberRule
+  negative: () => NumberRule
+}
+
+/** @public */
+export declare interface NumberSchemaType extends BaseSchemaType {
+  jsonType: 'number'
+  options?: NumberOptions
+  initialValue?: InitialValueProperty<any, number>
+}
+
+/** @public */
+export declare interface ObjectDefinition extends BaseSchemaDefinition {
+  type: 'object'
+  /**
+   * Object must have at least one field. This is validated at Studio startup.
+   */
+  fields: FieldDefinition[]
+  groups?: FieldGroupDefinition[]
+  fieldsets?: FieldsetDefinition[]
+  preview?: PreviewConfig
+  options?: ObjectOptions
+  validation?: ValidationBuilder<ObjectRule, Record<string, unknown>>
+  initialValue?: InitialValueProperty<any, Record<string, unknown>>
+}
+
+/** @public */
+export declare interface ObjectField<T extends SchemaType = SchemaType> {
+  name: string
+  fieldset?: string
+  group?: string | string[]
+  type: ObjectFieldType<T>
+}
+
+/** @public */
+export declare type ObjectFieldType<T extends SchemaType = SchemaType> = T & {
+  hidden?: ConditionalProperty
+  readOnly?: ConditionalProperty
+}
+
+/** @public */
+export declare interface ObjectOptions {
+  collapsible?: boolean
+  collapsed?: boolean
+  columns?: number
+  modal?: {
+    type?: 'dialog' | 'popover'
+    width?: number | number[] | 'auto'
+  }
+}
+
+/** @public */
+export declare interface ObjectRule extends RuleDef<ObjectRule, Record<string, unknown>> {}
+
+/** @public */
+export declare interface ObjectSchemaType extends BaseSchemaType {
+  jsonType: 'object'
+  fields: ObjectField[]
+  groups?: FieldGroup[]
+  fieldsets?: Fieldset[]
+  initialValue?: InitialValueProperty<any, Record<string, unknown>>
+  weak?: boolean
+  /** @alpha */
+  __experimental_search: {
+    path: (string | number)[]
+    weight: number
+    mapWith?: string
+  }[]
+  /** @alpha */
+  __experimental_omnisearch_visibility?: boolean
+  /** @alpha */
+  __experimental_actions?: string[]
+  /**
+   * @beta
+   */
+  orderings?: SortOrdering[]
+  options?: any
+}
+
+/** @internal */
+export declare interface ObjectSchemaTypeWithOptions extends Omit<ObjectSchemaType, 'options'> {
+  options?: CollapseOptions & {
+    columns?: number
+  }
+}
+
+/** @internal */
+export declare interface PatchMutation {
+  patch: PatchMutationOperation
+}
+
+/** @internal */
+export declare type PatchMutationOperation = PatchOperations & MutationSelection
+
+/**
+ * NOTE: this is actually incorrect/invalid, but implemented as-is for backwards compatibility
+ *
+ * @internal
+ */
+export declare interface PatchOperations {
+  set?: {
+    [key: string]: unknown
+  }
+  setIfMissing?: {
+    [key: string]: unknown
+  }
+  merge?: {
+    [key: string]: unknown
+  }
+  diffMatchPatch?: {
+    [key: string]: string
+  }
+  unset?: string[]
+  inc?: {
+    [key: string]: number
+  }
+  dec?: {
+    [key: string]: number
+  }
+  insert?: InsertPatch
+  ifRevisionID?: string
+}
+
+/** @public */
+export declare type Path = PathSegment[]
+
+/** @public */
+export declare type PathSegment = string | number | KeyedSegment | IndexTuple
+
+/** @alpha */
+export declare type PortableTextBlock = PortableTextTextBlock | PortableTextObject
+
+/** @alpha */
+export declare type PortableTextChild = PortableTextObject | PortableTextSpan
+
+/** @alpha */
+export declare interface PortableTextListBlock extends PortableTextTextBlock {
+  listItem: string
+  level: number
+}
+
+/** @alpha */
+export declare interface PortableTextObject {
+  _type: string
+  _key: string
+  [other: string]: unknown
+}
+
+/** @alpha */
+export declare interface PortableTextSpan {
+  _key: string
+  _type: 'span'
+  text: string
+  marks?: string[]
+}
+
+/** @alpha */
+export declare interface PortableTextTextBlock<TChild = PortableTextSpan | PortableTextObject> {
+  _type: string
+  _key: string
+  children: TChild[]
+  markDefs?: PortableTextObject[]
+  listItem?: string
+  style?: string
+  level?: number
+}
+
+/** @public */
+export declare interface PrepareViewOptions {
+  /** @beta */
+  ordering?: SortOrdering
+}
+
+/** @public */
+export declare interface PreviewConfig<
+  Select extends Record<string, string> = Record<string, string>,
+  PrepareValue extends Record<keyof Select, any> = Record<keyof Select, any>
+> {
+  select?: Select
+  prepare?: (value: PrepareValue, viewOptions?: PrepareViewOptions) => PreviewValue
+}
+
+/** @public */
+export declare interface PreviewValue {
+  title?: string
+  subtitle?: string
+  description?: string
+  media?: ReactNode | ElementType
+  imageUrl?: string
+}
+
+/** @public */
+export declare interface Reference {
+  _type: string
+  _ref: string
+  _key?: string
+  _weak?: boolean
+  _strengthenOnPublish?: {
+    type: string
+    weak?: boolean
+    template?: {
+      id: string
+      params: Record<string, string | number | boolean>
+    }
+  }
+}
+
+/** @public */
+export declare interface ReferenceBaseOptions {
+  disableNew?: boolean
+}
+
+/** @public */
+export declare interface ReferenceDefinition extends BaseSchemaDefinition {
+  type: 'reference'
+  to: ReferenceTo
+  weak?: boolean
+  options?: ReferenceOptions
+  validation?: ValidationBuilder<ReferenceRule, ReferenceValue>
+  initialValue?: InitialValueProperty<any, Omit<ReferenceValue, '_type'>>
+}
+
+/** @public */
+export declare type ReferenceFilterOptions =
+  | ReferenceFilterResolverOptions
+  | ReferenceFilterQueryOptions
+
+/** @public */
+export declare interface ReferenceFilterQueryOptions {
+  filter: string
+  filterParams?: Record<string, unknown>
+}
+
+/** @public */
+export declare type ReferenceFilterResolver = (
+  context: ReferenceFilterResolverContext
+) => ReferenceFilterSearchOptions | Promise<ReferenceFilterSearchOptions>
+
+/** @public */
+export declare interface ReferenceFilterResolverContext {
+  document: SanityDocument
+  parent?: Record<string, unknown> | Record<string, unknown>[]
+  parentPath: Path
+  getClient: (options: {apiVersion: string}) => SanityClient
+}
+
+/** @public */
+export declare interface ReferenceFilterResolverOptions {
+  filter?: ReferenceFilterResolver
+  filterParams?: never
+}
+
+/** @public */
+export declare type ReferenceFilterSearchOptions = {
+  filter?: string
+  params?: Record<string, unknown>
+  tag?: string
+}
+
+/**
+ * Types are closed for extension. To add properties via declaration merging to this type,
+ * redeclare and add the properties to the interfaces that make up ReferenceOptions type.
+ *
+ * @see ReferenceFilterOptions
+ * @see ReferenceFilterResolverOptions
+ * @see ReferenceBaseOptions
+ *
+ * @public
+ */
+export declare type ReferenceOptions = ReferenceBaseOptions & ReferenceFilterOptions
+
+/** @public */
+export declare interface ReferenceRule extends RuleDef<ReferenceRule, ReferenceValue> {}
+
+/** @public */
+export declare interface ReferenceSchemaType extends Omit<ObjectSchemaType, 'options'> {
+  jsonType: 'object'
+  to: ObjectSchemaType[]
+  weak?: boolean
+  options?: ReferenceOptions
+}
+
+/** @public */
+export declare type ReferenceTo =
+  | SchemaTypeDefinition
+  | TypeReference
+  | Array<SchemaTypeDefinition | TypeReference>
+
+/** @public */
+export declare type ReferenceValue = Reference
+
+/** @public */
+export declare interface Role {
+  name: string
+  title: string
+  description?: string
+}
+
+/** @public */
+export declare interface Rule {
+  /**
+   * @internal
+   * @deprecated internal use only
+   */
+  _type: RuleTypeConstraint | undefined
+  /**
+   * @internal
+   * @deprecated internal use only
+   */
+  _level: 'error' | 'warning' | 'info' | undefined
+  /**
+   * @internal
+   * @deprecated internal use only
+   */
+  _required: 'required' | 'optional' | undefined
+  /**
+   * @internal
+   * @deprecated internal use only
+   */
+  _typeDef: SchemaType | undefined
+  /**
+   * @internal
+   * @deprecated internal use only
+   */
+  _message: string | undefined
+  /**
+   * @internal
+   * @deprecated internal use only
+   */
+  _rules: RuleSpec[]
+  /**
+   * @internal
+   * @deprecated internal use only
+   */
+  _fieldRules: FieldRules | undefined
+  /**
+   * Takes in a path and returns an object with a symbol.
+   *
+   * When the validation lib sees this symbol, it will use the provided path to
+   * get a value from the current field's parent and use that value as the input
+   * to the Rule.
+   *
+   * The path that's given is forwarded to `lodash/get`
+   *
+   * ```js
+   * fields: [
+   * // ...
+   *   {
+   *     // ...
+   *     name: 'highestTemperature',
+   *     type: 'number',
+   *     validation: (Rule) => Rule.positive().min(Rule.valueOfField('lowestTemperature')),
+   *     // ...
+   *   },
+   * ]
+   * ```
+   */
+  valueOfField: (path: string | string[]) => FieldReference
+  error(message?: string): Rule
+  warning(message?: string): Rule
+  info(message?: string): Rule
+  reset(): this
+  isRequired(): boolean
+  clone(): Rule
+  cloneWithRules(rules: RuleSpec[]): Rule
+  merge(rule: Rule): Rule
+  type(targetType: RuleTypeConstraint | Lowercase<RuleTypeConstraint>): Rule
+  all(children: Rule[]): Rule
+  either(children: Rule[]): Rule
+  optional(): Rule
+  required(): Rule
+  custom<T = unknown>(fn: CustomValidator<T>): Rule
+  min(len: number | FieldReference): Rule
+  max(len: number | FieldReference): Rule
+  length(len: number | FieldReference): Rule
+  valid(value: unknown | unknown[]): Rule
+  integer(): Rule
+  precision(limit: number | FieldReference): Rule
+  positive(): Rule
+  negative(): Rule
+  greaterThan(num: number | FieldReference): Rule
+  lessThan(num: number | FieldReference): Rule
+  uppercase(): Rule
+  lowercase(): Rule
+  regex(
+    pattern: RegExp,
+    name: string,
+    options: {
+      name?: string
+      invert?: boolean
+    }
+  ): Rule
+  regex(
+    pattern: RegExp,
+    options: {
+      name?: string
+      invert?: boolean
+    }
+  ): Rule
+  regex(pattern: RegExp, name: string): Rule
+  regex(pattern: RegExp): Rule
+  email(): Rule
+  uri(options?: UriValidationOptions): Rule
+  unique(): Rule
+  reference(): Rule
+  fields(rules: FieldRules): Rule
+  assetRequired(): Rule
+  validate(value: unknown, options: ValidationContext): Promise<ValidationMarker[]>
+}
+
+/** @public */
+export declare type RuleBuilder<T extends RuleDef<T, FieldValue>, FieldValue = unknown> = T | T[]
+
+/**
+ * Note: `RuleClass` and `Rule` are split to fit the current `@sanity/types`
+ * setup. Classes are a bit weird in the `@sanity/types` package because classes
+ * create an actual javascript class while simultaneously creating a type
+ * definition.
+ *
+ * This implicitly creates two types:
+ * 1. the instance type — `Rule` and
+ * 2. the static/class type - `RuleClass`
+ *
+ * The `RuleClass` type contains the static methods and the `Rule` instance
+ * contains the instance methods. Downstream in the validation package, the Rule
+ * implementation asserts the class declaration is of this type.
+ *
+ * @internal
+ */
+export declare interface RuleClass {
+  FIELD_REF: symbol
+  array: (def?: SchemaType) => Rule
+  object: (def?: SchemaType) => Rule
+  string: (def?: SchemaType) => Rule
+  number: (def?: SchemaType) => Rule
+  boolean: (def?: S

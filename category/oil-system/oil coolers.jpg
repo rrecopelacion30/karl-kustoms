@@ -1,0 +1,107 @@
+lveDocument: true,
+        context: context
+    });
+    var nodeName = element.nodeName.toLowerCase();
+    if (!except.notRendered && notRenderedElementsPattern.test(nodeName)) {
+        return true;
+    }
+    var _path = getParents({
+        context: element
+    });
+    // in Internet Explorer <audio> has a default display: none, where others have display: inline
+    // but IE allows focusing <audio style="display:none">, but not <div display:none><audio>
+    // this is irrelevant to other browsers, as the controls attribute is required to make <audio> focusable
+    var isAudioWithoutControls = nodeName === "audio" && !element.hasAttribute("controls");
+    if (!except.cssDisplay && notDisplayed(isAudioWithoutControls ? _path.slice(1) : _path)) {
+        return false;
+    }
+    if (!except.cssVisibility && notVisible(_path)) {
+        return false;
+    }
+    if (!except.detailsElement && collapsedParent(_path)) {
+        return false;
+    }
+    if (!except.browsingContext) {
+        // elements within a browsing context are affected by the
+        // browsing context host element's visibility and tabindex
+        var frameElement = getFrameElement(element);
+        var _isVisible = isVisibleRules.except(except);
+        if (frameElement && !_isVisible(frameElement)) {
+            return false;
+        }
+    }
+    return true;
+}
+// bind exceptions to an iterator callback
+isVisibleRules.except = function() {
+    var except = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var isVisible = function isVisible(context) {
+        return isVisibleRules({
+            context: context,
+            except: except
+        });
+    };
+    isVisible.rules = isVisibleRules;
+    return isVisible;
+};
+// provide isVisible(context) as default iterator callback
+var isVisible = isVisibleRules.except({});
+function getMapByName(name, _document) {
+    // apparently getElementsByName() also considers id attribute in IE & opera
+    // https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementsByName
+    var map = _document.querySelector('map[name="' + cssEscape(name) + '"]');
+    return map || null;
+}
+function getImageOfArea(element) {
+    var map = element.parentElement;
+    if (!map.name || map.nodeName.toLowerCase() !== "map") {
+        return null;
+    }
+    // NOTE: image maps can also be applied to <object> with image content,
+    // but no browser supports this at the moment
+    // HTML5 specifies HTMLMapElement.images to be an HTMLCollection of all
+    // <img> and <object> referencing the <map> element, but no browser implements this
+    //   https://www.w3.org/TR/html5/embedded-content-0.html#the-map-element
+    //   https://developer.mozilla.org/en-US/docs/Web/API/HTMLMapElement
+    // the image must be valid and loaded for the map to take effect
+    var _document = getDocument(element);
+    return _document.querySelector('img[usemap="#' + cssEscape(map.name) + '"]') || null;
+}
+var supports$2 = void 0;
+// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/map
+// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#attr-usemap
+// https://github.com/jquery/jquery-ui/blob/master/ui/core.js#L88-L107
+function isValidArea(context) {
+    if (!supports$2) {
+        supports$2 = _supports();
+    }
+    var element = contextToElement({
+        label: "is/valid-area",
+        context: context
+    });
+    var nodeName = element.nodeName.toLowerCase();
+    if (nodeName !== "area") {
+        return false;
+    }
+    var hasTabindex = element.hasAttribute("tabindex");
+    if (!supports$2.focusAreaTabindex && hasTabindex) {
+        // Blink and WebKit do not consider <area tabindex="-1" href="#void"> focusable
+        return false;
+    }
+    var img = getImageOfArea(element);
+    if (!img || !isVisible(img)) {
+        return false;
+    }
+    // Firefox only allows fully loaded images to reference image maps
+    // https://stereochro.me/ideas/detecting-broken-images-js
+    if (!supports$2.focusBrokenImageMap && (!img.complete || !img.naturalHeight || img.offsetWidth <= 0 || img.offsetHeight <= 0)) {
+        return false;
+    }
+    // Firefox supports.can focus area elements even if they don't have an href attribute
+    if (!supports$2.focusAreaWithoutHref && !element.href) {
+        // Internet explorer supports.can focus area elements without href if either
+        // the area element or the image element has a tabindex attribute
+        return supports$2.focusAreaTabindex && hasTabindex || supports$2.focusAreaImgTabindex && img.hasAttribute("tabindex");
+    }
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#attr-usemap
+    var childOfInteractive = getPare

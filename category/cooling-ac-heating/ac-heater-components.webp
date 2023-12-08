@@ -1,0 +1,530 @@
+ayout?: 'radio' | 'dropdown'
+  direction?: 'horizontal' | 'vertical'
+}
+
+/**
+ * The shape of a field definition. Note, it's recommended to use the
+ * `defineField` function instead of using this type directly.
+ *
+ * Where `defineField` infers the exact field type,
+ * FieldDefinition is a compromise union of all types a field can have.
+ *
+ * A field definition can be a reference to another registered top-level type
+ * or a inline type definition.
+ *
+ * @public
+ */
+export declare type FieldDefinition<
+  TType extends IntrinsicTypeName = IntrinsicTypeName,
+  TAlias extends IntrinsicTypeName | undefined = undefined
+> = (InlineFieldDefinition[TType] | TypeAliasDefinition<string, TAlias>) & FieldDefinitionBase
+
+/** @public */
+export declare interface FieldDefinitionBase {
+  fieldset?: string
+  group?: string | string[]
+}
+
+/** @public */
+export declare interface FieldGroup {
+  name: string
+  icon?: ComponentType
+  title?: string
+  description?: string
+  hidden?: ConditionalProperty
+  default?: boolean
+  fields?: ObjectField[]
+}
+
+/** @public */
+export declare type FieldGroupDefinition = {
+  name: string
+  title?: string
+  hidden?: ConditionalProperty
+  icon?: ComponentType | ReactNode
+  default?: boolean
+}
+
+/**
+ * Holds a reference to a different field
+ * NOTE: Only use this through {@link Rule.valueOfField}
+ *
+ * @public
+ */
+export declare interface FieldReference {
+  type: symbol
+  path: string | string[]
+}
+
+/** @public */
+export declare type FieldRules = {
+  [fieldKey: string]: SchemaValidationValue
+}
+
+/** @public */
+export declare type Fieldset = SingleFieldSet | MultiFieldSet
+
+/** @public */
+export declare type FieldsetDefinition = {
+  name: string
+  title?: string
+  description?: string
+  hidden?: ConditionalProperty
+  readOnly?: ConditionalProperty
+  options?: ObjectOptions
+}
+
+/** @public */
+declare interface File_2 {
+  [key: string]: unknown
+  asset?: Reference
+}
+export {File_2 as File}
+
+/** @public */
+export declare interface FileAsset extends Asset {
+  _type: 'sanity.fileAsset'
+  metadata: Record<string, unknown>
+}
+
+/** @public */
+export declare interface FileDefinition
+  extends Omit<ObjectDefinition, 'type' | 'fields' | 'options' | 'groups'> {
+  type: 'file'
+  fields?: ObjectDefinition['fields']
+  options?: FileOptions
+  validation?: ValidationBuilder<FileRule>
+  initialValue?: InitialValueProperty<any, FileValue>
+}
+
+/** @public */
+export declare interface FileOptions extends ObjectOptions {
+  storeOriginalFilename?: boolean
+  accept?: string
+  sources?: AssetSource[]
+}
+
+/** @public */
+export declare interface FileRule extends RuleDef<FileRule, FileValue> {}
+
+/** @public */
+export declare interface FileSchemaType extends Omit<ObjectSchemaType, 'options'> {
+  options?: FileOptions
+}
+
+/** @public */
+export declare interface FileValue {
+  asset?: Reference
+  [index: string]: unknown
+}
+
+/** @public */
+export declare interface FormNodeValidation {
+  level: 'error' | 'warning' | 'info'
+  message: string
+  path: Path
+}
+
+/** @public */
+export declare interface GeopointDefinition extends BaseSchemaDefinition {
+  type: 'geopoint'
+  options?: GeopointOptions
+  validation?: ValidationBuilder<GeopointRule, GeopointValue>
+  initialValue?: InitialValueProperty<any, Omit<GeopointValue, '_type'>>
+}
+
+/** @public */
+export declare interface GeopointOptions {}
+
+/** @public */
+export declare interface GeopointRule extends RuleDef<GeopointRule, GeopointValue> {}
+
+/**
+ * Geographical point representing a pair of latitude and longitude coordinates,
+ * stored as degrees, in the World Geodetic System 1984 (WGS 84) format. Also
+ * includes an optional `alt` property representing the altitude in meters.
+ *
+ * @public
+ */
+export declare interface GeopointValue {
+  /**
+   * Type of the object. Must be `geopoint`.
+   */
+  _type: 'geopoint'
+  /**
+   * Latitude in degrees
+   */
+  lat: number
+  /**
+   * Longitude in degrees
+   */
+  lng: number
+  /**
+   * Altitude in meters
+   */
+  alt?: number
+}
+
+/** @public */
+declare interface Image_2 {
+  [key: string]: unknown
+  asset?: Reference
+  crop?: ImageCrop
+  hotspot?: ImageHotspot
+}
+export {Image_2 as Image}
+
+/** @public */
+export declare interface ImageAsset extends Asset {
+  _type: 'sanity.imageAsset'
+  metadata: ImageMetadata
+}
+
+/** @public */
+export declare interface ImageCrop {
+  _type?: 'sanity.imageCrop'
+  left: number
+  bottom: number
+  right: number
+  top: number
+}
+
+/** @public */
+export declare interface ImageDefinition
+  extends Omit<ObjectDefinition, 'type' | 'fields' | 'options' | 'groups'> {
+  type: 'image'
+  fields?: FieldDefinition[]
+  options?: ImageOptions
+  validation?: ValidationBuilder<ImageRule, ImageValue>
+  initialValue?: InitialValueProperty<any, ImageValue>
+}
+
+/** @public */
+export declare interface ImageDimensions {
+  _type: 'sanity.imageDimensions'
+  height: number
+  width: number
+  aspectRatio: number
+}
+
+/** @public */
+export declare interface ImageHotspot {
+  _type?: 'sanity.imageHotspot'
+  width: number
+  height: number
+  x: number
+  y: number
+}
+
+/** @public */
+export declare interface ImageMetadata {
+  [key: string]: unknown
+  _type: 'sanity.imageMetadata'
+  dimensions: ImageDimensions
+  palette?: ImagePalette
+  lqip?: string
+  blurHash?: string
+  hasAlpha: boolean
+  isOpaque: boolean
+}
+
+/** @public */
+export declare type ImageMetadataType = 'blurhash' | 'lqip' | 'palette' | 'exif' | 'location'
+
+/** @public */
+export declare interface ImageOptions extends FileOptions {
+  metadata?: ImageMetadataType[]
+  hotspot?: boolean
+}
+
+/** @public */
+export declare interface ImagePalette {
+  _type: 'sanity.imagePalette'
+  darkMuted?: ImageSwatch
+  darkVibrant?: ImageSwatch
+  dominant?: ImageSwatch
+  lightMuted?: ImageSwatch
+  lightVibrant?: ImageSwatch
+  muted?: ImageSwatch
+  vibrant?: ImageSwatch
+}
+
+/** @public */
+export declare interface ImageRule extends RuleDef<ImageRule, ImageValue> {}
+
+/** @internal */
+export declare interface ImageSchemaType extends Omit<ObjectSchemaType, 'options'> {
+  options?: ImageOptions
+}
+
+/** @public */
+export declare interface ImageSwatch {
+  _type: 'sanity.imagePaletteSwatch'
+  background: string
+  foreground: string
+  population: number
+  title?: string
+}
+
+/** @internal */
+export declare type ImageUrlAutoMode = 'format'
+
+/** @internal */
+export declare type ImageUrlCropMode =
+  | 'top'
+  | 'bottom'
+  | 'left'
+  | 'right'
+  | 'center'
+  | 'focalpoint'
+  | 'entropy'
+
+/** @internal */
+export declare type ImageUrlFitMode = 'clip' | 'crop' | 'fill' | 'fillmax' | 'max' | 'scale' | 'min'
+
+/** @internal */
+export declare type ImageUrlFormat = 'jpg' | 'pjpg' | 'png' | 'webp'
+
+/** @internal */
+export declare type ImageUrlOrientation = '0' | '90' | '180' | '270'
+
+/**
+ * NOTE: These are query parameters, so they will eventually be encoded as strings.
+ * However, since most/all query parameter encoders will accept numbers and encode
+ * them as strings, we'll use `string| number` where applicable, as it makes it easier
+ * to use in places that do calculations and such.
+ *
+ * @internal
+ */
+export declare interface ImageUrlParams {
+  bg?: string
+  dpr?: number | string
+  w?: number | string
+  h?: number | string
+  q?: number | string
+  dl?: string
+  dlRaw?: string
+  'fp-x'?: number | string
+  'fp-y'?: number | string
+  'max-w'?: number | string
+  'max-h'?: number | string
+  'min-w'?: number | string
+  'min-h'?: number | string
+  blur?: number | string
+  sharp?: number | string
+  rect?: string
+  fm?: ImageUrlFormat
+  or?: ImageUrlOrientation
+  fit?: ImageUrlFitMode
+  crop?: ImageUrlCropMode
+  auto?: ImageUrlAutoMode
+  invert?: 'true' | 'false'
+  quality?: number | string
+  flip?: 'h' | 'v' | 'hv'
+  sat?: number | string
+  pad?: number | string
+  colorquant?: number | string
+  border?: string
+}
+
+/** @public */
+export declare interface ImageValue extends FileValue {
+  crop?: ImageCrop
+  hotspot?: ImageHotspot
+  [index: string]: unknown
+}
+
+/** @public */
+export declare type IndexTuple = [number | '', number | '']
+
+/** @public */
+export declare type InitialValueProperty<Params, Value> =
+  | Value
+  | InitialValueResolver<Params, Value>
+  | undefined
+
+/** @public */
+export declare type InitialValueResolver<Params, Value> = (
+  params: Params | undefined,
+  context: InitialValueResolverContext
+) => Promise<Value> | Value
+
+/** @public */
+export declare interface InitialValueResolverContext {
+  projectId: string
+  dataset: string
+  schema: Schema
+  currentUser: CurrentUser | null
+  getClient: (options: {apiVersion: string}) => SanityClient
+}
+
+/** @public */
+export declare type InlineFieldDefinition = {
+  [K in keyof IntrinsicDefinitions]: Omit<
+    IntrinsicDefinitions[K],
+    'initialValue' | 'validation'
+  > & {
+    validation?: SchemaValidationValue
+    initialValue?: InitialValueProperty<any, any>
+  }
+}
+
+/** @internal */
+export declare type InsertPatch =
+  | {
+      before: string
+      items: unknown[]
+    }
+  | {
+      after: string
+      items: unknown[]
+    }
+  | {
+      replace: string
+      items: unknown[]
+    }
+
+/** @beta */
+export declare type IntrinsicArrayOfBase = {
+  [K in keyof IntrinsicDefinitions]: Omit<ArrayOfEntry<IntrinsicDefinitions[K]>, 'preview'>
+}
+
+/** @public */
+export declare type IntrinsicArrayOfDefinition = {
+  [K in keyof IntrinsicDefinitions]: Omit<
+    ArrayOfEntry<IntrinsicDefinitions[K]>,
+    'validation' | 'initialValue'
+  > & {
+    validation?: SchemaValidationValue
+    initialValue?: InitialValueProperty<any, any>
+  }
+}
+
+/** @beta */
+export declare type IntrinsicBase = {
+  [K in keyof IntrinsicDefinitions]: Omit<IntrinsicDefinitions[K], 'preview'>
+}
+
+/**
+ * `IntrinsicDefinitions` is a lookup map for "predefined" schema definitions.
+ * Schema types in `IntrinsicDefinitions` will have good type-completion and type-safety in {@link defineType},
+ * {@link defineField} and {@link defineArrayMember} once the `type` property is provided.
+ *
+ * By default, `IntrinsicDefinitions` contains all standard Sanity schema types (`array`, `string`, `number` ect),
+ * but it is an interface and as such, open for extension.
+ *
+ * This type can be extended using declaration merging; this way new entries can be added.
+ * See {@link defineType} for examples on how this can be accomplished.
+ *
+ * @see defineType
+ *
+ * @public
+ */
+export declare interface IntrinsicDefinitions {
+  array: ArrayDefinition
+  block: BlockDefinition
+  boolean: BooleanDefinition
+  date: DateDefinition
+  datetime: DatetimeDefinition
+  document: DocumentDefinition
+  file: FileDefinition
+  geopoint: GeopointDefinition
+  image: ImageDefinition
+  number: NumberDefinition
+  object: ObjectDefinition
+  reference: ReferenceDefinition
+  crossDatasetReference: CrossDatasetReferenceDefinition
+  slug: SlugDefinition
+  string: StringDefinition
+  text: TextDefinition
+  url: UrlDefinition
+  email: EmailDefinition
+}
+
+/**
+ * A union of all intrinsic types allowed natively in the schema.
+ *
+ * @see IntrinsicDefinitions
+ *
+ * @public
+ */
+export declare type IntrinsicTypeName = IntrinsicDefinitions[keyof IntrinsicDefinitions]['type']
+
+/** @internal */
+export declare function isArrayOfBlocksSchemaType(
+  type: unknown
+): type is ArraySchemaType<ObjectSchemaType>
+
+/** @internal */
+export declare function isArrayOfObjectsSchemaType(
+  type: unknown
+): type is ArraySchemaType<ObjectSchemaType>
+
+/** @internal */
+export declare function isArrayOfPrimitivesSchemaType(type: unknown): type is ArraySchemaType
+
+/** @internal */
+export declare function isArraySchemaType(type: unknown): type is ArraySchemaType
+
+/** @internal */
+export declare function isBlockChildrenObjectField(
+  field: unknown
+): field is BlockChildrenObjectField
+
+/** @internal */
+export declare function isBlockListObjectField(field: unknown): field is BlockListObjectField
+
+/** @internal */
+export declare function isBlockSchemaType(type: unknown): type is BlockSchemaType
+
+/** @internal */
+export declare function isBlockStyleObjectField(field: unknown): field is BlockStyleObjectField
+
+/** @internal */
+export declare function isBooleanSchemaType(type: unknown): type is BooleanSchemaType
+
+/** @internal */
+export declare function isCreateIfNotExistsMutation(
+  mutation: Mutation | TransactionLogMutation
+): mutation is CreateIfNotExistsMutation
+
+/** @internal */
+export declare function isCreateMutation(
+  mutation: Mutation | TransactionLogMutation
+): mutation is CreateMutation
+
+/** @internal */
+export declare function isCreateOrReplaceMutation(
+  mutation: Mutation | TransactionLogMutation
+): mutation is CreateOrReplaceMutation
+
+/** @internal */
+export declare function isCreateSquashedMutation(
+  mutation: Mutation | TransactionLogMutation
+): mutation is CreateSquashedMutation
+
+/** @beta */
+export declare function isCrossDatasetReference(
+  reference: unknown
+): reference is CrossDatasetReferenceValue
+
+/** @internal */
+export declare function isCrossDatasetReferenceSchemaType(
+  type: unknown
+): type is CrossDatasetReferenceSchemaType
+
+/** @internal */
+export declare function isDeleteMutation(
+  mutation: Mutation | TransactionLogMutation
+): mutation is DeleteMutation
+
+/**
+ * Returns wether or not the given type is a document type
+ * (eg that it was defined as `type: 'document'`)
+ *
+ * @param type - Schema type to test
+ * @returns True if type is a document type, false otherwise
+ *
+ * @public
+ */
+export declare function isDocumentSchemaType(type: unkn

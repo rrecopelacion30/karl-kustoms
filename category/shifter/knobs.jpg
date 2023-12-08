@@ -1,0 +1,170 @@
+/* eslint-disable */ // @ts-nocheck
+// Copied from https://github.com/medialize/ally.js
+// License: MIT
+// Copyright (c) 2015 Rodney Rehm
+//
+// Entrypoint: ally.js/maintain/tab-focus
+"use strict";
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+Object.defineProperty(exports, "default", {
+    enumerable: true,
+    get: function() {
+        return _default;
+    }
+});
+const _interop_require_default = require("@swc/helpers/_/_interop_require_default");
+const _platform = /*#__PURE__*/ _interop_require_default._(require("next/dist/compiled/platform"));
+const _cssescape = /*#__PURE__*/ _interop_require_default._(require("next/dist/compiled/css.escape"));
+// input may be undefined, selector-tring, Node, NodeList, HTMLCollection, array of Nodes
+// yes, to some extent this is a bad replica of jQuery's constructor function
+function nodeArray(input) {
+    if (!input) {
+        return [];
+    }
+    if (Array.isArray(input)) {
+        return input;
+    }
+    // instanceof Node - does not work with iframes
+    if (input.nodeType !== undefined) {
+        return [
+            input
+        ];
+    }
+    if (typeof input === "string") {
+        input = document.querySelectorAll(input);
+    }
+    if (input.length !== undefined) {
+        return [].slice.call(input, 0);
+    }
+    throw new TypeError("unexpected input " + String(input));
+}
+function contextToElement(_ref) {
+    var context = _ref.context, _ref$label = _ref.label, label = _ref$label === undefined ? "context-to-element" : _ref$label, resolveDocument = _ref.resolveDocument, defaultToDocument = _ref.defaultToDocument;
+    var element = nodeArray(context)[0];
+    if (resolveDocument && element && element.nodeType === Node.DOCUMENT_NODE) {
+        element = element.documentElement;
+    }
+    if (!element && defaultToDocument) {
+        return document.documentElement;
+    }
+    if (!element) {
+        throw new TypeError(label + " requires valid options.context");
+    }
+    if (element.nodeType !== Node.ELEMENT_NODE && element.nodeType !== Node.DOCUMENT_FRAGMENT_NODE) {
+        throw new TypeError(label + " requires options.context to be an Element");
+    }
+    return element;
+}
+function getShadowHost() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}, context = _ref.context;
+    var element = contextToElement({
+        label: "get/shadow-host",
+        context: context
+    });
+    // walk up to the root
+    var container = null;
+    while(element){
+        container = element;
+        element = element.parentNode;
+    }
+    // https://developer.mozilla.org/en-US/docs/Web/API/Node.nodeType
+    // NOTE: Firefox 34 does not expose ShadowRoot.host (but 37 does)
+    if (container.nodeType === container.DOCUMENT_FRAGMENT_NODE && container.host) {
+        // the root is attached to a fragment node that has a host
+        return container.host;
+    }
+    return null;
+}
+function getDocument(node) {
+    if (!node) {
+        return document;
+    }
+    if (node.nodeType === Node.DOCUMENT_NODE) {
+        return node;
+    }
+    return node.ownerDocument || document;
+}
+function isActiveElement(context) {
+    var element = contextToElement({
+        label: "is/active-element",
+        resolveDocument: true,
+        context: context
+    });
+    var _document = getDocument(element);
+    if (_document.activeElement === element) {
+        return true;
+    }
+    var shadowHost = getShadowHost({
+        context: element
+    });
+    if (shadowHost && shadowHost.shadowRoot.activeElement === element) {
+        return true;
+    }
+    return false;
+}
+// [elem, elem.parent, elem.parent.parent, …, html]
+// will not contain the shadowRoot (DOCUMENT_FRAGMENT_NODE) and shadowHost
+function getParents() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}, context = _ref.context;
+    var list = [];
+    var element = contextToElement({
+        label: "get/parents",
+        context: context
+    });
+    while(element){
+        list.push(element);
+        // IE does know support parentElement on SVGElement
+        element = element.parentNode;
+        if (element && element.nodeType !== Node.ELEMENT_NODE) {
+            element = null;
+        }
+    }
+    return list;
+}
+// Element.prototype.matches may be available at a different name
+// https://developer.mozilla.org/en/docs/Web/API/Element/matches
+var names = [
+    "matches",
+    "webkitMatchesSelector",
+    "mozMatchesSelector",
+    "msMatchesSelector"
+];
+var name = null;
+function findMethodName(element) {
+    names.some(function(_name) {
+        if (!element[_name]) {
+            return false;
+        }
+        name = _name;
+        return true;
+    });
+}
+function elementMatches(element, selector) {
+    if (!name) {
+        findMethodName(element);
+    }
+    return element[name](selector);
+}
+// deep clone of original platform
+var platform = JSON.parse(JSON.stringify(_platform.default));
+// operating system
+var os = platform.os.family || "";
+var ANDROID = os === "Android";
+var WINDOWS = os.slice(0, 7) === "Windows";
+var OSX = os === "OS X";
+var IOS = os === "iOS";
+// layout
+var BLINK = platform.layout === "Blink";
+var GECKO = platform.layout === "Gecko";
+var TRIDENT = platform.layout === "Trident";
+var EDGE = platform.layout === "EdgeHTML";
+var WEBKIT = platform.layout === "WebKit";
+// browser version (not layout engine version!)
+var version = parseFloat(platform.version);
+var majorVersion = Math.floor(version);
+platform.majorVersion = majorVersion;
+platform.is = {
+    // operating system
+    ANDROID: ANDRO

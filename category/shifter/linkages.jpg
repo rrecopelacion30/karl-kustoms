@@ -1,0 +1,130 @@
+e && data.wrapper.appendChild(element);
+    // test if the element with invalid tabindex can be focused
+    focus && focus.focus && focus.focus();
+    // validate test's result
+    return options.validate ? options.validate(element, focus, data.document) : data.document.activeElement === focus;
+}
+function after(data) {
+    // restore focus to what it was before test and cleanup
+    if (data.activeElement === document.body) {
+        document.activeElement && document.activeElement.blur && document.activeElement.blur();
+        if (platform.is.IE10) {
+            // IE10 does not redirect focus to <body> when the activeElement is removed
+            document.body.focus();
+        }
+    } else {
+        data.activeElement && data.activeElement.focus && data.activeElement.focus();
+    }
+    document.body.removeChild(data.iframe);
+    // restore scroll position
+    window.scrollTop = data.windowScrollTop;
+    window.scrollLeft = data.windowScrollLeft;
+    document.body.scrollTop = data.bodyScrollTop;
+    document.body.scrollLeft = data.bodyScrollLeft;
+}
+function detectFocus(tests) {
+    var data = before();
+    var results = {};
+    Object.keys(tests).map(function(key) {
+        results[key] = test(data, tests[key]);
+    });
+    after(data);
+    return results;
+}
+// this file is overwritten by `npm run build:pre`
+var version$1 = "1.4.1";
+/*
+    Facility to cache test results in localStorage.
+
+    USAGE:
+      cache.get('key');
+      cache.set('key', 'value');
+ */ function readLocalStorage(key) {
+    // allow reading from storage to retrieve previous support results
+    // even while the document does not have focus
+    var data = void 0;
+    try {
+        data = window.localStorage && window.localStorage.getItem(key);
+        data = data ? JSON.parse(data) : {};
+    } catch (e) {
+        data = {};
+    }
+    return data;
+}
+function writeLocalStorage(key, value) {
+    if (!document.hasFocus()) {
+        // if the document does not have focus when tests are executed, focus() may
+        // not be handled properly and events may not be dispatched immediately.
+        // This can happen when a document is reloaded while Developer Tools have focus.
+        try {
+            window.localStorage && window.localStorage.removeItem(key);
+        } catch (e) {
+        // ignore
+        }
+        return;
+    }
+    try {
+        window.localStorage && window.localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+    // ignore
+    }
+}
+var userAgent = typeof window !== "undefined" && window.navigator.userAgent || "";
+var cacheKey = "ally-supports-cache";
+var cache = readLocalStorage(cacheKey);
+// update the cache if ally or the user agent changed (newer version, etc)
+if (cache.userAgent !== userAgent || cache.version !== version$1) {
+    cache = {};
+}
+cache.userAgent = userAgent;
+cache.version = version$1;
+var cache$1 = {
+    get: function get() {
+        return cache;
+    },
+    set: function set(values) {
+        Object.keys(values).forEach(function(key) {
+            cache[key] = values[key];
+        });
+        cache.time = new Date().toISOString();
+        writeLocalStorage(cacheKey, cache);
+    }
+};
+function cssShadowPiercingDeepCombinator() {
+    var combinator = void 0;
+    // see https://dev.w3.org/csswg/css-scoping-1/#deep-combinator
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=1117572
+    // https://code.google.com/p/chromium/issues/detail?id=446051
+    try {
+        document.querySelector("html >>> :first-child");
+        combinator = ">>>";
+    } catch (noArrowArrowArrow) {
+        try {
+            // old syntax supported at least up to Chrome 41
+            // https://code.google.com/p/chromium/issues/detail?id=446051
+            document.querySelector("html /deep/ :first-child");
+            combinator = "/deep/";
+        } catch (noDeep) {
+            combinator = "";
+        }
+    }
+    return combinator;
+}
+var gif = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#attr-usemap
+var focusAreaImgTabindex = {
+    element: "div",
+    mutate: function mutate(element) {
+        element.innerHTML = '<map name="image-map-tabindex-test">' + '<area shape="rect" coords="63,19,144,45"></map>' + '<img usemap="#image-map-tabindex-test" tabindex="-1" alt="" src="' + gif + '">';
+        return element.querySelector("area");
+    }
+};
+// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#attr-usemap
+var focusAreaTabindex = {
+    element: "div",
+    mutate: function mutate(element) {
+        element.innerHTML = '<map name="image-map-tabindex-test">' + '<area href="#void" tabindex="-1" shape="rect" coords="63,19,144,45"></map>' + '<img usemap="#image-map-tabindex-test" alt="" src="' + gif + '">';
+        return false;
+    },
+    validate: function validate(element, focusTarget, _document) {
+        if (pl

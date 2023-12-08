@@ -1,0 +1,519 @@
+an instance of {@link Warning} and adds it
+   * to {@link Result#messages}.
+   *
+   * @param {string} text        - warning message
+   * @param {Object} [opts]      - warning options
+   * @param {Node}   opts.node   - CSS node that caused the warning
+   * @param {string} opts.word   - word in CSS source that caused the warning
+   * @param {number} opts.index  - index in CSS node string that caused
+   *                               the warning
+   * @param {string} opts.plugin - name of the plugin that created
+   *                               this warning. {@link Result#warn} fills
+   *                               this property automatically.
+   *
+   * @return {Warning} created warning
+   */
+  ;
+
+  _proto.warn = function warn(text, opts) {
+    if (opts === void 0) {
+      opts = {};
+    }
+
+    if (!opts.plugin) {
+      if (this.lastPlugin && this.lastPlugin.postcssPlugin) {
+        opts.plugin = this.lastPlugin.postcssPlugin;
+      }
+    }
+
+    var warning = new Warning(text, opts);
+    this.messages.push(warning);
+    return warning;
+  }
+  /**
+   * Returns warnings from plugins. Filters {@link Warning} instances
+   * from {@link Result#messages}.
+   *
+   * @example
+   * result.warnings().forEach(warn => {
+   *   console.warn(warn.toString());
+   * });
+   *
+   * @return {Warning[]} warnings from plugins
+   */
+  ;
+
+  _proto.warnings = function warnings() {
+    return this.messages.filter(function (i) {
+      return i.type === 'warning';
+    });
+  }
+  /**
+   * An alias for the {@link Result#css} property.
+   * Use it with syntaxes that generate non-CSS output.
+   * @type {string}
+   *
+   * @example
+   * result.css === result.content;
+   */
+  ;
+
+  _createClass(Result, [{
+    key: "content",
+    get: function get() {
+      return this.css;
+    }
+  }]);
+
+  return Result;
+}();
+
+function isPromise(obj) {
+  return typeof obj === 'object' && typeof obj.then === 'function';
+}
+/**
+ * @callback onFulfilled
+ * @param {Result} result
+ */
+
+/**
+ * @callback onRejected
+ * @param {Error} error
+ */
+
+/**
+ * A Promise proxy for the result of PostCSS transformations.
+ *
+ * A `LazyResult` instance is returned by {@link Processor#process}.
+ *
+ * @example
+ * const lazy = postcss([cssnext]).process(css);
+ */
+
+
+var LazyResult = /*#__PURE__*/function () {
+  function LazyResult(processor, css, opts) {
+    this.stringified = false;
+    this.processed = false;
+    var root;
+
+    if (typeof css === 'object' && css.type === 'root') {
+      root = css;
+    } else if (css instanceof LazyResult || css instanceof Result) {
+      root = css.root;
+
+      if (css.map) {
+        if (typeof opts.map === 'undefined') opts.map = {};
+        if (!opts.map.inline) opts.map.inline = false;
+        opts.map.prev = css.map;
+      }
+    } else {
+      var parser = parse;
+      if (opts.syntax) parser = opts.syntax.parse;
+      if (opts.parser) parser = opts.parser;
+      if (parser.parse) parser = parser.parse;
+
+      try {
+        root = parser(css, opts);
+      } catch (error) {
+        this.error = error;
+      }
+    }
+
+    this.result = new Result(processor, root, opts);
+  }
+  /**
+   * Returns a {@link Processor} instance, which will be used
+   * for CSS transformations.
+   * @type {Processor}
+   */
+
+
+  var _proto = LazyResult.prototype;
+
+  /**
+   * Processes input CSS through synchronous plugins
+   * and calls {@link Result#warnings()}.
+   *
+   * @return {Warning[]} warnings from plugins
+   */
+  _proto.warnings = function warnings() {
+    return this.sync().warnings();
+  }
+  /**
+   * Alias for the {@link LazyResult#css} property.
+   *
+   * @example
+   * lazy + '' === lazy.css;
+   *
+   * @return {string} output CSS
+   */
+  ;
+
+  _proto.toString = function toString() {
+    return this.css;
+  }
+  /**
+   * Processes input CSS through synchronous and asynchronous plugins
+   * and calls `onFulfilled` with a Result instance. If a plugin throws
+   * an error, the `onRejected` callback will be executed.
+   *
+   * It implements standard Promise API.
+   *
+   * @param {onFulfilled} onFulfilled - callback will be executed
+   *                                    when all plugins will finish work
+   * @param {onRejected}  onRejected  - callback will be execited on any error
+   *
+   * @return {Promise} Promise API to make queue
+   *
+   * @example
+   * postcss([cssnext]).process(css).then(result => {
+   *   console.log(result.css);
+   * });
+   */
+  ;
+
+  _proto.then = function then(onFulfilled, onRejected) {
+    return this.async().then(onFulfilled, onRejected);
+  }
+  /**
+   * Processes input CSS through synchronous and asynchronous plugins
+   * and calls onRejected for each error thrown in any plugin.
+   *
+   * It implements standard Promise API.
+   *
+   * @param {onRejected} onRejected - callback will be execited on any error
+   *
+   * @return {Promise} Promise API to make queue
+   *
+   * @example
+   * postcss([cssnext]).process(css).then(result => {
+   *   console.log(result.css);
+   * }).catch(error => {
+   *   console.error(error);
+   * });
+   */
+  ;
+
+  _proto["catch"] = function _catch(onRejected) {
+    return this.async()["catch"](onRejected);
+  };
+
+  _proto.handleError = function handleError(error, plugin) {
+    try {
+      this.error = error;
+
+      if (error.name === 'CssSyntaxError' && !error.plugin) {
+        error.plugin = plugin.postcssPlugin;
+        error.setMessage();
+      } else if (plugin.postcssVersion) {
+        var pluginName = plugin.postcssPlugin;
+        var pluginVer = plugin.postcssVersion;
+        var runtimeVer = this.result.processor.version;
+        var a = pluginVer.split('.');
+        var b = runtimeVer.split('.');
+
+        if (a[0] !== b[0] || parseInt(a[1]) > parseInt(b[1])) {
+          warnOnce("" + ('Your current PostCSS version ' + 'is ') + runtimeVer + ", but " + pluginName + " " + ("uses " + pluginVer + ". Perhaps this is ") + "the source of the error below.");
+        }
+      }
+    } catch (err) {
+      if (console && console.error) console.error(err);
+    }
+  };
+
+  _proto.asyncTick = function asyncTick(resolve, reject) {
+    var _this = this;
+
+    if (this.plugin >= this.processor.plugins.length) {
+      this.processed = true;
+      return resolve();
+    }
+
+    try {
+      var plugin = this.processor.plugins[this.plugin];
+      var promise = this.run(plugin);
+      this.plugin += 1;
+
+      if (isPromise(promise)) {
+        promise.then(function () {
+          _this.asyncTick(resolve, reject);
+        })["catch"](function (error) {
+          _this.handleError(error, plugin);
+
+          _this.processed = true;
+          reject(error);
+        });
+      } else {
+        this.asyncTick(resolve, reject);
+      }
+    } catch (error) {
+      this.processed = true;
+      reject(error);
+    }
+  };
+
+  _proto.async = function async() {
+    var _this2 = this;
+
+    if (this.processed) {
+      return new Promise(function (resolve, reject) {
+        if (_this2.error) {
+          reject(_this2.error);
+        } else {
+          resolve(_this2.stringify());
+        }
+      });
+    }
+
+    if (this.processing) {
+      return this.processing;
+    }
+
+    this.processing = new Promise(function (resolve, reject) {
+      if (_this2.error) return reject(_this2.error);
+      _this2.plugin = 0;
+
+      _this2.asyncTick(resolve, reject);
+    }).then(function () {
+      _this2.processed = true;
+      return _this2.stringify();
+    });
+    return this.processing;
+  };
+
+  _proto.sync = function sync() {
+    var _this3 = this;
+
+    if (this.processed) return this.result;
+    this.processed = true;
+
+    if (this.processing) {
+      throw new Error('Use process(css).then(cb) to work with async plugins');
+    }
+
+    if (this.error) throw this.error;
+    this.result.processor.plugins.forEach(function (plugin) {
+      var promise = _this3.run(plugin);
+
+      if (isPromise(promise)) {
+        throw new Error('Use process(css).then(cb) to work with async plugins');
+      }
+    });
+    return this.result;
+  };
+
+  _proto.run = function run(plugin) {
+    this.result.lastPlugin = plugin;
+
+    try {
+      return plugin(this.result.root, this.result);
+    } catch (error) {
+      this.handleError(error, plugin);
+      throw error;
+    }
+  };
+
+  _proto.stringify = function stringify$1() {
+    if (this.stringified) return this.result;
+    this.stringified = true;
+    this.sync();
+    var opts = this.result.opts;
+    var str = stringify;
+    if (opts.syntax) str = opts.syntax.stringify;
+    if (opts.stringifier) str = opts.stringifier;
+    if (str.stringify) str = str.stringify;
+    var result = '';
+    str(this.root, function (i) {
+      result += i;
+    });
+    this.result.css = result;
+    return this.result;
+  };
+
+  _createClass(LazyResult, [{
+    key: "processor",
+    get: function get() {
+      return this.result.processor;
+    }
+    /**
+     * Options from the {@link Processor#process} call.
+     * @type {processOptions}
+     */
+
+  }, {
+    key: "opts",
+    get: function get() {
+      return this.result.opts;
+    }
+    /**
+     * Processes input CSS through synchronous plugins, converts `Root`
+     * to a CSS string and returns {@link Result#css}.
+     *
+     * This property will only work with synchronous plugins.
+     * If the processor contains any asynchronous plugins
+     * it will throw an error. This is why this method is only
+     * for debug purpose, you should always use {@link LazyResult#then}.
+     *
+     * @type {string}
+     * @see Result#css
+     */
+
+  }, {
+    key: "css",
+    get: function get() {
+      return this.stringify().css;
+    }
+    /**
+     * An alias for the `css` property. Use it with syntaxes
+     * that generate non-CSS output.
+     *
+     * This property will only work with synchronous plugins.
+     * If the processor contains any asynchronous plugins
+     * it will throw an error. This is why this method is only
+     * for debug purpose, you should always use {@link LazyResult#then}.
+     *
+     * @type {string}
+     * @see Result#content
+     */
+
+  }, {
+    key: "content",
+    get: function get() {
+      return this.stringify().content;
+    }
+    /**
+     * Processes input CSS through synchronous plugins
+     * and returns {@link Result#map}.
+     *
+     * This property will only work with synchronous plugins.
+     * If the processor contains any asynchronous plugins
+     * it will throw an error. This is why this method is only
+     * for debug purpose, you should always use {@link LazyResult#then}.
+     *
+     * @type {SourceMapGenerator}
+     * @see Result#map
+     */
+
+  }, {
+    key: "map",
+    get: function get() {
+      return this.stringify().map;
+    }
+    /**
+     * Processes input CSS through synchronous plugins
+     * and returns {@link Result#root}.
+     *
+     * This property will only work with synchronous plugins. If the processor
+     * contains any asynchronous plugins it will throw an error.
+     *
+     * This is why this method is only for debug purpose,
+     * you should always use {@link LazyResult#then}.
+     *
+     * @type {Root}
+     * @see Result#root
+     */
+
+  }, {
+    key: "root",
+    get: function get() {
+      return this.sync().root;
+    }
+    /**
+     * Processes input CSS through synchronous plugins
+     * and returns {@link Result#messages}.
+     *
+     * This property will only work with synchronous plugins. If the processor
+     * contains any asynchronous plugins it will throw an error.
+     *
+     * This is why this method is only for debug purpose,
+     * you should always use {@link LazyResult#then}.
+     *
+     * @type {Message[]}
+     * @see Result#messages
+     */
+
+  }, {
+    key: "messages",
+    get: function get() {
+      return this.sync().messages;
+    }
+  }]);
+
+  return LazyResult;
+}();
+
+//      
+/**
+ * @callback builder
+ * @param {string} part          - part of generated CSS connected to this node
+ * @param {Node}   node          - AST node
+ * @param {"start"|"end"} [type] - node’s part type
+ */
+
+/**
+ * @callback parser
+ *
+ * @param {string|toString} css   - string with input CSS or any object
+ *                                  with toString() method, like a Buffer
+ * @param {processOptions} [opts] - options with only `from` and `map` keys
+ *
+ * @return {Root} PostCSS AST
+ */
+
+/**
+ * @callback stringifier
+ *
+ * @param {Node} node       - start node for stringifing. Usually {@link Root}.
+ * @param {builder} builder - function to concatenate CSS from node’s parts
+ *                            or generate string and source map
+ *
+ * @return {void}
+ */
+
+/**
+ * @typedef {object} syntax
+ * @property {parser} parse          - function to generate AST by string
+ * @property {stringifier} stringify - function to generate string by AST
+ */
+
+/**
+ * @typedef {object} toString
+ * @property {function} toString
+ */
+
+/**
+ * @callback pluginFunction
+ * @param {Root} root     - parsed input CSS
+ * @param {Result} result - result to set warnings or check other plugins
+ */
+
+/**
+ * @typedef {object} Plugin
+ * @property {function} postcss - PostCSS plugin function
+ */
+
+/**
+ * @typedef {object} processOptions
+ * @property {string} from             - the path of the CSS source file.
+ *                                       You should always set `from`,
+ *                                       because it is used in source map
+ *                                       generation and syntax error messages.
+ * @property {string} to               - the path where you’ll put the output
+ *                                       CSS file. You should always set `to`
+ *                                       to generate correct source maps.
+ * @property {parser} parser           - function to generate AST by string
+ * @property {stringifier} stringifier - class to generate string by AST
+ * @property {syntax} syntax           - object with `parse` and `stringify`
+ * @property {object} map              - source map options
+ * @property {boolean} map.inline                    - does source map should
+ *                                                     be embedded in the output
+ *                                                     CSS as a base64-encoded
+ *                                                     comment
+ * @property {string|object|false|function} map.prev - source map content
+ *                                                     from a previous
+ *                                                     processing step
+ *                                                     (for example, Sass).
+ *                                                     PostCSS will try to find
+ *                                                     previous map
+ *                                                   

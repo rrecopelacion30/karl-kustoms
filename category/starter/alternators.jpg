@@ -1,0 +1,391 @@
+ value template item ID. See {@link InitialValueTemplateItem}
+   */
+  getId() {
+    return this.spec.id;
+  }
+  /** Set initial value template item title
+   * @param title - initial value template item title
+   * @returns initial value template item based on title provided. See {@link InitialValueTemplateItemBuilder}
+   */
+  title(title) {
+    return this.clone({
+      title
+    });
+  }
+  /** Get initial value template item title
+   * @returns initial value template item title. See {@link InitialValueTemplateItem}
+   */
+  getTitle() {
+    return this.spec.title;
+  }
+  /** Set initial value template item description
+   * @param description - initial value template item description
+   * @returns initial value template item builder based on description provided. See {@link InitialValueTemplateItemBuilder}
+   */
+  description(description) {
+    return this.clone({
+      description
+    });
+  }
+  /** Get initial value template item description
+   * @returns initial value template item description. See {@link InitialValueTemplateItem}
+   */
+  getDescription() {
+    return this.spec.description;
+  }
+  /** Set initial value template ID
+   * @param templateId - initial value template item template ID
+   * @returns initial value template item based builder on template ID provided. See {@link InitialValueTemplateItemBuilder}
+   */
+  templateId(templateId) {
+    const paneId = this.spec.id || templateId;
+    return this.clone({
+      id: paneId,
+      templateId
+    });
+  }
+  /** Get initial value template item template ID
+   * @returns initial value template item ID. See {@link InitialValueTemplateItem}
+   */
+  getTemplateId() {
+    return this.spec.templateId;
+  }
+  /** Get initial value template item template parameters
+   * @param parameters - initial value template item parameters
+   * @returns initial value template item builder based on parameters provided. See {@link InitialValueTemplateItemBuilder}
+   */
+  parameters(parameters) {
+    return this.clone({
+      parameters
+    });
+  }
+  /** Get initial value template item template parameters
+   * @returns initial value template item parameters. See {@link InitialValueTemplateItem}
+   */
+  getParameters() {
+    return this.spec.parameters;
+  }
+  /** Serialize initial value template item
+   * @param options - serialization options. See {@link SerializeOptions}
+   * @returns initial value template item object based on the path, index and hint provided in options. See {@link InitialValueTemplateItem}
+   */
+  serialize() {
+    let {
+      path = [],
+      index,
+      hint
+    } = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+      path: []
+    };
+    const {
+      spec,
+      _context
+    } = this;
+    const {
+      templates
+    } = _context;
+    if (typeof spec.id !== "string" || !spec.id) {
+      throw new SerializeError("`id` is required for initial value template item nodes", path, index, hint).withHelpUrl(HELP_URL.ID_REQUIRED);
+    }
+    if (!spec.templateId) {
+      throw new SerializeError("template id (`templateId`) is required for initial value template item nodes", path, spec.id, hint).withHelpUrl(HELP_URL.ID_REQUIRED);
+    }
+    const template = templates.find(t => t.id === spec.templateId);
+    if (!template) {
+      throw new SerializeError("template id (`templateId`) is required for initial value template item nodes", path, spec.id, hint).withHelpUrl(HELP_URL.ID_REQUIRED);
+    }
+    return {
+      id: spec.id,
+      templateId: spec.id,
+      schemaType: template.schemaType,
+      type: "initialValueTemplateItem",
+      description: spec.description || template.description,
+      title: spec.title || template.title,
+      subtitle: spec.subtitle,
+      icon: spec.icon || template.icon,
+      initialDocumentId: spec.initialDocumentId,
+      parameters: spec.parameters
+    };
+  }
+  /** Clone generic view builder (allows for options overriding)
+   * @param withSpec - initial value template item builder options. See {@link InitialValueTemplateItemBuilder}
+   * @returns initial value template item builder based on the context and options provided. See {@link InitialValueTemplateItemBuilder}
+   */
+  clone() {
+    let withSpec = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    const builder = new InitialValueTemplateItemBuilder(this._context);
+    builder.spec = {
+      ...this.spec,
+      ...withSpec
+    };
+    return builder;
+  }
+}
+function defaultInitialValueTemplateItems(context) {
+  const {
+    schema,
+    getStructureBuilder,
+    templates
+  } = context;
+  const typeNames = schema.getTypeNames();
+  const ordered = templates.filter(tpl => {
+    var _a;
+    return !((_a = tpl.parameters) == null ? void 0 : _a.length);
+  }).sort((a, b) => typeNames.indexOf(a.schemaType) - typeNames.indexOf(b.schemaType));
+  return ordered.map(tpl => getStructureBuilder().initialValueTemplateItem(tpl.id));
+}
+function maybeSerializeInitialValueTemplateItem(item, index, path) {
+  return item instanceof InitialValueTemplateItemBuilder ? item.serialize({
+    path,
+    index
+  }) : item;
+}
+function menuItemsFromInitialValueTemplateItems(context, templateItems) {
+  const {
+    schema,
+    templates
+  } = context;
+  return templateItems.map(item => {
+    const template = templates.find(t => t.id === item.templateId);
+    const title = item.title || (template == null ? void 0 : template.title) || "Create new";
+    const params = pickBy__default.default({
+      type: template && template.schemaType,
+      template: item.templateId
+    }, Boolean);
+    const intentParams = item.parameters ? [params, item.parameters] : params;
+    const schemaType = template && schema.get(template.schemaType);
+    return new MenuItemBuilder(context).title(title).icon(template && template.icon || (schemaType == null ? void 0 : schemaType.icon) || icons.ComposeIcon).intent({
+      type: "create",
+      params: intentParams
+    }).serialize();
+  });
+}
+var __defProp$5 = Object.defineProperty;
+var __defNormalProp$5 = (obj, key, value) => key in obj ? __defProp$5(obj, key, {
+  enumerable: true,
+  configurable: true,
+  writable: true,
+  value
+}) : obj[key] = value;
+var __publicField$5 = (obj, key, value) => {
+  __defNormalProp$5(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+function noChildResolver() {
+  return void 0;
+}
+const shallowIntentChecker = (intentName, params, _ref48) => {
+  let {
+    pane,
+    index
+  } = _ref48;
+  return index <= 1 && defaultIntentChecker(intentName, params, {
+    pane,
+    index
+  });
+};
+class GenericListBuilder {
+  constructor() {
+    /** Check if initial value templates are set */
+    __publicField$5(this, "initialValueTemplatesSpecified", false);
+    /** Generic list option object */
+    __publicField$5(this, "spec", {});
+  }
+  /** Set generic list ID
+   * @param id - generic list ID
+   * @returns generic list builder based on ID provided. See {@link ConcreteImpl}
+   */
+  id(id) {
+    return this.clone({
+      id
+    });
+  }
+  /** Get generic list ID
+   * @returns generic list ID
+   */
+  getId() {
+    return this.spec.id;
+  }
+  /** Set generic list title
+   * @param title - generic list title
+   * @returns generic list builder based on title and ID provided. See {@link ConcreteImpl}
+   */
+  title(title) {
+    return this.clone({
+      title,
+      id: getStructureNodeId(title, this.spec.id)
+    });
+  }
+  /** Get generic list title
+   * @returns generic list title
+   */
+  getTitle() {
+    return this.spec.title;
+  }
+  /** Set generic list layout
+   * @param defaultLayout - generic list layout key. See {@link PreviewLayoutKey}
+   * @returns generic list builder based on layout provided. See {@link ConcreteImpl}
+   */
+  defaultLayout(defaultLayout) {
+    return this.clone({
+      defaultLayout
+    });
+  }
+  /** Get generic list layout
+   * @returns generic list layout
+   */
+  getDefaultLayout() {
+    return this.spec.defaultLayout;
+  }
+  /** Set generic list menu items
+   * @param menuItems - generic list menu items. See {@link MenuItem} and {@link MenuItemBuilder}
+   * @returns generic list builder based on menu items provided. See {@link ConcreteImpl}
+   */
+  menuItems(menuItems) {
+    return this.clone({
+      menuItems
+    });
+  }
+  /** Get generic list menu items
+   * @returns generic list menu items
+   */
+  getMenuItems() {
+    return this.spec.menuItems;
+  }
+  /** Set generic list menu item groups
+   * @param menuItemGroups - generic list menu item groups. See {@link MenuItemGroup} and {@link MenuItemGroupBuilder}
+   * @returns generic list builder based on menu item groups provided. See {@link ConcreteImpl}
+   */
+  menuItemGroups(menuItemGroups) {
+    return this.clone({
+      menuItemGroups
+    });
+  }
+  /** Get generic list menu item groups
+   * @returns generic list menu item groups
+   */
+  getMenuItemGroups() {
+    return this.spec.menuItemGroups;
+  }
+  /** Set generic list child
+   * @param child - generic list child. See {@link Child}
+   * @returns generic list builder based on child provided (clone). See {@link ConcreteImpl}
+   */
+  child(child) {
+    return this.clone({
+      child
+    });
+  }
+  /** Get generic list child
+   * @returns generic list child
+   */
+  getChild() {
+    return this.spec.child;
+  }
+  /** Set generic list can handle intent
+   * @param canHandleIntent - generic list intent checker. See {@link IntentChecker}
+   * @returns generic list builder based on can handle intent provided. See {@link ConcreteImpl}
+   */
+  canHandleIntent(canHandleIntent) {
+    return this.clone({
+      canHandleIntent
+    });
+  }
+  /** Get generic list can handle intent
+   * @returns generic list can handle intent
+   */
+  getCanHandleIntent() {
+    return this.spec.canHandleIntent;
+  }
+  /** Set generic list display options
+   * @param enabled - allow / disallow for showing icons
+   * @returns generic list builder based on display options (showIcons) provided. See {@link ConcreteImpl}
+   */
+  showIcons() {
+    let enabled = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+    return this.clone({
+      displayOptions: {
+        ...(this.spec.displayOptions || {}),
+        showIcons: enabled
+      }
+    });
+  }
+  /** Get generic list display options
+   * @returns generic list display options (specifically showIcons)
+   */
+  getShowIcons() {
+    return this.spec.displayOptions ? this.spec.displayOptions.showIcons : void 0;
+  }
+  /** Set generic list initial value templates
+   * @param templates - generic list initial value templates. See {@link InitialValueTemplateItem} and {@link InitialValueTemplateItemBuilder}
+   * @returns generic list builder based on templates provided. See {@link ConcreteImpl}
+   */
+  initialValueTemplates(templates) {
+    this.initialValueTemplatesSpecified = true;
+    return this.clone({
+      initialValueTemplates: Array.isArray(templates) ? templates : [templates]
+    });
+  }
+  /** Get generic list initial value templates
+   * @returns generic list initial value templates
+   */
+  getInitialValueTemplates() {
+    return this.spec.initialValueTemplates;
+  }
+  /** Serialize generic list
+   * @param options - serialization options. See {@link SerializeOptions}
+   * @returns generic list object based on path provided in options. See {@link GenericList}
+   */
+  serialize() {
+    let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+      path: []
+    };
+    const id = this.spec.id || "";
+    const path = options.path;
+    const defaultLayout = this.spec.defaultLayout;
+    if (defaultLayout && !layoutOptions.includes(defaultLayout)) {
+      throw new SerializeError("`layout` must be one of ".concat(layoutOptions.map(item => "\"".concat(item, "\"")).join(", ")), path, id || options.index, this.spec.title);
+    }
+    const initialValueTemplates = (this.spec.initialValueTemplates || []).map((item, i) => maybeSerializeInitialValueTemplateItem(item, i, path));
+    return {
+      id: validateId(id, options.path, id || options.index),
+      title: this.spec.title,
+      type: "genericList",
+      defaultLayout,
+      child: this.spec.child || noChildResolver,
+      canHandleIntent: this.spec.canHandleIntent || shallowIntentChecker,
+      displayOptions: this.spec.displayOptions,
+      initialValueTemplates,
+      menuItems: (this.spec.menuItems || []).map((item, i) => maybeSerializeMenuItem(item, i, path)),
+      menuItemGroups: (this.spec.menuItemGroups || []).map((item, i) => maybeSerializeMenuItemGroup(item, i, path))
+    };
+  }
+}
+var __defProp$4 = Object.defineProperty;
+var __defNormalProp$4 = (obj, key, value) => key in obj ? __defProp$4(obj, key, {
+  enumerable: true,
+  configurable: true,
+  writable: true,
+  value
+}) : obj[key] = value;
+var __publicField$4 = (obj, key, value) => {
+  __defNormalProp$4(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+const validateFilter = (spec, options) => {
+  var _a;
+  const filter = ((_a = spec.options) == null ? void 0 : _a.filter.trim()) || "";
+  if (["*", "{"].includes(filter[0])) {
+    throw new SerializeError("`filter` cannot start with `".concat(filter[0], "` - looks like you are providing a query, not a filter"), options.path, spec.id, spec.title).withHelpUrl(HELP_URL.QUERY_PROVIDED_FOR_FILTER);
+  }
+  return filter;
+};
+const createDocumentChildResolverForItem = context => (itemId, options) => {
+  var _a;
+  const parentItem = options.parent;
+  const template = ((_a = options.params) == null ? void 0 : _a.template) ? context.templates.find(tpl => tpl.id === options.params.template) : void 0;
+  const type = template ? template.schemaType : parentItem.schemaTypeName || resolveTypeForDocument(context.getClient, itemId);
+  return Promise.resolve(type).then(schemaType => schemaType ? context.resolveDocumentNode({
+    schemaType,
+    documentId: itemId
+  }) : new DocumentBuilder(context).id("editor"

@@ -1,0 +1,1152 @@
+R_RIGHT_SQUARE_BRACKET: ']', /* ] */
+  CHAR_SEMICOLON: ';', /* ; */
+  CHAR_SINGLE_QUOTE: '\'', /* ' */
+  CHAR_SPACE: ' ', /*   */
+  CHAR_TAB: '\t', /* \t */
+  CHAR_UNDERSCORE: '_', /* _ */
+  CHAR_VERTICAL_LINE: '|', /* | */
+  CHAR_ZERO_WIDTH_NOBREAK_SPACE: '\uFEFF' /* \uFEFF */
+};
+
+const stringify$1 = stringify$4;
+
+/**
+ * Constants
+ */
+
+const {
+  MAX_LENGTH,
+  CHAR_BACKSLASH, /* \ */
+  CHAR_BACKTICK, /* ` */
+  CHAR_COMMA, /* , */
+  CHAR_DOT, /* . */
+  CHAR_LEFT_PARENTHESES, /* ( */
+  CHAR_RIGHT_PARENTHESES, /* ) */
+  CHAR_LEFT_CURLY_BRACE, /* { */
+  CHAR_RIGHT_CURLY_BRACE, /* } */
+  CHAR_LEFT_SQUARE_BRACKET, /* [ */
+  CHAR_RIGHT_SQUARE_BRACKET, /* ] */
+  CHAR_DOUBLE_QUOTE, /* " */
+  CHAR_SINGLE_QUOTE, /* ' */
+  CHAR_NO_BREAK_SPACE,
+  CHAR_ZERO_WIDTH_NOBREAK_SPACE
+} = constants$1;
+
+/**
+ * parse
+ */
+
+const parse$1 = (input, options = {}) => {
+  if (typeof input !== 'string') {
+    throw new TypeError('Expected a string');
+  }
+
+  let opts = options || {};
+  let max = typeof opts.maxLength === 'number' ? Math.min(MAX_LENGTH, opts.maxLength) : MAX_LENGTH;
+  if (input.length > max) {
+    throw new SyntaxError(`Input length (${input.length}), exceeds max characters (${max})`);
+  }
+
+  let ast = { type: 'root', input, nodes: [] };
+  let stack = [ast];
+  let block = ast;
+  let prev = ast;
+  let brackets = 0;
+  let length = input.length;
+  let index = 0;
+  let depth = 0;
+  let value;
+
+  /**
+   * Helpers
+   */
+
+  const advance = () => input[index++];
+  const push = node => {
+    if (node.type === 'text' && prev.type === 'dot') {
+      prev.type = 'text';
+    }
+
+    if (prev && prev.type === 'text' && node.type === 'text') {
+      prev.value += node.value;
+      return;
+    }
+
+    block.nodes.push(node);
+    node.parent = block;
+    node.prev = prev;
+    prev = node;
+    return node;
+  };
+
+  push({ type: 'bos' });
+
+  while (index < length) {
+    block = stack[stack.length - 1];
+    value = advance();
+
+    /**
+     * Invalid chars
+     */
+
+    if (value === CHAR_ZERO_WIDTH_NOBREAK_SPACE || value === CHAR_NO_BREAK_SPACE) {
+      continue;
+    }
+
+    /**
+     * Escaped chars
+     */
+
+    if (value === CHAR_BACKSLASH) {
+      push({ type: 'text', value: (options.keepEscaping ? value : '') + advance() });
+      continue;
+    }
+
+    /**
+     * Right square bracket (literal): ']'
+     */
+
+    if (value === CHAR_RIGHT_SQUARE_BRACKET) {
+      push({ type: 'text', value: '\\' + value });
+      continue;
+    }
+
+    /**
+     * Left square bracket: '['
+     */
+
+    if (value === CHAR_LEFT_SQUARE_BRACKET) {
+      brackets++;
+      let next;
+
+      while (index < length && (next = advance())) {
+        value += next;
+
+        if (next === CHAR_LEFT_SQUARE_BRACKET) {
+          brackets++;
+          continue;
+        }
+
+        if (next === CHAR_BACKSLASH) {
+          value += advance();
+          continue;
+        }
+
+        if (next === CHAR_RIGHT_SQUARE_BRACKET) {
+          brackets--;
+
+          if (brackets === 0) {
+            break;
+          }
+        }
+      }
+
+      push({ type: 'text', value });
+      continue;
+    }
+
+    /**
+     * Parentheses
+     */
+
+    if (value === CHAR_LEFT_PARENTHESES) {
+      block = push({ type: 'paren', nodes: [] });
+      stack.push(block);
+      push({ type: 'text', value });
+      continue;
+    }
+
+    if (value === CHAR_RIGHT_PARENTHESES) {
+      if (block.type !== 'paren') {
+        push({ type: 'text', value });
+        continue;
+      }
+      block = stack.pop();
+      push({ type: 'text', value });
+      block = stack[stack.length - 1];
+      continue;
+    }
+
+    /**
+     * Quotes: '|"|`
+     */
+
+    if (value === CHAR_DOUBLE_QUOTE || value === CHAR_SINGLE_QUOTE || value === CHAR_BACKTICK) {
+      let open = value;
+      let next;
+
+      if (options.keepQuotes !== true) {
+        value = '';
+      }
+
+      while (index < length && (next = advance())) {
+        if (next === CHAR_BACKSLASH) {
+          value += next + advance();
+          continue;
+        }
+
+        if (next === open) {
+          if (options.keepQuotes === true) value += next;
+          break;
+        }
+
+        value += next;
+      }
+
+      push({ type: 'text', value });
+      continue;
+    }
+
+    /**
+     * Left curly brace: '{'
+     */
+
+    if (value === CHAR_LEFT_CURLY_BRACE) {
+      depth++;
+
+      let dollar = prev.value && prev.value.slice(-1) === '$' || block.dollar === true;
+      let brace = {
+        type: 'brace',
+        open: true,
+        close: false,
+        dollar,
+        depth,
+        commas: 0,
+        ranges: 0,
+        nodes: []
+      };
+
+      block = push(brace);
+      stack.push(block);
+      push({ type: 'open', value });
+      continue;
+    }
+
+    /**
+     * Right curly brace: '}'
+     */
+
+    if (value === CHAR_RIGHT_CURLY_BRACE) {
+      if (block.type !== 'brace') {
+        push({ type: 'text', value });
+        continue;
+      }
+
+      let type = 'close';
+      block = stack.pop();
+      block.close = true;
+
+      push({ type, value });
+      depth--;
+
+      block = stack[stack.length - 1];
+      continue;
+    }
+
+    /**
+     * Comma: ','
+     */
+
+    if (value === CHAR_COMMA && depth > 0) {
+      if (block.ranges > 0) {
+        block.ranges = 0;
+        let open = block.nodes.shift();
+        block.nodes = [open, { type: 'text', value: stringify$1(block) }];
+      }
+
+      push({ type: 'comma', value });
+      block.commas++;
+      continue;
+    }
+
+    /**
+     * Dot: '.'
+     */
+
+    if (value === CHAR_DOT && depth > 0 && block.commas === 0) {
+      let siblings = block.nodes;
+
+      if (depth === 0 || siblings.length === 0) {
+        push({ type: 'text', value });
+        continue;
+      }
+
+      if (prev.type === 'dot') {
+        block.range = [];
+        prev.value += value;
+        prev.type = 'range';
+
+        if (block.nodes.length !== 3 && block.nodes.length !== 5) {
+          block.invalid = true;
+          block.ranges = 0;
+          prev.type = 'text';
+          continue;
+        }
+
+        block.ranges++;
+        block.args = [];
+        continue;
+      }
+
+      if (prev.type === 'range') {
+        siblings.pop();
+
+        let before = siblings[siblings.length - 1];
+        before.value += prev.value + value;
+        prev = before;
+        block.ranges--;
+        continue;
+      }
+
+      push({ type: 'dot', value });
+      continue;
+    }
+
+    /**
+     * Text
+     */
+
+    push({ type: 'text', value });
+  }
+
+  // Mark imbalanced braces and brackets as invalid
+  do {
+    block = stack.pop();
+
+    if (block.type !== 'root') {
+      block.nodes.forEach(node => {
+        if (!node.nodes) {
+          if (node.type === 'open') node.isOpen = true;
+          if (node.type === 'close') node.isClose = true;
+          if (!node.nodes) node.type = 'text';
+          node.invalid = true;
+        }
+      });
+
+      // get the location of the block on parent.nodes (block's siblings)
+      let parent = stack[stack.length - 1];
+      let index = parent.nodes.indexOf(block);
+      // replace the (invalid) block with it's nodes
+      parent.nodes.splice(index, 1, ...block.nodes);
+    }
+  } while (stack.length > 0);
+
+  push({ type: 'eos' });
+  return ast;
+};
+
+var parse_1 = parse$1;
+
+const stringify = stringify$4;
+const compile = compile_1;
+const expand = expand_1;
+const parse = parse_1;
+
+/**
+ * Expand the given pattern or create a regex-compatible string.
+ *
+ * ```js
+ * const braces = require('braces');
+ * console.log(braces('{a,b,c}', { compile: true })); //=> ['(a|b|c)']
+ * console.log(braces('{a,b,c}')); //=> ['a', 'b', 'c']
+ * ```
+ * @param {String} `str`
+ * @param {Object} `options`
+ * @return {String}
+ * @api public
+ */
+
+const braces$1 = (input, options = {}) => {
+  let output = [];
+
+  if (Array.isArray(input)) {
+    for (let pattern of input) {
+      let result = braces$1.create(pattern, options);
+      if (Array.isArray(result)) {
+        output.push(...result);
+      } else {
+        output.push(result);
+      }
+    }
+  } else {
+    output = [].concat(braces$1.create(input, options));
+  }
+
+  if (options && options.expand === true && options.nodupes === true) {
+    output = [...new Set(output)];
+  }
+  return output;
+};
+
+/**
+ * Parse the given `str` with the given `options`.
+ *
+ * ```js
+ * // braces.parse(pattern, [, options]);
+ * const ast = braces.parse('a/{b,c}/d');
+ * console.log(ast);
+ * ```
+ * @param {String} pattern Brace pattern to parse
+ * @param {Object} options
+ * @return {Object} Returns an AST
+ * @api public
+ */
+
+braces$1.parse = (input, options = {}) => parse(input, options);
+
+/**
+ * Creates a braces string from an AST, or an AST node.
+ *
+ * ```js
+ * const braces = require('braces');
+ * let ast = braces.parse('foo/{a,b}/bar');
+ * console.log(stringify(ast.nodes[2])); //=> '{a,b}'
+ * ```
+ * @param {String} `input` Brace pattern or AST.
+ * @param {Object} `options`
+ * @return {Array} Returns an array of expanded values.
+ * @api public
+ */
+
+braces$1.stringify = (input, options = {}) => {
+  if (typeof input === 'string') {
+    return stringify(braces$1.parse(input, options), options);
+  }
+  return stringify(input, options);
+};
+
+/**
+ * Compiles a brace pattern into a regex-compatible, optimized string.
+ * This method is called by the main [braces](#braces) function by default.
+ *
+ * ```js
+ * const braces = require('braces');
+ * console.log(braces.compile('a/{b,c}/d'));
+ * //=> ['a/(b|c)/d']
+ * ```
+ * @param {String} `input` Brace pattern or AST.
+ * @param {Object} `options`
+ * @return {Array} Returns an array of expanded values.
+ * @api public
+ */
+
+braces$1.compile = (input, options = {}) => {
+  if (typeof input === 'string') {
+    input = braces$1.parse(input, options);
+  }
+  return compile(input, options);
+};
+
+/**
+ * Expands a brace pattern into an array. This method is called by the
+ * main [braces](#braces) function when `options.expand` is true. Before
+ * using this method it's recommended that you read the [performance notes](#performance))
+ * and advantages of using [.compile](#compile) instead.
+ *
+ * ```js
+ * const braces = require('braces');
+ * console.log(braces.expand('a/{b,c}/d'));
+ * //=> ['a/b/d', 'a/c/d'];
+ * ```
+ * @param {String} `pattern` Brace pattern
+ * @param {Object} `options`
+ * @return {Array} Returns an array of expanded values.
+ * @api public
+ */
+
+braces$1.expand = (input, options = {}) => {
+  if (typeof input === 'string') {
+    input = braces$1.parse(input, options);
+  }
+
+  let result = expand(input, options);
+
+  // filter out empty strings if specified
+  if (options.noempty === true) {
+    result = result.filter(Boolean);
+  }
+
+  // filter out duplicates if specified
+  if (options.nodupes === true) {
+    result = [...new Set(result)];
+  }
+
+  return result;
+};
+
+/**
+ * Processes a brace pattern and returns either an expanded array
+ * (if `options.expand` is true), a highly optimized regex-compatible string.
+ * This method is called by the main [braces](#braces) function.
+ *
+ * ```js
+ * const braces = require('braces');
+ * console.log(braces.create('user-{200..300}/project-{a,b,c}-{1..10}'))
+ * //=> 'user-(20[0-9]|2[1-9][0-9]|300)/project-(a|b|c)-([1-9]|10)'
+ * ```
+ * @param {String} `pattern` Brace pattern
+ * @param {Object} `options`
+ * @return {Array} Returns an array of expanded values.
+ * @api public
+ */
+
+braces$1.create = (input, options = {}) => {
+  if (input === '' || input.length < 3) {
+    return [input];
+  }
+
+ return options.expand !== true
+    ? braces$1.compile(input, options)
+    : braces$1.expand(input, options);
+};
+
+/**
+ * Expose "braces"
+ */
+
+var braces_1 = braces$1;
+
+const require$$0 = [
+	"3dm",
+	"3ds",
+	"3g2",
+	"3gp",
+	"7z",
+	"a",
+	"aac",
+	"adp",
+	"ai",
+	"aif",
+	"aiff",
+	"alz",
+	"ape",
+	"apk",
+	"appimage",
+	"ar",
+	"arj",
+	"asf",
+	"au",
+	"avi",
+	"bak",
+	"baml",
+	"bh",
+	"bin",
+	"bk",
+	"bmp",
+	"btif",
+	"bz2",
+	"bzip2",
+	"cab",
+	"caf",
+	"cgm",
+	"class",
+	"cmx",
+	"cpio",
+	"cr2",
+	"cur",
+	"dat",
+	"dcm",
+	"deb",
+	"dex",
+	"djvu",
+	"dll",
+	"dmg",
+	"dng",
+	"doc",
+	"docm",
+	"docx",
+	"dot",
+	"dotm",
+	"dra",
+	"DS_Store",
+	"dsk",
+	"dts",
+	"dtshd",
+	"dvb",
+	"dwg",
+	"dxf",
+	"ecelp4800",
+	"ecelp7470",
+	"ecelp9600",
+	"egg",
+	"eol",
+	"eot",
+	"epub",
+	"exe",
+	"f4v",
+	"fbs",
+	"fh",
+	"fla",
+	"flac",
+	"flatpak",
+	"fli",
+	"flv",
+	"fpx",
+	"fst",
+	"fvt",
+	"g3",
+	"gh",
+	"gif",
+	"graffle",
+	"gz",
+	"gzip",
+	"h261",
+	"h263",
+	"h264",
+	"icns",
+	"ico",
+	"ief",
+	"img",
+	"ipa",
+	"iso",
+	"jar",
+	"jpeg",
+	"jpg",
+	"jpgv",
+	"jpm",
+	"jxr",
+	"key",
+	"ktx",
+	"lha",
+	"lib",
+	"lvp",
+	"lz",
+	"lzh",
+	"lzma",
+	"lzo",
+	"m3u",
+	"m4a",
+	"m4v",
+	"mar",
+	"mdi",
+	"mht",
+	"mid",
+	"midi",
+	"mj2",
+	"mka",
+	"mkv",
+	"mmr",
+	"mng",
+	"mobi",
+	"mov",
+	"movie",
+	"mp3",
+	"mp4",
+	"mp4a",
+	"mpeg",
+	"mpg",
+	"mpga",
+	"mxu",
+	"nef",
+	"npx",
+	"numbers",
+	"nupkg",
+	"o",
+	"odp",
+	"ods",
+	"odt",
+	"oga",
+	"ogg",
+	"ogv",
+	"otf",
+	"ott",
+	"pages",
+	"pbm",
+	"pcx",
+	"pdb",
+	"pdf",
+	"pea",
+	"pgm",
+	"pic",
+	"png",
+	"pnm",
+	"pot",
+	"potm",
+	"potx",
+	"ppa",
+	"ppam",
+	"ppm",
+	"pps",
+	"ppsm",
+	"ppsx",
+	"ppt",
+	"pptm",
+	"pptx",
+	"psd",
+	"pya",
+	"pyc",
+	"pyo",
+	"pyv",
+	"qt",
+	"rar",
+	"ras",
+	"raw",
+	"resources",
+	"rgb",
+	"rip",
+	"rlc",
+	"rmf",
+	"rmvb",
+	"rpm",
+	"rtf",
+	"rz",
+	"s3m",
+	"s7z",
+	"scpt",
+	"sgi",
+	"shar",
+	"snap",
+	"sil",
+	"sketch",
+	"slk",
+	"smv",
+	"snk",
+	"so",
+	"stl",
+	"suo",
+	"sub",
+	"swf",
+	"tar",
+	"tbz",
+	"tbz2",
+	"tga",
+	"tgz",
+	"thmx",
+	"tif",
+	"tiff",
+	"tlz",
+	"ttc",
+	"ttf",
+	"txz",
+	"udf",
+	"uvh",
+	"uvi",
+	"uvm",
+	"uvp",
+	"uvs",
+	"uvu",
+	"viv",
+	"vob",
+	"war",
+	"wav",
+	"wax",
+	"wbmp",
+	"wdp",
+	"weba",
+	"webm",
+	"webp",
+	"whl",
+	"wim",
+	"wm",
+	"wma",
+	"wmv",
+	"wmx",
+	"woff",
+	"woff2",
+	"wrm",
+	"wvx",
+	"xbm",
+	"xif",
+	"xla",
+	"xlam",
+	"xls",
+	"xlsb",
+	"xlsm",
+	"xlsx",
+	"xlt",
+	"xltm",
+	"xltx",
+	"xm",
+	"xmind",
+	"xpi",
+	"xpm",
+	"xwd",
+	"xz",
+	"z",
+	"zip",
+	"zipx"
+];
+
+var binaryExtensions$1 = require$$0;
+
+const path = require$$0$2;
+const binaryExtensions = binaryExtensions$1;
+
+const extensions = new Set(binaryExtensions);
+
+var isBinaryPath$1 = filePath => extensions.has(path.extname(filePath).slice(1).toLowerCase());
+
+var constants = {};
+
+(function (exports) {
+
+	const {sep} = require$$0$2;
+	const {platform} = process;
+	const os = require$$2$1;
+
+	exports.EV_ALL = 'all';
+	exports.EV_READY = 'ready';
+	exports.EV_ADD = 'add';
+	exports.EV_CHANGE = 'change';
+	exports.EV_ADD_DIR = 'addDir';
+	exports.EV_UNLINK = 'unlink';
+	exports.EV_UNLINK_DIR = 'unlinkDir';
+	exports.EV_RAW = 'raw';
+	exports.EV_ERROR = 'error';
+
+	exports.STR_DATA = 'data';
+	exports.STR_END = 'end';
+	exports.STR_CLOSE = 'close';
+
+	exports.FSEVENT_CREATED = 'created';
+	exports.FSEVENT_MODIFIED = 'modified';
+	exports.FSEVENT_DELETED = 'deleted';
+	exports.FSEVENT_MOVED = 'moved';
+	exports.FSEVENT_CLONED = 'cloned';
+	exports.FSEVENT_UNKNOWN = 'unknown';
+	exports.FSEVENT_TYPE_FILE = 'file';
+	exports.FSEVENT_TYPE_DIRECTORY = 'directory';
+	exports.FSEVENT_TYPE_SYMLINK = 'symlink';
+
+	exports.KEY_LISTENERS = 'listeners';
+	exports.KEY_ERR = 'errHandlers';
+	exports.KEY_RAW = 'rawEmitters';
+	exports.HANDLER_KEYS = [exports.KEY_LISTENERS, exports.KEY_ERR, exports.KEY_RAW];
+
+	exports.DOT_SLASH = `.${sep}`;
+
+	exports.BACK_SLASH_RE = /\\/g;
+	exports.DOUBLE_SLASH_RE = /\/\//;
+	exports.SLASH_OR_BACK_SLASH_RE = /[/\\]/;
+	exports.DOT_RE = /\..*\.(sw[px])$|~$|\.subl.*\.tmp/;
+	exports.REPLACER_RE = /^\.[/\\]/;
+
+	exports.SLASH = '/';
+	exports.SLASH_SLASH = '//';
+	exports.BRACE_START = '{';
+	exports.BANG = '!';
+	exports.ONE_DOT = '.';
+	exports.TWO_DOTS = '..';
+	exports.STAR = '*';
+	exports.GLOBSTAR = '**';
+	exports.ROOT_GLOBSTAR = '/**/*';
+	exports.SLASH_GLOBSTAR = '/**';
+	exports.DIR_SUFFIX = 'Dir';
+	exports.ANYMATCH_OPTS = {dot: true};
+	exports.STRING_TYPE = 'string';
+	exports.FUNCTION_TYPE = 'function';
+	exports.EMPTY_STR = '';
+	exports.EMPTY_FN = () => {};
+	exports.IDENTITY_FN = val => val;
+
+	exports.isWindows = platform === 'win32';
+	exports.isMacos = platform === 'darwin';
+	exports.isLinux = platform === 'linux';
+	exports.isIBMi = os.type() === 'OS400'; 
+} (constants));
+
+const fs$2 = require$$0$1;
+const sysPath$2 = require$$0$2;
+const { promisify: promisify$2 } = require$$2;
+const isBinaryPath = isBinaryPath$1;
+const {
+  isWindows: isWindows$1,
+  isLinux,
+  EMPTY_FN: EMPTY_FN$2,
+  EMPTY_STR: EMPTY_STR$1,
+  KEY_LISTENERS,
+  KEY_ERR,
+  KEY_RAW,
+  HANDLER_KEYS,
+  EV_CHANGE: EV_CHANGE$2,
+  EV_ADD: EV_ADD$2,
+  EV_ADD_DIR: EV_ADD_DIR$2,
+  EV_ERROR: EV_ERROR$2,
+  STR_DATA: STR_DATA$1,
+  STR_END: STR_END$2,
+  BRACE_START: BRACE_START$1,
+  STAR
+} = constants;
+
+const THROTTLE_MODE_WATCH = 'watch';
+
+const open = promisify$2(fs$2.open);
+const stat$2 = promisify$2(fs$2.stat);
+const lstat$1 = promisify$2(fs$2.lstat);
+const close = promisify$2(fs$2.close);
+const fsrealpath = promisify$2(fs$2.realpath);
+
+const statMethods$1 = { lstat: lstat$1, stat: stat$2 };
+
+// TODO: emit errors properly. Example: EMFILE on Macos.
+const foreach = (val, fn) => {
+  if (val instanceof Set) {
+    val.forEach(fn);
+  } else {
+    fn(val);
+  }
+};
+
+const addAndConvert = (main, prop, item) => {
+  let container = main[prop];
+  if (!(container instanceof Set)) {
+    main[prop] = container = new Set([container]);
+  }
+  container.add(item);
+};
+
+const clearItem = cont => key => {
+  const set = cont[key];
+  if (set instanceof Set) {
+    set.clear();
+  } else {
+    delete cont[key];
+  }
+};
+
+const delFromSet = (main, prop, item) => {
+  const container = main[prop];
+  if (container instanceof Set) {
+    container.delete(item);
+  } else if (container === item) {
+    delete main[prop];
+  }
+};
+
+const isEmptySet = (val) => val instanceof Set ? val.size === 0 : !val;
+
+/**
+ * @typedef {String} Path
+ */
+
+// fs_watch helpers
+
+// object to hold per-process fs_watch instances
+// (may be shared across chokidar FSWatcher instances)
+
+/**
+ * @typedef {Object} FsWatchContainer
+ * @property {Set} listeners
+ * @property {Set} errHandlers
+ * @property {Set} rawEmitters
+ * @property {fs.FSWatcher=} watcher
+ * @property {Boolean=} watcherUnusable
+ */
+
+/**
+ * @type {Map<String,FsWatchContainer>}
+ */
+const FsWatchInstances = new Map();
+
+/**
+ * Instantiates the fs_watch interface
+ * @param {String} path to be watched
+ * @param {Object} options to be passed to fs_watch
+ * @param {Function} listener main event handler
+ * @param {Function} errHandler emits info about errors
+ * @param {Function} emitRaw emits raw event data
+ * @returns {fs.FSWatcher} new fsevents instance
+ */
+function createFsWatchInstance(path, options, listener, errHandler, emitRaw) {
+  const handleEvent = (rawEvent, evPath) => {
+    listener(path);
+    emitRaw(rawEvent, evPath, {watchedPath: path});
+
+    // emit based on events occurring for files from a directory's watcher in
+    // case the file's watcher misses it (and rely on throttling to de-dupe)
+    if (evPath && path !== evPath) {
+      fsWatchBroadcast(
+        sysPath$2.resolve(path, evPath), KEY_LISTENERS, sysPath$2.join(path, evPath)
+      );
+    }
+  };
+  try {
+    return fs$2.watch(path, options, handleEvent);
+  } catch (error) {
+    errHandler(error);
+  }
+}
+
+/**
+ * Helper for passing fs_watch event data to a collection of listeners
+ * @param {Path} fullPath absolute path bound to fs_watch instance
+ * @param {String} type listener type
+ * @param {*=} val1 arguments to be passed to listeners
+ * @param {*=} val2
+ * @param {*=} val3
+ */
+const fsWatchBroadcast = (fullPath, type, val1, val2, val3) => {
+  const cont = FsWatchInstances.get(fullPath);
+  if (!cont) return;
+  foreach(cont[type], (listener) => {
+    listener(val1, val2, val3);
+  });
+};
+
+/**
+ * Instantiates the fs_watch interface or binds listeners
+ * to an existing one covering the same file system entry
+ * @param {String} path
+ * @param {String} fullPath absolute path
+ * @param {Object} options to be passed to fs_watch
+ * @param {Object} handlers container for event listener functions
+ */
+const setFsWatchListener = (path, fullPath, options, handlers) => {
+  const {listener, errHandler, rawEmitter} = handlers;
+  let cont = FsWatchInstances.get(fullPath);
+
+  /** @type {fs.FSWatcher=} */
+  let watcher;
+  if (!options.persistent) {
+    watcher = createFsWatchInstance(
+      path, options, listener, errHandler, rawEmitter
+    );
+    return watcher.close.bind(watcher);
+  }
+  if (cont) {
+    addAndConvert(cont, KEY_LISTENERS, listener);
+    addAndConvert(cont, KEY_ERR, errHandler);
+    addAndConvert(cont, KEY_RAW, rawEmitter);
+  } else {
+    watcher = createFsWatchInstance(
+      path,
+      options,
+      fsWatchBroadcast.bind(null, fullPath, KEY_LISTENERS),
+      errHandler, // no need to use broadcast here
+      fsWatchBroadcast.bind(null, fullPath, KEY_RAW)
+    );
+    if (!watcher) return;
+    watcher.on(EV_ERROR$2, async (error) => {
+      const broadcastErr = fsWatchBroadcast.bind(null, fullPath, KEY_ERR);
+      cont.watcherUnusable = true; // documented since Node 10.4.1
+      // Workaround for https://github.com/joyent/node/issues/4337
+      if (isWindows$1 && error.code === 'EPERM') {
+        try {
+          const fd = await open(path, 'r');
+          await close(fd);
+          broadcastErr(error);
+        } catch (err) {}
+      } else {
+        broadcastErr(error);
+      }
+    });
+    cont = {
+      listeners: listener,
+      errHandlers: errHandler,
+      rawEmitters: rawEmitter,
+      watcher
+    };
+    FsWatchInstances.set(fullPath, cont);
+  }
+  // const index = cont.listeners.indexOf(listener);
+
+  // removes this instance's listeners and closes the underlying fs_watch
+  // instance if there are no more listeners left
+  return () => {
+    delFromSet(cont, KEY_LISTENERS, listener);
+    delFromSet(cont, KEY_ERR, errHandler);
+    delFromSet(cont, KEY_RAW, rawEmitter);
+    if (isEmptySet(cont.listeners)) {
+      // Check to protect against issue gh-730.
+      // if (cont.watcherUnusable) {
+      cont.watcher.close();
+      // }
+      FsWatchInstances.delete(fullPath);
+      HANDLER_KEYS.forEach(clearItem(cont));
+      cont.watcher = undefined;
+      Object.freeze(cont);
+    }
+  };
+};
+
+// fs_watchFile helpers
+
+// object to hold per-process fs_watchFile instances
+// (may be shared across chokidar FSWatcher instances)
+const FsWatchFileInstances = new Map();
+
+/**
+ * Instantiates the fs_watchFile interface or binds listeners
+ * to an existing one covering the same file system entry
+ * @param {String} path to be watched
+ * @param {String} fullPath absolute path
+ * @param {Object} options options to be passed to fs_watchFile
+ * @param {Object} handlers container for event listener functions
+ * @returns {Function} closer
+ */
+const setFsWatchFileListener = (path, fullPath, options, handlers) => {
+  const {listener, rawEmitter} = handlers;
+  let cont = FsWatchFileInstances.get(fullPath);
+
+  const copts = cont && cont.options;
+  if (copts && (copts.persistent < options.persistent || copts.interval > options.interval)) {
+    fs$2.unwatchFile(fullPath);
+    cont = undefined;
+  }
+
+  /* eslint-enable no-unused-vars, prefer-destructuring */
+
+  if (cont) {
+    addAndConvert(cont, KEY_LISTENERS, listener);
+    addAndConvert(cont, KEY_RAW, rawEmitter);
+  } else {
+    // TODO
+    // listeners.add(listener);
+    // rawEmitters.add(rawEmitter);
+    cont = {
+      listeners: listener,
+      rawEmitters: rawEmitter,
+      options,
+      watcher: fs$2.watchFile(fullPath, options, (curr, prev) => {
+        foreach(cont.rawEmitters, (rawEmitter) => {
+          rawEmitter(EV_CHANGE$2, fullPath, {curr, prev});
+        });
+        const currmtime = curr.mtimeMs;
+        if (curr.size !== prev.size || currmtime > prev.mtimeMs || currmtime === 0) {
+          foreach(cont.listeners, (listener) => listener(path, curr));
+        }
+      })
+    };
+    FsWatchFileInstances.set(fullPath, cont);
+  }
+  // const index = cont.listeners.indexOf(listener);
+
+  // Removes this instance's listeners and closes the underlying fs_watchFile
+  // instance if there are no more listeners left.
+  return () => {
+    delFromSet(cont, KEY_LISTENERS, listener);
+    delFromSet(cont, KEY_RAW, rawEmitter);
+    if (isEmptySet(cont.listeners)) {
+      FsWatchFileInstances.delete(fullPath);
+      fs$2.unwatchFile(fullPath);
+      cont.options = cont.watcher = undefined;
+      Object.freeze(cont);
+    }
+  };
+};
+
+/**
+ * @mixin
+ */
+let NodeFsHandler$1 = class NodeFsHandler {
+
+/**
+ * @param {import("../index").FSWatcher} fsW
+ */
+constructor(fsW) {
+  this.fsw = fsW;
+  this._boundHandleError = (error) => fsW._handleError(error);
+}
+
+/**
+ * Watch file for changes with fs_watchFile or fs_watch.
+ * @param {String} path to file or dir
+ * @param {Function} listener on fs change
+ * @returns {Function} closer for the watcher instance
+ */
+_watchWithNodeFs(path, listener) {
+  const opts = this.fsw.options;
+  const directory = sysPath$2.dirname(path);
+  const basename = sysPath$2.basename(path);
+  const parent = this.fsw._getWatchedDir(directory);
+  parent.add(base

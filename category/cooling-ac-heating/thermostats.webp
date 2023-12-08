@@ -1,0 +1,619 @@
+  constraint: {
+        options: {
+          scheme: RegExp[]
+          allowRelative: boolean
+          relativeOnly: boolean
+          allowCredentials: boolean
+        }
+      }
+    }
+
+/** @internal */
+export declare type RuleSpecConstraint<T extends RuleSpec['flag']> = ConditionalIndexAccess<
+  Extract<
+    RuleSpec,
+    {
+      flag: T
+    }
+  >,
+  'constraint'
+>
+
+/** @public */
+export declare type RuleTypeConstraint =
+  | 'Array'
+  | 'Boolean'
+  | 'Date'
+  | 'Number'
+  | 'Object'
+  | 'String'
+
+/** @public */
+export declare interface SanityDocument {
+  _id: string
+  _type: string
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  [key: string]: unknown
+}
+
+/**
+ * Similar to `SanityDocument` but only requires the `_id` and `_type`
+ *
+ * @see SanityDocument
+ *
+ * @public
+ */
+export declare interface SanityDocumentLike {
+  _id: string
+  _type: string
+  _createdAt?: string
+  _updatedAt?: string
+  _rev?: string
+  [key: string]: unknown
+}
+
+/** @public */
+export declare interface Schema {
+  /** @internal */
+  _original?: {
+    name: string
+    types: SchemaTypeDefinition[]
+  }
+  /** @internal */
+  _registry: {
+    [typeName: string]: any
+  }
+  /** @internal */
+  _validation?: SchemaValidationProblemGroup[]
+  name: string
+  get: (name: string) => SchemaType | undefined
+  has: (name: string) => boolean
+  getTypeNames: () => string[]
+}
+
+/**
+ * Note: you probably want `SchemaTypeDefinition` instead
+ * @see SchemaTypeDefinition
+ *
+ * @public
+ */
+export declare type SchemaType =
+  | ArraySchemaType
+  | BooleanSchemaType
+  | FileSchemaType
+  | NumberSchemaType
+  | ObjectSchemaType
+  | StringSchemaType
+  | ReferenceSchemaType
+
+/**
+ * Represents a Sanity schema type definition with an optional type parameter.
+ *
+ * It's recommend to use the `defineType` helper instead of this type by
+ * itself.
+ *
+ * @see defineType
+ *
+ * @public
+ */
+export declare type SchemaTypeDefinition<TType extends IntrinsicTypeName = IntrinsicTypeName> =
+  | IntrinsicDefinitions[IntrinsicTypeName]
+  | TypeAliasDefinition<string, TType>
+
+/** @public */
+export declare interface SchemaValidationError {
+  helpId?: string
+  message: string
+  severity: 'error'
+}
+
+/** @internal */
+export declare type SchemaValidationProblem = SchemaValidationError | SchemaValidationWarning
+
+/** @internal */
+export declare interface SchemaValidationProblemGroup {
+  path: SchemaValidationProblemPath
+  problems: SchemaValidationProblem[]
+}
+
+/** @internal */
+export declare type SchemaValidationProblemPath = Array<
+  | {
+      kind: 'type'
+      type: string
+      name: string
+    }
+  | {
+      kind: 'property'
+      name: string
+    }
+>
+
+/**
+ * Represents the possible values of a schema type's `validation` field.
+ *
+ * If the schema has not been run through `inferFromSchema` from
+ * `@sanity/validation` then value could be a function.
+ *
+ * `inferFromSchema` mutates the schema converts this value to an array of
+ * `Rule` instances.
+ *
+ * @privateRemarks
+ *
+ * Usage of the schema inside the studio will almost always be from the compiled
+ * `createSchema` function. In this case, you can cast the value or throw to
+ * narrow the type. E.g.:
+ *
+ * ```ts
+ * if (typeof type.validation === 'function') {
+ *   throw new Error(
+ *     `Schema type "${type.name}"'s \`validation\` was not run though \`inferFromSchema\``
+ *   )
+ * }
+ * ```
+ *
+ * @public
+ */
+export declare type SchemaValidationValue =
+  | false
+  | undefined
+  | Rule
+  | SchemaValidationValue[]
+  | ((rule: Rule) => SchemaValidationValue)
+
+/** @internal */
+export declare interface SchemaValidationWarning {
+  helpId?: string
+  message: string
+  severity: 'warning'
+}
+
+/** @public */
+export declare interface SingleFieldSet {
+  single: true
+  field: ObjectField
+  hidden?: ConditionalProperty
+  readOnly?: ConditionalProperty
+  group?: string | string[]
+}
+
+/** @internal */
+export declare interface SingleMutationResult {
+  transactionId: string
+  documentId: string
+  results: {
+    id: string
+  }[]
+}
+
+/** @internal */
+export declare interface Slug {
+  _type: 'slug'
+  current: string
+}
+
+/** @public */
+export declare interface SlugDefinition extends BaseSchemaDefinition {
+  type: 'slug'
+  options?: SlugOptions
+  validation?: ValidationBuilder<SlugRule, SlugValue>
+  initialValue?: InitialValueProperty<any, Omit<SlugValue, '_type'>>
+}
+
+/** @public */
+export declare type SlugifierFn = (
+  source: string,
+  schemaType: SlugSchemaType,
+  context: SlugSourceContext
+) => string | Promise<string>
+
+/** @public */
+export declare type SlugIsUniqueValidator = (
+  slug: string,
+  context: SlugValidationContext
+) => boolean | Promise<boolean>
+
+/** @public */
+export declare interface SlugOptions {
+  source?: string | Path | SlugSourceFn
+  maxLength?: number
+  slugify?: SlugifierFn
+  isUnique?: SlugIsUniqueValidator
+}
+
+/** @public */
+export declare type SlugParent = Record<string, unknown> | Record<string, unknown>[]
+
+/** @public */
+export declare interface SlugRule extends RuleDef<SlugRule, SlugValue> {}
+
+/** @public */
+export declare interface SlugSchemaType extends ObjectSchemaType {
+  jsonType: 'object'
+  options?: SlugOptions
+}
+
+/** @public */
+export declare interface SlugSourceContext {
+  parentPath: Path
+  parent: SlugParent
+  projectId: string
+  dataset: string
+  schema: Schema
+  currentUser: CurrentUser | null
+  getClient: (options: {apiVersion: string}) => SanityClient
+}
+
+/** @public */
+export declare type SlugSourceFn = (
+  document: SanityDocument,
+  context: SlugSourceContext
+) => string | Promise<string>
+
+/** @public */
+export declare interface SlugValidationContext extends ValidationContext {
+  parent: SlugParent
+  type: SlugSchemaType
+  defaultIsUnique: SlugIsUniqueValidator
+}
+
+/** @public */
+export declare interface SlugValue {
+  _type: 'slug'
+  current?: string
+}
+
+/** @beta */
+export declare type SortOrdering = {
+  title: string
+  name: string
+  by: SortOrderingItem[]
+}
+
+/** @beta */
+export declare interface SortOrderingItem {
+  field: string
+  direction: 'asc' | 'desc'
+}
+
+/**
+ * A specific `ObjectField` for `marks` in `SpanSchemaType`
+ * @see SpanSchemaType
+ *
+ * @internal
+ */
+export declare type SpanMarksObjectField = {
+  name: 'marks'
+} & ObjectField<ArraySchemaTypeOf<StringSchemaType>>
+
+/**
+ * Represents the compiled schema shape for `span`s for portable text.
+ *
+ * Note: this does _not_ represent the schema definition shape.
+ *
+ * @internal
+ */
+export declare interface SpanSchemaType extends Omit<ObjectSchemaType, 'fields'> {
+  annotations: (ObjectSchemaType & {
+    icon?: string | ComponentType
+    components?: {
+      item?: ComponentType
+    }
+  })[]
+  decorators: BlockDecoratorDefinition[]
+  fields: [SpanMarksObjectField, SpanTextObjectField]
+}
+
+/**
+ * A specific `ObjectField` for `text` in `SpanSchemaType`
+ * @see SpanSchemaType
+ *
+ * @internal
+ */
+export declare type SpanTextObjectField = {
+  name: 'text'
+} & ObjectField<TextSchemaType>
+
+/** @beta */
+export declare type StrictDefinition = boolean | undefined
+
+/** @public */
+export declare interface StringDefinition extends BaseSchemaDefinition {
+  type: 'string'
+  options?: StringOptions
+  placeholder?: string
+  validation?: ValidationBuilder<StringRule, string>
+  initialValue?: InitialValueProperty<any, string>
+}
+
+/** @public */
+export declare interface StringOptions extends EnumListProps<string> {}
+
+/** @public */
+export declare interface StringRule extends RuleDef<StringRule, string> {
+  min: (minNumber: number | FieldReference) => StringRule
+  max: (maxNumber: number | FieldReference) => StringRule
+  length: (exactLength: number | FieldReference) => StringRule
+  uppercase: () => StringRule
+  lowercase: () => StringRule
+  regex(
+    pattern: RegExp,
+    name: string,
+    options: {
+      name?: string
+      invert?: boolean
+    }
+  ): StringRule
+  regex(
+    pattern: RegExp,
+    options: {
+      name?: string
+      invert?: boolean
+    }
+  ): StringRule
+  regex(pattern: RegExp, name: string): StringRule
+  regex(pattern: RegExp): StringRule
+  email(): StringRule
+}
+
+/**
+ * This is used for string, text, date and datetime.
+ * This interface represent the compiled version at runtime, when accessed through Schema.
+ *
+ * @public
+ */
+export declare interface StringSchemaType extends BaseSchemaType {
+  jsonType: 'string'
+  options?: StringOptions & TextOptions & DateOptions & DatetimeOptions
+  initialValue?: InitialValueProperty<any, string>
+}
+
+/** @public */
+export declare type SwatchName =
+  | 'darkMuted'
+  | 'darkVibrant'
+  | 'dominant'
+  | 'lightMuted'
+  | 'lightVibrant'
+  | 'muted'
+  | 'vibrant'
+
+/** @public */
+export declare interface TextDefinition extends BaseSchemaDefinition {
+  type: 'text'
+  rows?: number
+  options?: TextOptions
+  placeholder?: string
+  validation?: ValidationBuilder<TextRule, string>
+  initialValue?: InitialValueProperty<any, string>
+}
+
+/** @public */
+export declare interface TextOptions extends StringOptions {}
+
+/** @public */
+export declare interface TextRule extends StringRule {}
+
+/** @public */
+export declare interface TextSchemaType extends StringSchemaType {
+  rows?: number
+}
+
+/** @public */
+export declare interface TitledListValue<V = unknown> {
+  _key?: string
+  title: string
+  value?: V
+}
+
+/**
+ * An entry in the transaction log
+ *
+ * @internal
+ */
+export declare interface TransactionLogEvent {
+  /**
+   * ID of transaction
+   */
+  id: string
+  /**
+   * ISO-formatted timestamp (zulu-time) of when the transaction happened
+   */
+  timestamp: string
+  /**
+   * User ID of the user who performed the transaction
+   */
+  author: string
+  /**
+   * Document IDs involved in this transaction
+   */
+  documentIDs: string[]
+}
+
+/**
+ * An entry in the transaction log that includes the effects of the transaction.
+ * Used when asking the transaction log to include effects in mendoza format,
+ * eg `?effectFormat=mendoza`
+ *
+ * @internal
+ */
+export declare interface TransactionLogEventWithEffects extends TransactionLogEvent {
+  /**
+   * Object of effects, where the key is the document ID affected and the value
+   * is the effect pair, eg `{apply: MendozaPatch, revert: MendozaPatch}`
+   */
+  effects: Record<string, MendozaEffectPair | undefined>
+}
+
+/**
+ * An entry in the transaction log that includes the mutations that were performed.
+ * Used when asking the transaction log not to exclude the mutations,
+ * eg `excludeMutations=false`
+ *
+ * @internal
+ */
+export declare interface TransactionLogEventWithMutations extends TransactionLogEvent {
+  /**
+   * Array of mutations that occured in this transaction. Note that the transaction
+   * log has an additional mutation type not typically seen in other APIs;
+   * `createSquashed` ({@link CreateSquashedMutation}).
+   */
+  mutations: TransactionLogMutation[]
+}
+
+/**
+ * A mutation that can occur in the transaction log, which includes the
+ * {@link CreateSquashedMutation} mutation type.
+ *
+ * @internal
+ */
+export declare type TransactionLogMutation = Mutation | CreateSquashedMutation
+
+/**
+ * Represents a type definition that is an alias/extension of an existing type
+ * in your schema. Creating a type alias will re-register that existing type
+ * under a different name. You can also override the default type options with
+ * a type alias definition.
+ *
+ * @public
+ */
+export declare interface TypeAliasDefinition<
+  TType extends string,
+  TAlias extends IntrinsicTypeName | undefined
+> extends BaseSchemaDefinition {
+  type: TType
+  options?: TAlias extends IntrinsicTypeName ? IntrinsicDefinitions[TAlias]['options'] : unknown
+  validation?: SchemaValidationValue
+  initialValue?: InitialValueProperty<any, any>
+  preview?: PreviewConfig
+  components?: {
+    annotation?: ComponentType<any>
+    block?: ComponentType<any>
+    inlineBlock?: ComponentType<any>
+    diff?: ComponentType<any>
+    field?: ComponentType<any>
+    input?: ComponentType<any>
+    item?: ComponentType<any>
+    preview?: ComponentType<any>
+  }
+}
+
+/**
+ * `typed` can be used to ensure that an object conforms to an exact interface.
+ *
+ * It can be useful when working with `defineType` and `defineField` on occasions where a wider type with
+ * custom options or properties is required.
+ *
+ * ## Example  usage
+ * ```ts
+ *  defineField({
+ *    type: 'string',
+ *    name: 'nestedField',
+ *    options: typed<StringOptions & {myCustomOption: boolean}>({
+ *      layout: 'radio',
+ *      // allowed
+ *      myCustomOption: true,
+ *      //@ts-expect-error unknownProp is not part of StringOptions & {myCustomOption: boolean}
+ *      unknownProp: 'not allowed in typed context',
+ *    }),
+ *  }),
+ * ```
+ *
+ * @param input - returned directly
+ *
+ * @internal
+ */
+export declare function typed<T>(input: T): T
+
+/** @public */
+export declare interface TypedObject {
+  [key: string]: unknown
+  _type: string
+}
+
+/**
+ * Represents a reference to another type registered top-level in your schema.
+ *
+ * @public
+ */
+export declare interface TypeReference {
+  type: string
+  name?: string
+  icon?: ComponentType | ReactNode
+  options?: {
+    [key: string]: unknown
+  }
+}
+
+/** @internal */
+export declare interface UploadState {
+  progress: number
+  /** @deprecated use createdAt instead */
+  initiated?: string
+  /** @deprecated use updatedAt instead */
+  updated?: string
+  createdAt: string
+  updatedAt: string
+  file: {
+    name: string
+    type: string
+  }
+  previewImage?: string
+}
+
+/** @public */
+export declare interface UriValidationOptions {
+  scheme?: (string | RegExp) | Array<string | RegExp>
+  allowRelative?: boolean
+  relativeOnly?: boolean
+  allowCredentials?: boolean
+}
+
+/** @public */
+export declare interface UrlDefinition extends BaseSchemaDefinition {
+  type: 'url'
+  options?: UrlOptions
+  placeholder?: string
+  validation?: ValidationBuilder<UrlRule, string>
+  initialValue?: InitialValueProperty<any, string>
+}
+
+/** @public */
+export declare interface UrlOptions {}
+
+/** @public */
+export declare interface UrlRule extends RuleDef<UrlRule, string> {
+  uri(options: UriValidationOptions): UrlRule
+}
+
+/** @public */
+export declare interface User {
+  id: string
+  displayName?: string
+  imageUrl?: string
+  email?: string
+}
+
+/** @public */
+export declare type ValidationBuilder<T extends RuleDef<T, FieldValue>, FieldValue = unknown> = (
+  rule: T
+) => RuleBuilder<T, FieldValue>
+
+/**
+ * A context object passed around during validation. This includes the
+ * `Rule.custom` context.
+ *
+ * e.g.
+ *
+ * ```js
+ * Rule.custom((_, validationContext) => {
+ *   // ...
+ * })`
+ * ```
+ *
+ * @public
+ */
+export declare type ValidationContext = {
+  getClient: (options: {apiVersion: strin

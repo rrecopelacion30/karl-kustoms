@@ -1,0 +1,415 @@
+  }), actions && /* @__PURE__ */jsx(Box, {
+              flex: "none",
+              hidden: collapsed,
+              children: /* @__PURE__ */jsx(LegacyLayerProvider, {
+                zOffset: "paneHeader",
+                children: actions
+              })
+            })]
+          }), showTabsOrSubActions && /* @__PURE__ */jsxs(Flex, {
+            align: "center",
+            hidden: collapsed,
+            overflow: "auto",
+            paddingBottom: 3,
+            paddingX: 3,
+            paddingTop: 1,
+            children: [/* @__PURE__ */jsx(TabsBox, {
+              flex: 1,
+              marginRight: subActions ? 3 : 0,
+              children: tabs
+            }), subActions && subActions]
+          }), !collapsed && contentAfter && contentAfter]
+        })
+      })
+    })
+  });
+});
+function PaneHeaderActionButton(props) {
+  const {
+    node,
+    padding
+  } = props;
+  if (node.type === "item") {
+    return /* @__PURE__ */jsx(PaneHeaderMenuItemActionButton, {
+      node,
+      padding
+    });
+  }
+  if (node.type === "group") {
+    return /* @__PURE__ */jsx(PaneHeaderMenuGroupActionButton, {
+      node,
+      padding
+    });
+  }
+  console.warn('unknown menu node (expected `type: "item" | "group"`):', node);
+  return null;
+}
+function PaneHeaderMenuItemActionButton(props) {
+  var _a;
+  const {
+    node,
+    padding
+  } = props;
+  if (node.intent) {
+    return /* @__PURE__ */jsx(PaneHeaderActionIntentButton, {
+      ...props,
+      intent: node.intent
+    });
+  }
+  const disabledTooltipContent = typeof node.disabled === "object" && /* @__PURE__ */jsx(Text, {
+    size: 1,
+    children: node.disabled.reason
+  });
+  return /* @__PURE__ */jsx(TooltipOfDisabled, {
+    content: disabledTooltipContent,
+    placement: "bottom",
+    children: /* @__PURE__ */jsx(StatusButton, {
+      disabled: Boolean(node.disabled),
+      hotkey: (_a = node.hotkey) == null ? void 0 : _a.split("+"),
+      icon: node.icon,
+      label: disabledTooltipContent ? void 0 : node.title,
+      onClick: node.onAction,
+      padding,
+      selected: node.selected,
+      tone: node.tone
+    })
+  });
+}
+function PaneHeaderActionIntentButton(props) {
+  var _a;
+  const {
+    intent,
+    node,
+    padding
+  } = props;
+  const disabledTooltipContent = typeof node.disabled === "object" && /* @__PURE__ */jsx(Text, {
+    size: 1,
+    children: node.disabled.reason
+  });
+  const intentLink = useIntentLink({
+    intent: intent.type,
+    params: intent.params
+  });
+  const handleClick = useCallback(event => {
+    intentLink.onClick(event);
+    node.onAction();
+  }, [intentLink, node]);
+  return /* @__PURE__ */jsx(TooltipOfDisabled, {
+    content: disabledTooltipContent,
+    placement: "bottom",
+    children: /* @__PURE__ */jsx(StatusButton, {
+      as: "a",
+      disabled: Boolean(node.disabled),
+      hotkey: (_a = node.hotkey) == null ? void 0 : _a.split("+"),
+      href: intentLink.href,
+      icon: node.icon,
+      label: disabledTooltipContent ? void 0 : node.title,
+      onClick: handleClick,
+      padding,
+      selected: node.selected,
+      tone: node.tone
+    })
+  });
+}
+function PaneHeaderMenuGroupActionButton(props) {
+  var _a;
+  const {
+    node,
+    padding
+  } = props;
+  return /* @__PURE__ */jsx(MenuButton, {
+    button: /* @__PURE__ */jsx(StatusButton, {
+      disabled: node.disabled,
+      icon: (_a = node.icon) != null ? _a : UnknownIcon,
+      label: node.title,
+      padding
+    }),
+    id: useId(),
+    menu: /* @__PURE__ */jsx(Menu, {
+      children: node.children.map((child, idx) => {
+        var _a2;
+        return /* @__PURE__ */jsx(PaneMenuButtonItem, {
+          disabled: Boolean(node.disabled),
+          isAfterGroup: ((_a2 = node.children[idx - 1]) == null ? void 0 : _a2.type) === "group",
+          node: child
+        }, child.key);
+      })
+    })
+  });
+}
+const Root$6 = styled(Card)(_templateObject21 || (_templateObject21 = _taggedTemplateLiteral(["\n  transition: opacity 200ms;\n  position: relative;\n  z-index: 1;\n  padding-left: env(safe-area-inset-left);\n  padding-right: env(safe-area-inset-right);\n  opacity: 0;\n\n  &:not([hidden]) {\n    display: flex;\n  }\n\n  &:not([data-collapsed]) {\n    overflow: auto;\n  }\n\n  &[data-mounted] {\n    opacity: 1;\n  }\n\n  &[data-resizing] {\n    pointer-events: none;\n  }\n"])));
+function isMenuNodeButton(node) {
+  return (node.type === "item" || node.type === "group") && node.renderAsButton;
+}
+const isNotMenuNodeButton = negate(isMenuNodeButton);
+function resolveMenuNodes(params) {
+  var _a, _b;
+  const {
+    fieldActions = [],
+    menuItems,
+    menuItemGroups
+  } = params;
+  const nodes = [];
+  let keyOffset = 0;
+  for (let i = 0; i < fieldActions.length; i += 1) {
+    const a = fieldActions[i];
+    nodes.push(mapFieldActionToPaneMenuNode(a, "".concat(i, "-").concat(a.type)));
+  }
+  keyOffset += nodes.length;
+  const groups = [];
+  for (const itemGroup of menuItemGroups) {
+    const group = groups.find(g => g.key === itemGroup.id);
+    if (!group) {
+      groups.push({
+        type: "group",
+        key: itemGroup.id,
+        children: [],
+        expanded: true,
+        renderAsButton: false,
+        title: itemGroup.title
+      });
+    }
+  }
+  const ungroupedItems = [];
+  for (let i = 0; i < menuItems.length; i += 1) {
+    const item = menuItems[i];
+    let group = item.group && groups.find(g => g.key === item.group);
+    if (item.group && !group) {
+      group = {
+        type: "group",
+        key: item.group,
+        expanded: true,
+        icon: item.icon,
+        title: item.group,
+        children: [],
+        renderAsButton: false
+      };
+      groups.push(group);
+    }
+    if (group) {
+      group.children.push({
+        type: "item",
+        key: "".concat(keyOffset + i, "-item"),
+        hotkey: item.shortcut,
+        icon: item.icon,
+        onAction: () => params.actionHandler(item),
+        renderAsButton: (_a = item.showAsAction) != null ? _a : false,
+        selected: item.selected,
+        title: item.title,
+        tone: item.tone
+      });
+    } else {
+      ungroupedItems.push({
+        type: "item",
+        key: "".concat(keyOffset + i, "-item"),
+        hotkey: item.shortcut,
+        icon: item.icon,
+        onAction: () => params.actionHandler(item),
+        renderAsButton: (_b = item.showAsAction) != null ? _b : false,
+        selected: item.selected,
+        title: item.title,
+        tone: item.tone
+      });
+    }
+  }
+  return [...ungroupedItems, ...groups, ...nodes];
+}
+function mapFieldActionToPaneMenuNode(a, key) {
+  var _a, _b, _c;
+  if (a.type === "divider") {
+    return {
+      type: "divider",
+      key
+    };
+  }
+  if (a.type === "group") {
+    return {
+      type: "group",
+      key,
+      children: a.children.map((child, childIdx) => mapFieldActionToPaneMenuNode(child, "".concat(key, "-").concat(childIdx, "-").concat(child.type))),
+      disabled: a.disabled,
+      expanded: (_a = a.expanded) != null ? _a : true,
+      icon: a.icon,
+      title: a.title,
+      renderAsButton: (_b = a.renderAsButton) != null ? _b : false
+    };
+  }
+  return {
+    type: "item",
+    key,
+    disabled: a.disabled,
+    icon: a.icon,
+    iconRight: a.iconRight,
+    onAction: a.onAction,
+    renderAsButton: (_c = a.renderAsButton) != null ? _c : false,
+    selected: a.selected,
+    title: a.title,
+    tone: a.tone
+  };
+}
+const IntentButton = forwardRef(function IntentButton2(props, ref) {
+  const {
+    intent,
+    ...restProps
+  } = props;
+  const Link = useMemo(() =>
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  forwardRef(function Link2(linkProps, linkRef) {
+    return /* @__PURE__ */jsx(IntentLink, {
+      ...linkProps,
+      intent: intent.type,
+      params: intent.params,
+      ref: linkRef
+    });
+  }), [intent]);
+  return props.disabled ? /* @__PURE__ */jsx(Button, {
+    ...props,
+    as: "a",
+    role: "link",
+    "aria-disabled": "true"
+  }) : /* @__PURE__ */jsx(Button, {
+    ...restProps,
+    as: Link,
+    "data-as": "a",
+    ref
+  });
+});
+function InsufficientPermissionsMessageTooltip(_ref17) {
+  let {
+    reveal,
+    loading,
+    children
+  } = _ref17;
+  const currentUser = useCurrentUser();
+  if (!reveal) {
+    return /* @__PURE__ */jsx(Fragment, {
+      children
+    });
+  }
+  return /* @__PURE__ */jsx(Tooltip, {
+    content: loading ? /* @__PURE__ */jsx(Box, {
+      padding: 2,
+      children: /* @__PURE__ */jsx(Text, {
+        children: "Loading\u2026"
+      })
+    }) : /* @__PURE__ */jsx(InsufficientPermissionsMessage, {
+      currentUser
+    }),
+    portal: true,
+    children: /* @__PURE__ */jsx("div", {
+      children
+    })
+  });
+}
+const POPOVER_PROPS = {
+  constrainSize: true,
+  placement: "bottom",
+  portal: true
+};
+const getIntent = (schema, templates, item) => {
+  var _a;
+  const typeName = (_a = templates.find(t => t.id === item.templateId)) == null ? void 0 : _a.schemaType;
+  if (!typeName) return null;
+  const baseParams = {
+    template: item.templateId,
+    type: typeName,
+    id: item.initialDocumentId
+  };
+  return {
+    type: "create",
+    params: item.parameters ? [baseParams, item.parameters] : baseParams
+  };
+};
+function PaneHeaderCreateButton(_ref18) {
+  let {
+    templateItems
+  } = _ref18;
+  const schema = useSchema();
+  const templates = useTemplates();
+  const [templatePermissions, isTemplatePermissionsLoading] = useTemplatePermissions({
+    templateItems
+  });
+  const nothingGranted = useMemo(() => {
+    return !isTemplatePermissionsLoading && (templatePermissions == null ? void 0 : templatePermissions.every(permission => !permission.granted));
+  }, [isTemplatePermissionsLoading, templatePermissions]);
+  const permissionsById = useMemo(() => {
+    if (!templatePermissions) return {};
+    return templatePermissions.reduce((acc, permission) => {
+      acc[permission.id] = permission;
+      return acc;
+    }, {});
+  }, [templatePermissions]);
+  if (nothingGranted) {
+    return /* @__PURE__ */jsx(InsufficientPermissionsMessageTooltip, {
+      reveal: true,
+      loading: isTemplatePermissionsLoading,
+      children: /* @__PURE__ */jsx(Button, {
+        "aria-label": "Insufficient permissions",
+        icon: ComposeIcon,
+        mode: "bleed",
+        disabled: true,
+        "data-testid": "action-intent-button"
+      })
+    });
+  }
+  if (templateItems.length === 1) {
+    const firstItem = templateItems[0];
+    const permissions = permissionsById[firstItem.id];
+    const disabled = !(permissions == null ? void 0 : permissions.granted);
+    const intent = getIntent(schema, templates, firstItem);
+    if (!intent) return null;
+    return /* @__PURE__ */jsx(InsufficientPermissionsMessageTooltip, {
+      reveal: disabled,
+      loading: isTemplatePermissionsLoading,
+      children: /* @__PURE__ */jsx(IntentButton, {
+        "aria-label": firstItem.title,
+        icon: firstItem.icon || ComposeIcon,
+        intent,
+        mode: "bleed",
+        disabled,
+        "data-testid": "action-intent-button"
+      })
+    });
+  }
+  return /* @__PURE__ */jsx(MenuButton, {
+    button: /* @__PURE__ */jsx(Button, {
+      icon: ComposeIcon,
+      mode: "bleed",
+      "data-testid": "multi-action-intent-button"
+    }),
+    id: "create-menu",
+    menu: /* @__PURE__ */jsxs(Menu, {
+      children: [/* @__PURE__ */jsx(Box, {
+        paddingX: 3,
+        paddingTop: 3,
+        paddingBottom: 2,
+        children: /* @__PURE__ */jsx(Label, {
+          muted: true,
+          children: "Create"
+        })
+      }), templateItems.map((item, itemIndex) => {
+        const permissions = permissionsById[item.id];
+        const disabled = !(permissions == null ? void 0 : permissions.granted);
+        const intent = getIntent(schema, templates, item);
+        const template = templates.find(t => t.id === item.templateId);
+        if (!template || !intent) return null;
+        const Link = forwardRef((linkProps, linkRef) => disabled ? /* @__PURE__ */jsx("button", {
+          type: "button",
+          disabled: true,
+          ...linkProps,
+          ref: linkRef
+        }) : /* @__PURE__ */jsx(IntentLink, {
+          ...linkProps,
+          intent: intent.type,
+          params: intent.params,
+          ref: linkRef
+        }));
+        Link.displayName = "Link";
+        return /* @__PURE__ */jsx(InsufficientPermissionsMessageTooltip, {
+          reveal: disabled,
+          loading: isTemplatePermissionsLoading,
+          children: /* @__PURE__ */jsx(MenuItem, {
+            as: Link,
+            "data-as": disabled ? "button" : "a",
+            text: item.title || template.title,
+            "aria-label": disabled ? "Insufficient

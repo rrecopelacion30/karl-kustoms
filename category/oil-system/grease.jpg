@@ -1,0 +1,301 @@
+gy
+    });
+    if (document.body.createShadowRoot && platform.is.BLINK) {
+        // sort tabindex localized to shadow dom
+        // see https://github.com/medialize/ally.js/issues/6
+        elements = sortShadowed(elements, _context, sortElements);
+    } else {
+        elements = sortElements(elements, _context);
+    }
+    if (includeContext) {
+        // if we include the context itself, it has to be the first
+        // element of the sequence
+        elements = moveContextToBeginning(elements, _context);
+    }
+    return elements;
+}
+// codes mostly cloned from https://github.com/keithamus/jwerty/blob/master/jwerty.js
+// deliberately not exposing characters like <,.-#* because they vary *wildly*
+// across keyboard layouts and may cause various problems
+// (e.g. "*" is "Shift +" on a German Mac keyboard)
+// (e.g. "@" is "Alt L" on a German Mac keyboard)
+var keycode = {
+    // Element Focus
+    tab: 9,
+    // Navigation
+    left: 37,
+    up: 38,
+    right: 39,
+    down: 40,
+    pageUp: 33,
+    "page-up": 33,
+    pageDown: 34,
+    "page-down": 34,
+    end: 35,
+    home: 36,
+    // Action
+    enter: 13,
+    escape: 27,
+    space: 32,
+    // Modifier
+    shift: 16,
+    capsLock: 20,
+    "caps-lock": 20,
+    ctrl: 17,
+    alt: 18,
+    meta: 91,
+    // in firefox: 224
+    // on mac (chrome): meta-left=91, meta-right=93
+    // on win (IE11): meta-left=91, meta-right=92
+    pause: 19,
+    // Content Manipulation
+    insert: 45,
+    delete: 46,
+    backspace: 8,
+    // the same logical key may be identified through different keyCodes
+    _alias: {
+        91: [
+            92,
+            93,
+            224
+        ]
+    }
+};
+// Function keys (112 - 137)
+// NOTE: not every keyboard knows F13+
+for(var n = 1; n < 26; n++){
+    keycode["f" + n] = n + 111;
+}
+// Number keys (48-57, numpad 96-105)
+// NOTE: not every keyboard knows num-0+
+for(var _n = 0; _n < 10; _n++){
+    var code = _n + 48;
+    var numCode = _n + 96;
+    keycode[_n] = code;
+    keycode["num-" + _n] = numCode;
+    keycode._alias[code] = [
+        numCode
+    ];
+}
+// Latin characters (65 - 90)
+for(var _n2 = 0; _n2 < 26; _n2++){
+    var _code = _n2 + 65;
+    var name$1 = String.fromCharCode(_code).toLowerCase();
+    keycode[name$1] = _code;
+}
+var modifier = {
+    alt: "altKey",
+    ctrl: "ctrlKey",
+    meta: "metaKey",
+    shift: "shiftKey"
+};
+var modifierSequence = Object.keys(modifier).map(function(name) {
+    return modifier[name];
+});
+function createExpectedModifiers(ignoreModifiers) {
+    var value = ignoreModifiers ? null : false;
+    return {
+        altKey: value,
+        ctrlKey: value,
+        metaKey: value,
+        shiftKey: value
+    };
+}
+function resolveModifiers(modifiers) {
+    var ignoreModifiers = modifiers.indexOf("*") !== -1;
+    var expected = createExpectedModifiers(ignoreModifiers);
+    modifiers.forEach(function(token) {
+        if (token === "*") {
+            // we've already covered the all-in operator
+            return;
+        }
+        // we want the modifier pressed
+        var value = true;
+        var operator = token.slice(0, 1);
+        if (operator === "?") {
+            // we don't care if the modifier is pressed
+            value = null;
+        } else if (operator === "!") {
+            // we do not want the modifier pressed
+            value = false;
+        }
+        if (value !== true) {
+            // compensate for the modifier's operator
+            token = token.slice(1);
+        }
+        var propertyName = modifier[token];
+        if (!propertyName) {
+            throw new TypeError('Unknown modifier "' + token + '"');
+        }
+        expected[propertyName] = value;
+    });
+    return expected;
+}
+function resolveKey(key) {
+    var code = keycode[key] || parseInt(key, 10);
+    if (!code || typeof code !== "number" || isNaN(code)) {
+        throw new TypeError('Unknown key "' + key + '"');
+    }
+    return [
+        code
+    ].concat(keycode._alias[code] || []);
+}
+function matchModifiers(expected, event) {
+    // returns true on match
+    return !modifierSequence.some(function(prop) {
+        // returns true on mismatch
+        return typeof expected[prop] === "boolean" && Boolean(event[prop]) !== expected[prop];
+    });
+}
+function keyBinding(text) {
+    return text.split(/\s+/).map(function(_text) {
+        var tokens = _text.split("+");
+        var _modifiers = resolveModifiers(tokens.slice(0, -1));
+        var _keyCodes = resolveKey(tokens.slice(-1));
+        return {
+            keyCodes: _keyCodes,
+            modifiers: _modifiers,
+            matchModifiers: matchModifiers.bind(null, _modifiers)
+        };
+    });
+}
+// Node.compareDocumentPosition is available since IE9
+// see https://developer.mozilla.org/en-US/docs/Web/API/Node.compareDocumentPosition
+// callback returns true when element is contained by parent or is the parent suited for use with Array.some()
+/*
+  USAGE:
+    var isChildOf = getParentComparator({parent: someNode});
+    listOfElements.some(isChildOf)
+*/ function getParentComparator() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}, parent = _ref.parent, element = _ref.element, includeSelf = _ref.includeSelf;
+    if (parent) {
+        return function isChildOf(node) {
+            return Boolean(includeSelf && node === parent || parent.compareDocumentPosition(node) & Node.DOCUMENT_POSITION_CONTAINED_BY);
+        };
+    } else if (element) {
+        return function isParentOf(node) {
+            return Boolean(includeSelf && element === node || node.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_CONTAINED_BY);
+        };
+    }
+    throw new TypeError("util/compare-position#getParentComparator required either options.parent or options.element");
+}
+// Bug 286933 - Key events in the autocomplete popup should be hidden from page scripts
+// @browser-issue Gecko https://bugzilla.mozilla.org/show_bug.cgi?id=286933
+function whenKey() {
+    var map = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var bindings = {};
+    var context = nodeArray(map.context)[0] || document.documentElement;
+    delete map.context;
+    var filter = nodeArray(map.filter);
+    delete map.filter;
+    var mapKeys = Object.keys(map);
+    if (!mapKeys.length) {
+        throw new TypeError("when/key requires at least one option key");
+    }
+    var registerBinding = function registerBinding(event) {
+        event.keyCodes.forEach(function(code) {
+            if (!bindings[code]) {
+                bindings[code] = [];
+            }
+            bindings[code].push(event);
+        });
+    };
+    mapKeys.forEach(function(text) {
+        if (typeof map[text] !== "function") {
+            throw new TypeError('when/key requires option["' + text + '"] to be a function');
+        }
+        var addCallback = function addCallback(event) {
+            event.callback = map[text];
+            return event;
+        };
+        keyBinding(text).map(addCallback).forEach(registerBinding);
+    });
+    var handleKeyDown = function handleKeyDown(event) {
+        if (event.defaultPrevented) {
+            return;
+        }
+        if (filter.length) {
+            // ignore elements within the exempted sub-trees
+            var isParentOfElement = getParentComparator({
+                element: event.target,
+                includeSelf: true
+            });
+            if (filter.some(isParentOfElement)) {
+                return;
+            }
+        }
+        var key = event.keyCode || event.which;
+        if (!bindings[key]) {
+            return;
+        }
+        bindings[key].forEach(function(_event) {
+            if (!_event.matchModifiers(event)) {
+                return;
+            }
+            _event.callback.call(context, event, disengage);
+        });
+    };
+    context.addEventListener("keydown", handleKeyDown, false);
+    var disengage = function disengage() {
+        context.removeEventListener("keydown", handleKeyDown, false);
+    };
+    return {
+        disengage: disengage
+    };
+}
+function _default(param) {
+    let { context  } = param === void 0 ? {} : param;
+    if (!context) {
+        context = document.documentElement;
+    }
+    // Make sure the supports tests are run before intercepting the Tab key,
+    // or IE10 and IE11 will fail to process the first Tab key event. Not
+    // limiting this warm-up to IE because it may be a problem elsewhere, too.
+    queryTabsequence();
+    return whenKey({
+        // Safari on OSX may require ALT+TAB to reach links,
+        // see https://github.com/medialize/ally.js/issues/146
+        "?alt+?shift+tab": function altShiftTab(event) {
+            // we're completely taking over the Tab key handling
+            event.preventDefault();
+            var sequence = queryTabsequence({
+                context: context
+            });
+            var backward = event.shiftKey;
+            var first = sequence[0];
+            var last = sequence[sequence.length - 1];
+            // wrap around first to last, last to first
+            var source = backward ? first : last;
+            var target = backward ? last : first;
+            if (isActiveElement(source)) {
+                target.focus();
+                return;
+            }
+            // find current position in tabsequence
+            var currentIndex = void 0;
+            var found = sequence.some(function(element, index) {
+                if (!isActiveElement(element)) {
+                    return false;
+                }
+                currentIndex = index;
+                return true;
+            });
+            if (!found) {
+                // redirect to first as we're not in our tabsequence
+                first.focus();
+                return;
+            }
+            // shift focus to previous/next element in the sequence
+            var offset = backward ? -1 : 1;
+            sequence[currentIndex + offset].focus();
+        }
+    });
+}
+
+if ((typeof exports.default === 'function' || (typeof exports.default === 'object' && exports.default !== null)) && typeof exports.default.__esModule === 'undefined') {
+  Object.defineProperty(exports.default, '__esModule', { value: true });
+  Object.assign(exports.default, exports);
+  module.exports = exports.default;
+}
+
+//# sourceMappingURL=maintain--tab-focus.js.map                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       

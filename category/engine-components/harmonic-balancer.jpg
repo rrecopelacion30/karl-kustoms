@@ -1,0 +1,561 @@
+See {@link MenuItemBuilder}
+   */
+  icon(icon) {
+    return this.clone({
+      icon
+    });
+  }
+  /**
+   * Get menu item icon
+   * @returns menu item icon. See {@link PartialMenuItem}
+   */
+  getIcon() {
+    return this.spec.icon;
+  }
+  /**
+   * Set menu item parameters
+   * @param params - menu item parameters. See {@link MenuItemParamsType}
+   * @returns menu item builder based on parameters provided. See {@link MenuItemBuilder}
+   */
+  params(params) {
+    return this.clone({
+      params
+    });
+  }
+  /**
+   * Get meny item parameters
+   * @returns menu item parameters. See {@link PartialMenuItem}
+   */
+  getParams() {
+    return this.spec.params;
+  }
+  /**
+   * Set menu item to show as action
+   * @param showAsAction - determine if menu item should show as action
+   * @returns menu item builder based on if it should show as action. See {@link MenuItemBuilder}
+   */
+  showAsAction() {
+    let showAsAction = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+    return this.clone({
+      showAsAction: Boolean(showAsAction)
+    });
+  }
+  /**
+   * Check if menu item should show as action
+   * @returns true if menu item should show as action, false if not. See {@link PartialMenuItem}
+   */
+  getShowAsAction() {
+    return this.spec.showAsAction;
+  }
+  /** Serialize menu item builder
+   * @param options - serialization options. See {@link SerializeOptions}
+   * @returns menu item node based on path provided in options. See {@link MenuItem}
+   */
+  serialize() {
+    let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+      path: []
+    };
+    const {
+      title,
+      action,
+      intent
+    } = this.spec;
+    if (!title) {
+      const hint = typeof action === "string" ? "action: \"".concat(action, "\"") : void 0;
+      throw new SerializeError("`title` is required for menu item", options.path, options.index, hint).withHelpUrl(HELP_URL.TITLE_REQUIRED);
+    }
+    if (!action && !intent) {
+      throw new SerializeError("`action` or `intent` required for menu item with title ".concat(this.spec.title), options.path, options.index, "\"".concat(title, "\"")).withHelpUrl(HELP_URL.ACTION_OR_INTENT_REQUIRED);
+    }
+    if (intent && action) {
+      throw new SerializeError("cannot set both `action` AND `intent`", options.path, options.index, "\"".concat(title, "\"")).withHelpUrl(HELP_URL.ACTION_AND_INTENT_MUTUALLY_EXCLUSIVE);
+    }
+    return {
+      ...this.spec,
+      title
+    };
+  }
+  /** Clone menu item builder
+   * @param withSpec - menu item options. See {@link PartialMenuItem}
+   * @returns menu item builder based on context and spec provided. See {@link MenuItemBuilder}
+   */
+  clone(withSpec) {
+    const builder = new MenuItemBuilder(this._context);
+    builder.spec = {
+      ...this.spec,
+      ...(withSpec || {})
+    };
+    return builder;
+  }
+}
+function getOrderingMenuItem(context, ordering, extendedProjection) {
+  return new MenuItemBuilder(context).group("sorting").title("Sort by ".concat(ordering.title)).icon(SortIcon).action("setSortOrder").params({
+    by: ordering.by,
+    extendedProjection
+  });
+}
+function getOrderingMenuItemsForSchemaType(context, typeName) {
+  const {
+    schema
+  } = context;
+  const type = typeof typeName === "string" ? schema.get(typeName) : typeName;
+  if (!type || !("orderings" in type)) {
+    return [];
+  }
+  return (type.orderings ? type.orderings.concat(DEFAULT_ORDERING_OPTIONS) : DEFAULT_ORDERING_OPTIONS).map(ordering => getOrderingMenuItem(context, ordering, getExtendedProjection(type, ordering.by)));
+}
+var __defProp$c = Object.defineProperty;
+var __defNormalProp$c = (obj, key, value) => key in obj ? __defProp$c(obj, key, {
+  enumerable: true,
+  configurable: true,
+  writable: true,
+  value
+}) : obj[key] = value;
+var __publicField$c = (obj, key, value) => {
+  __defNormalProp$c(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+function maybeSerializeMenuItemGroup(item, index, path) {
+  return item instanceof MenuItemGroupBuilder ? item.serialize({
+    path,
+    index
+  }) : item;
+}
+class MenuItemGroupBuilder {
+  constructor(_context, spec) {
+    this._context = _context;
+    /** Menu item group ID */
+    __publicField$c(this, "_id");
+    /** Menu item group title */
+    __publicField$c(this, "_title");
+    this._id = spec ? spec.id : "";
+    this._title = spec ? spec.title : "";
+  }
+  /**
+   * Set menu item group ID
+   * @param id - menu item group ID
+   * @returns menu item group builder based on ID provided. See {@link MenuItemGroupBuilder}
+   */
+  id(id) {
+    return new MenuItemGroupBuilder(this._context, {
+      id,
+      title: this._title
+    });
+  }
+  /**
+   * Get menu item group ID
+   * @returns menu item group ID
+   */
+  getId() {
+    return this._id;
+  }
+  /**
+   * Set menu item group title
+   * @param title - menu item group title
+   * @returns menu item group builder based on title provided. See {@link MenuItemGroupBuilder}
+   */
+  title(title) {
+    return new MenuItemGroupBuilder(this._context, {
+      id: this._id,
+      title
+    });
+  }
+  /**
+   * Get menu item group title
+   * @returns menu item group title
+   */
+  getTitle() {
+    return this._title;
+  }
+  /**
+   * Serialize menu item group builder
+   * @param options - serialization options (path). See {@link SerializeOptions}
+   * @returns menu item group based on path provided in options. See {@link MenuItemGroup}
+   */
+  serialize() {
+    let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+      path: []
+    };
+    const {
+      _id,
+      _title
+    } = this;
+    if (!_id) {
+      throw new SerializeError("`id` is required for a menu item group", options.path, options.index, _title).withHelpUrl(HELP_URL.ID_REQUIRED);
+    }
+    if (!_title) {
+      throw new SerializeError("`title` is required for a menu item group", options.path, _id).withHelpUrl(HELP_URL.TITLE_REQUIRED);
+    }
+    return {
+      id: _id,
+      title: _title
+    };
+  }
+}
+const disallowedPattern = /([^A-Za-z0-9-_.])/;
+function validateId(id, parentPath, pathSegment) {
+  if (typeof id !== "string") {
+    throw new SerializeError("Structure node id must be of type string, got ".concat(typeof id), parentPath, pathSegment);
+  }
+  const [disallowedChar] = id.match(disallowedPattern) || [];
+  if (disallowedChar) {
+    throw new SerializeError("Structure node id cannot contain character \"".concat(disallowedChar, "\""), parentPath, pathSegment);
+  }
+  if (id.startsWith("__edit__")) {
+    throw new SerializeError("Structure node id cannot start with __edit__", parentPath, pathSegment);
+  }
+  return id;
+}
+function getStructureNodeId(title, id) {
+  if (id) {
+    return id;
+  }
+  const camelCased = camelCase(title);
+  return disallowedPattern.test(camelCased) ? camelCase(speakingurl(title)) : camelCased;
+}
+var __defProp$b = Object.defineProperty;
+var __defNormalProp$b = (obj, key, value) => key in obj ? __defProp$b(obj, key, {
+  enumerable: true,
+  configurable: true,
+  writable: true,
+  value
+}) : obj[key] = value;
+var __publicField$b = (obj, key, value) => {
+  __defNormalProp$b(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+class ComponentBuilder {
+  constructor(spec) {
+    /** component builder option object */
+    __publicField$b(this, "spec");
+    this.spec = {
+      options: {},
+      ...(spec ? spec : {})
+    };
+  }
+  /** Set Component ID
+   * @param id - component ID
+   * @returns component builder based on ID provided
+   */
+  id(id) {
+    return this.clone({
+      id
+    });
+  }
+  /** Get ID
+   * @returns ID
+   */
+  getId() {
+    return this.spec.id;
+  }
+  /** Set Component title
+   * @param title - component title
+   * @returns component builder based on title provided (and ID)
+   */
+  title(title) {
+    return this.clone({
+      title,
+      id: getStructureNodeId(title, this.spec.id)
+    });
+  }
+  /** Get Component title
+   * @returns title
+   */
+  getTitle() {
+    return this.spec.title;
+  }
+  /** Set Component child
+   * @param child - child component
+   * @returns component builder based on child component provided
+   */
+  child(child) {
+    return this.clone({
+      child
+    });
+  }
+  /** Get Component child
+   * @returns child component
+   */
+  getChild() {
+    return this.spec.child;
+  }
+  /** Set component
+   * @param component - user built component
+   * @returns component builder based on component provided
+   */
+  component(component) {
+    return this.clone({
+      component
+    });
+  }
+  /** Get Component
+   * @returns component
+   */
+  getComponent() {
+    return this.spec.component;
+  }
+  /** Set Component options
+   * @param options - component options
+   * @returns component builder based on options provided
+   */
+  options(options) {
+    return this.clone({
+      options
+    });
+  }
+  /** Get Component options
+   * @returns component options
+   */
+  getOptions() {
+    return this.spec.options || {};
+  }
+  /** Set Component menu items
+   * @param menuItems - component menu items
+   * @returns component builder based on menuItems provided
+   */
+  menuItems(menuItems) {
+    return this.clone({
+      menuItems
+    });
+  }
+  /** Get Component menu items
+   * @returns menu items
+   */
+  getMenuItems() {
+    return this.spec.menuItems;
+  }
+  /** Set Component menu item groups
+   * @param menuItemGroups - component menu item groups
+   * @returns component builder based on menuItemGroups provided
+   */
+  menuItemGroups(menuItemGroups) {
+    return this.clone({
+      menuItemGroups
+    });
+  }
+  /** Get Component menu item groups
+   * @returns menu item groups
+   */
+  getMenuItemGroups() {
+    return this.spec.menuItemGroups;
+  }
+  /** Serialize component
+   * @param options - serialization options
+   * @returns component object based on path provided in options
+   *
+   */
+  serialize() {
+    let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+      path: []
+    };
+    const {
+      id,
+      title,
+      child,
+      options: componentOptions,
+      component
+    } = this.spec;
+    if (!id) {
+      throw new SerializeError("`id` is required for `component` structure item", options.path, options.index).withHelpUrl(HELP_URL.ID_REQUIRED);
+    }
+    if (!component) {
+      throw new SerializeError("`component` is required for `component` structure item", options.path, options.index).withHelpUrl(HELP_URL.ID_REQUIRED);
+    }
+    return {
+      id: validateId(id, options.path, options.index),
+      title,
+      type: "component",
+      child,
+      component,
+      options: componentOptions || {},
+      menuItems: (this.spec.menuItems || []).map((item, i) => maybeSerializeMenuItem(item, i, options.path)),
+      menuItemGroups: (this.spec.menuItemGroups || []).map((item, i) => maybeSerializeMenuItemGroup(item, i, options.path))
+    };
+  }
+  /** Clone component builder (allows for options overriding)
+   * @param withSpec - component builder options
+   * @returns cloned builder
+   */
+  clone(withSpec) {
+    const builder = new ComponentBuilder();
+    builder.spec = {
+      ...this.spec,
+      ...(withSpec || {})
+    };
+    return builder;
+  }
+}
+async function resolveTypeForDocument(getClient, id) {
+  const query = "*[_id in [$documentId, $draftId]]._type";
+  const documentId = getPublishedId(id);
+  const draftId = getDraftId(id);
+  const types = await getClient(DEFAULT_STUDIO_CLIENT_OPTIONS).fetch(query, {
+    documentId,
+    draftId
+  }, {
+    tag: "structure.resolve-type"
+  });
+  return types[0];
+}
+var __defProp$a = Object.defineProperty;
+var __defNormalProp$a = (obj, key, value) => key in obj ? __defProp$a(obj, key, {
+  enumerable: true,
+  configurable: true,
+  writable: true,
+  value
+}) : obj[key] = value;
+var __publicField$a = (obj, key, value) => {
+  __defNormalProp$a(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+class GenericViewBuilder {
+  constructor() {
+    /** Generic view option object */
+    __publicField$a(this, "spec", {});
+  }
+  /** Set generic view ID
+   * @param id - generic view ID
+   * @returns generic view builder based on ID provided. See {@link ConcreteImpl}
+   */
+  id(id) {
+    return this.clone({
+      id
+    });
+  }
+  /** Get generic view ID
+   * @returns generic view ID
+   */
+  getId() {
+    return this.spec.id;
+  }
+  /** Set generic view title
+   * @param title - generic view title
+   * @returns generic view builder based on title provided and (if provided) its ID. See {@link ConcreteImpl}
+   */
+  title(title) {
+    return this.clone({
+      title,
+      id: this.spec.id || kebabCase(title)
+    });
+  }
+  /** Get generic view title
+   * @returns generic view title
+   */
+  getTitle() {
+    return this.spec.title;
+  }
+  /** Set generic view icon
+   * @param icon - generic view icon
+   * @returns generic view builder based on icon provided. See {@link ConcreteImpl}
+   */
+  icon(icon) {
+    return this.clone({
+      icon
+    });
+  }
+  /** Get generic view icon
+   * @returns generic view icon
+   */
+  getIcon() {
+    return this.spec.icon;
+  }
+  /** Serialize generic view
+   * @param options - serialization options. See {@link SerializeOptions}
+   * @returns generic view object based on path provided in options. See {@link BaseView}
+   */
+  serialize() {
+    let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+      path: []
+    };
+    const {
+      id,
+      title,
+      icon
+    } = this.spec;
+    if (!id) {
+      throw new SerializeError("`id` is required for view item", options.path, options.index).withHelpUrl(HELP_URL.ID_REQUIRED);
+    }
+    if (!title) {
+      throw new SerializeError("`title` is required for view item", options.path, options.index).withHelpUrl(HELP_URL.TITLE_REQUIRED);
+    }
+    return {
+      id: validateId(id, options.path, options.index),
+      title,
+      icon
+    };
+  }
+}
+function isSerializable(view) {
+  return typeof view.serialize === "function";
+}
+function maybeSerializeView(item, index, path) {
+  return isSerializable(item) ? item.serialize({
+    path,
+    index
+  }) : item;
+}
+var __defProp$9 = Object.defineProperty;
+var __defNormalProp$9 = (obj, key, value) => key in obj ? __defProp$9(obj, key, {
+  enumerable: true,
+  configurable: true,
+  writable: true,
+  value
+}) : obj[key] = value;
+var __publicField$9 = (obj, key, value) => {
+  __defNormalProp$9(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+const isComponentSpec = spec => isRecord(spec) && spec.type === "component";
+class ComponentViewBuilder extends GenericViewBuilder {
+  constructor(componentOrSpec) {
+    const spec = isComponentSpec(componentOrSpec) ? {
+      ...componentOrSpec
+    } : {
+      options: {}
+    };
+    super();
+    /** Partial Component view option object. See {@link ComponentView} */
+    __publicField$9(this, "spec");
+    this.spec = spec;
+    const userComponent = typeof componentOrSpec === "function" ? componentOrSpec : this.spec.component;
+    if (userComponent) {
+      this.spec = this.component(userComponent).spec;
+    }
+  }
+  /** Set view Component
+   * @param component - component view component. See {@link UserViewComponent}
+   * @returns component view builder based on component view provided. See {@link ComponentViewBuilder}
+   */
+  component(component) {
+    return this.clone({
+      component
+    });
+  }
+  /** Get view Component
+   * @returns Partial component view. See {@link ComponentView}
+   */
+  getComponent() {
+    return this.spec.component;
+  }
+  /** Set view Component options
+   * @param options - component view options
+   * @returns component view builder based on options provided. See {@link ComponentViewBuilder}
+   */
+  options(options) {
+    return this.clone({
+      options
+    });
+  }
+  /** Get view Component options
+   * @returns component view options. See {@link ComponentView}
+   */
+  getOptions() {
+    return this.spec.options || {};
+  }
+  /** Serialize view Component
+   * @param options - serialization options. See {@link SerializeOptions}
+   * @returns component view based on path provided in options. See {@link ComponentView}
+   *
+   */
+  serialize() {
+    let options = arguments.length > 0 && arguments[0] !== undef

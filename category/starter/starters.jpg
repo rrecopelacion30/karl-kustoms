@@ -1,0 +1,348 @@
+import transformDeclPairs from 'css-to-react-native';
+import { typeOf, isElement, isValidElementType } from 'react-is';
+import React, { useContext, useMemo, createElement, Component } from 'react';
+import 'shallowequal';
+import Stylis from '@emotion/stylis';
+import unitless from '@emotion/unitless';
+import supportsColor from 'supports-color';
+import hoist from 'hoist-non-react-statics';
+
+//      
+
+/* eslint-disable no-bitwise */
+var AD_REPLACER_R = /(a)(d)/gi;
+/* This is the "capacity" of our alphabet i.e. 2x26 for all letters plus their capitalised
+ * counterparts */
+
+var charsLength = 52;
+/* start at 75 for 'a' until 'z' (25) and then start at 65 for capitalised letters */
+
+var getAlphabeticChar = function getAlphabeticChar(code) {
+  return String.fromCharCode(code + (code > 25 ? 39 : 97));
+};
+/* input a number, usually a hash and convert it to base-52 */
+
+
+function generateAlphabeticName(code) {
+  var name = '';
+  var x;
+  /* get a char and divide by alphabet-length */
+
+  for (x = Math.abs(code); x > charsLength; x = x / charsLength | 0) {
+    name = getAlphabeticChar(x % charsLength) + name;
+  }
+
+  return (getAlphabeticChar(x % charsLength) + name).replace(AD_REPLACER_R, '$1-$2');
+}
+
+//      
+
+/* eslint-disable */
+var SEED = 5381; // When we have separate strings it's useful to run a progressive
+// version of djb2 where we pretend that we're still looping over
+// the same string
+
+var phash = function phash(h, x) {
+  var i = x.length;
+
+  while (i) {
+    h = h * 33 ^ x.charCodeAt(--i);
+  }
+
+  return h;
+}; // This is a djb2 hashing function
+
+var hash = function hash(x) {
+  return phash(SEED, x);
+};
+
+//      
+var generateComponentId = (function (str) {
+  return generateAlphabeticName(hash(str) >>> 0);
+});
+
+//      
+function getComponentName(target) {
+  return (process.env.NODE_ENV !== 'production' ? typeof target === 'string' && target : false) || // $FlowFixMe
+  target.displayName || // $FlowFixMe
+  target.name || 'Component';
+}
+
+//      
+function isFunction(test) {
+  return typeof test === 'function';
+}
+
+//      
+function isStatelessFunction(test) {
+  return typeof test === 'function' && !(test.prototype && test.prototype.isReactComponent);
+}
+
+//      
+var isPlainObject = (function (x) {
+  return x !== null && typeof x === 'object' && (x.toString ? x.toString() : Object.prototype.toString.call(x)) === '[object Object]' && !typeOf(x);
+});
+
+//      
+function isStyledComponent(target) {
+  return target && typeof target.styledComponentId === 'string';
+}
+
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if ("value" in descriptor) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+
+function _extends() {
+  _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends.apply(this, arguments);
+}
+
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+  subClass.__proto__ = superClass;
+}
+
+function _objectWithoutPropertiesLoose(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+
+  return target;
+}
+
+//      
+var SC_ATTR = typeof process !== 'undefined' && typeof process.env !== 'undefined' && (process.env.REACT_APP_SC_ATTR || process.env.SC_ATTR) || 'data-styled';
+var SC_ATTR_ACTIVE = 'active';
+var SC_ATTR_VERSION = 'data-styled-version';
+var SC_VERSION = "5.3.11";
+var SPLITTER = '/*!sc*/\n';
+var IS_BROWSER = typeof window !== 'undefined' && 'HTMLElement' in window;
+var DISABLE_SPEEDY = Boolean(typeof SC_DISABLE_SPEEDY === 'boolean' ? SC_DISABLE_SPEEDY : typeof process !== 'undefined' && typeof process.env !== 'undefined' ? typeof process.env.REACT_APP_SC_DISABLE_SPEEDY !== 'undefined' && process.env.REACT_APP_SC_DISABLE_SPEEDY !== '' ? process.env.REACT_APP_SC_DISABLE_SPEEDY === 'false' ? false : process.env.REACT_APP_SC_DISABLE_SPEEDY : typeof process.env.SC_DISABLE_SPEEDY !== 'undefined' && process.env.SC_DISABLE_SPEEDY !== '' ? process.env.SC_DISABLE_SPEEDY === 'false' ? false : process.env.SC_DISABLE_SPEEDY : process.env.NODE_ENV !== 'production' : false); // Shared empty execution context when generating static styles
+
+//      
+var EMPTY_ARRAY = Object.freeze([]);
+var EMPTY_OBJECT = Object.freeze({});
+
+var errorMap = {
+  "1": "Cannot create styled-component for component: %s.\n\n",
+  "2": "Can't collect styles once you've consumed a `ServerStyleSheet`'s styles! `ServerStyleSheet` is a one off instance for each server-side render cycle.\n\n- Are you trying to reuse it across renders?\n- Are you accidentally calling collectStyles twice?\n\n",
+  "3": "Streaming SSR is only supported in a Node.js environment; Please do not try to call this method in the browser.\n\n",
+  "4": "The `StyleSheetManager` expects a valid target or sheet prop!\n\n- Does this error occur on the client and is your target falsy?\n- Does this error occur on the server and is the sheet falsy?\n\n",
+  "5": "The clone method cannot be used on the client!\n\n- Are you running in a client-like environment on the server?\n- Are you trying to run SSR on the client?\n\n",
+  "6": "Trying to insert a new style tag, but the given Node is unmounted!\n\n- Are you using a custom target that isn't mounted?\n- Does your document not have a valid head element?\n- Have you accidentally removed a style tag manually?\n\n",
+  "7": "ThemeProvider: Please return an object from your \"theme\" prop function, e.g.\n\n```js\ntheme={() => ({})}\n```\n\n",
+  "8": "ThemeProvider: Please make your \"theme\" prop an object.\n\n",
+  "9": "Missing document `<head>`\n\n",
+  "10": "Cannot find a StyleSheet instance. Usually this happens if there are multiple copies of styled-components loaded at once. Check out this issue for how to troubleshoot and fix the common cases where this situation can happen: https://github.com/styled-components/styled-components/issues/1941#issuecomment-417862021\n\n",
+  "11": "_This error was replaced with a dev-time warning, it will be deleted for v4 final._ [createGlobalStyle] received children which will not be rendered. Please use the component without passing children elements.\n\n",
+  "12": "It seems you are interpolating a keyframe declaration (%s) into an untagged string. This was supported in styled-components v3, but is not longer supported in v4 as keyframes are now injected on-demand. Please wrap your string in the css\\`\\` helper which ensures the styles are injected correctly. See https://www.styled-components.com/docs/api#css\n\n",
+  "13": "%s is not a styled component and cannot be referred to via component selector. See https://www.styled-components.com/docs/advanced#referring-to-other-components for more details.\n\n",
+  "14": "ThemeProvider: \"theme\" prop is required.\n\n",
+  "15": "A stylis plugin has been supplied that is not named. We need a name for each plugin to be able to prevent styling collisions between different stylis configurations within the same app. Before you pass your plugin to `<StyleSheetManager stylisPlugins={[]}>`, please make sure each plugin is uniquely-named, e.g.\n\n```js\nObject.defineProperty(importedPlugin, 'name', { value: 'some-unique-name' });\n```\n\n",
+  "16": "Reached the limit of how many styled components may be created at group %s.\nYou may only create up to 1,073,741,824 components. If you're creating components dynamically,\nas for instance in your render method then you may be running into this limitation.\n\n",
+  "17": "CSSStyleSheet could not be found on HTMLStyleElement.\nHas styled-components' style tag been unmounted or altered by another script?\n"
+};
+
+//      
+var ERRORS = process.env.NODE_ENV !== 'production' ? errorMap : {};
+/**
+ * super basic version of sprintf
+ */
+
+function format() {
+  var a = arguments.length <= 0 ? undefined : arguments[0];
+  var b = [];
+
+  for (var c = 1, len = arguments.length; c < len; c += 1) {
+    b.push(c < 0 || arguments.length <= c ? undefined : arguments[c]);
+  }
+
+  b.forEach(function (d) {
+    a = a.replace(/%[a-z]/, d);
+  });
+  return a;
+}
+/**
+ * Create an error file out of errors.md for development and a simple web link to the full errors
+ * in production mode.
+ */
+
+
+function throwStyledComponentsError(code) {
+  for (var _len = arguments.length, interpolations = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    interpolations[_key - 1] = arguments[_key];
+  }
+
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error("An error occurred. See https://git.io/JUIaE#" + code + " for more information." + (interpolations.length > 0 ? " Args: " + interpolations.join(', ') : ''));
+  } else {
+    throw new Error(format.apply(void 0, [ERRORS[code]].concat(interpolations)).trim());
+  }
+}
+
+//      
+/** Create a GroupedTag with an underlying Tag implementation */
+
+var makeGroupedTag = function makeGroupedTag(tag) {
+  return new DefaultGroupedTag(tag);
+};
+var BASE_SIZE = 1 << 9;
+
+var DefaultGroupedTag = /*#__PURE__*/function () {
+  function DefaultGroupedTag(tag) {
+    this.groupSizes = new Uint32Array(BASE_SIZE);
+    this.length = BASE_SIZE;
+    this.tag = tag;
+  }
+
+  var _proto = DefaultGroupedTag.prototype;
+
+  _proto.indexOfGroup = function indexOfGroup(group) {
+    var index = 0;
+
+    for (var i = 0; i < group; i++) {
+      index += this.groupSizes[i];
+    }
+
+    return index;
+  };
+
+  _proto.insertRules = function insertRules(group, rules) {
+    if (group >= this.groupSizes.length) {
+      var oldBuffer = this.groupSizes;
+      var oldSize = oldBuffer.length;
+      var newSize = oldSize;
+
+      while (group >= newSize) {
+        newSize <<= 1;
+
+        if (newSize < 0) {
+          throwStyledComponentsError(16, "" + group);
+        }
+      }
+
+      this.groupSizes = new Uint32Array(newSize);
+      this.groupSizes.set(oldBuffer);
+      this.length = newSize;
+
+      for (var i = oldSize; i < newSize; i++) {
+        this.groupSizes[i] = 0;
+      }
+    }
+
+    var ruleIndex = this.indexOfGroup(group + 1);
+
+    for (var _i = 0, l = rules.length; _i < l; _i++) {
+      if (this.tag.insertRule(ruleIndex, rules[_i])) {
+        this.groupSizes[group]++;
+        ruleIndex++;
+      }
+    }
+  };
+
+  _proto.clearGroup = function clearGroup(group) {
+    if (group < this.length) {
+      var length = this.groupSizes[group];
+      var startIndex = this.indexOfGroup(group);
+      var endIndex = startIndex + length;
+      this.groupSizes[group] = 0;
+
+      for (var i = startIndex; i < endIndex; i++) {
+        this.tag.deleteRule(startIndex);
+      }
+    }
+  };
+
+  _proto.getGroup = function getGroup(group) {
+    var css = '';
+
+    if (group >= this.length || this.groupSizes[group] === 0) {
+      return css;
+    }
+
+    var length = this.groupSizes[group];
+    var startIndex = this.indexOfGroup(group);
+    var endIndex = startIndex + length;
+
+    for (var i = startIndex; i < endIndex; i++) {
+      css += "" + this.tag.getRule(i) + SPLITTER;
+    }
+
+    return css;
+  };
+
+  return DefaultGroupedTag;
+}();
+
+//      
+var MAX_SMI = 1 << 31 - 1;
+var groupIDRegister = new Map();
+var reverseRegister = new Map();
+var nextFreeGroup = 1;
+var getGroupForId = function getGroupForId(id) {
+  if (groupIDRegister.has(id)) {
+    return groupIDRegister.get(id);
+  }
+
+  while (reverseRegister.has(nextFreeGroup)) {
+    nextFreeGroup++;
+  }
+
+  var group = nextFreeGroup++;
+
+  if (process.env.NODE_ENV !== 'production' && ((group | 0) < 0 || group > MAX_SMI)) {
+    throwStyledComponentsError(16, "" + group);
+  }
+
+  groupIDRegister.set(id, group);
+  reverseRegister.set(group, id);
+  return group;
+};
+var getIdForGroup = function getIdForGroup(group) {
+  return reverseRegister.get(group);
+};
+var setGroupForId = function setGroupForId(id, group) {
+  if (group >= nextFreeGroup) {
+    nextFreeGroup = group + 1;
+  }
+
+  groupIDRegister.set(id, group);
+  reverseRegister.set(group, id);
+};
+
+//      
+var SELECTOR = "style[" + SC_ATTR + "][" + SC_ATTR_VERSION + "=\"" + SC_VERSION + "\"]";
+var MARKER_RE = new RegExp("^" + SC_ATTR + "\\.g(\\d+)\\[id=\"([\\w\\d-]+)\"\\].*?\

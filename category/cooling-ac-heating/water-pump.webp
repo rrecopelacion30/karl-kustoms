@@ -1,0 +1,615 @@
+ string, string, string> */
+  (setLightness);
+  var curriedSetLightness$1 = curriedSetLightness;
+
+  /**
+   * Sets the saturation of a color to the provided value. The saturation range can be
+   * from 0 and 1.
+   *
+   * @example
+   * // Styles as object usage
+   * const styles = {
+   *   background: setSaturation(0.2, '#CCCD64'),
+   *   background: setSaturation('0.75', 'rgba(204,205,100,0.7)'),
+   * }
+   *
+   * // styled-components usage
+   * const div = styled.div`
+   *   background: ${setSaturation(0.2, '#CCCD64')};
+   *   background: ${setSaturation('0.75', 'rgba(204,205,100,0.7)')};
+   * `
+   *
+   * // CSS in JS Output
+   * element {
+   *   background: "#adad84";
+   *   background: "rgba(228,229,76,0.7)";
+   * }
+   */
+
+  function setSaturation(saturation, color) {
+    if (color === 'transparent') return color;
+    return toColorString(_extends__default["default"]({}, parseToHsl(color), {
+      saturation: parseFloat(saturation)
+    }));
+  } // prettier-ignore
+
+
+  var curriedSetSaturation = /*#__PURE__*/curry
+  /* ::<number | string, string, string> */
+  (setSaturation);
+  var curriedSetSaturation$1 = curriedSetSaturation;
+
+  /**
+   * Shades a color by mixing it with black. `shade` can produce
+   * hue shifts, where as `darken` manipulates the luminance channel and therefore
+   * doesn't produce hue shifts.
+   *
+   * @example
+   * // Styles as object usage
+   * const styles = {
+   *   background: shade(0.25, '#00f')
+   * }
+   *
+   * // styled-components usage
+   * const div = styled.div`
+   *   background: ${shade(0.25, '#00f')};
+   * `
+   *
+   * // CSS in JS Output
+   *
+   * element {
+   *   background: "#00003f";
+   * }
+   */
+
+  function shade(percentage, color) {
+    if (color === 'transparent') return color;
+    return mix$1(parseFloat(percentage), 'rgb(0, 0, 0)', color);
+  } // prettier-ignore
+
+
+  var curriedShade = /*#__PURE__*/curry
+  /* ::<number | string, string, string> */
+  (shade);
+  var curriedShade$1 = curriedShade;
+
+  /**
+   * Tints a color by mixing it with white. `tint` can produce
+   * hue shifts, where as `lighten` manipulates the luminance channel and therefore
+   * doesn't produce hue shifts.
+   *
+   * @example
+   * // Styles as object usage
+   * const styles = {
+   *   background: tint(0.25, '#00f')
+   * }
+   *
+   * // styled-components usage
+   * const div = styled.div`
+   *   background: ${tint(0.25, '#00f')};
+   * `
+   *
+   * // CSS in JS Output
+   *
+   * element {
+   *   background: "#bfbfff";
+   * }
+   */
+
+  function tint(percentage, color) {
+    if (color === 'transparent') return color;
+    return mix$1(parseFloat(percentage), 'rgb(255, 255, 255)', color);
+  } // prettier-ignore
+
+
+  var curriedTint = /*#__PURE__*/curry
+  /* ::<number | string, string, string> */
+  (tint);
+  var curriedTint$1 = curriedTint;
+
+  /**
+   * Decreases the opacity of a color. Its range for the amount is between 0 to 1.
+   *
+   *
+   * @example
+   * // Styles as object usage
+   * const styles = {
+   *   background: transparentize(0.1, '#fff'),
+   *   background: transparentize(0.2, 'hsl(0, 0%, 100%)'),
+   *   background: transparentize('0.5', 'rgba(255, 0, 0, 0.8)'),
+   * }
+   *
+   * // styled-components usage
+   * const div = styled.div`
+   *   background: ${transparentize(0.1, '#fff')};
+   *   background: ${transparentize(0.2, 'hsl(0, 0%, 100%)')};
+   *   background: ${transparentize('0.5', 'rgba(255, 0, 0, 0.8)')};
+   * `
+   *
+   * // CSS in JS Output
+   *
+   * element {
+   *   background: "rgba(255,255,255,0.9)";
+   *   background: "rgba(255,255,255,0.8)";
+   *   background: "rgba(255,0,0,0.3)";
+   * }
+   */
+
+  function transparentize(amount, color) {
+    if (color === 'transparent') return color;
+    var parsedColor = parseToRgb(color);
+    var alpha = typeof parsedColor.alpha === 'number' ? parsedColor.alpha : 1;
+
+    var colorWithAlpha = _extends__default["default"]({}, parsedColor, {
+      alpha: guard(0, 1, +(alpha * 100 - parseFloat(amount) * 100).toFixed(2) / 100)
+    });
+
+    return rgba(colorWithAlpha);
+  } // prettier-ignore
+
+
+  var curriedTransparentize = /*#__PURE__*/curry
+  /* ::<number | string, string, string> */
+  (transparentize);
+  var curriedTransparentize$1 = curriedTransparentize;
+
+  /**
+   * Shorthand for easily setting the animation property. Allows either multiple arrays with animations
+   * or a single animation spread over the arguments.
+   * @example
+   * // Styles as object usage
+   * const styles = {
+   *   ...animation(['rotate', '1s', 'ease-in-out'], ['colorchange', '2s'])
+   * }
+   *
+   * // styled-components usage
+   * const div = styled.div`
+   *   ${animation(['rotate', '1s', 'ease-in-out'], ['colorchange', '2s'])}
+   * `
+   *
+   * // CSS as JS Output
+   *
+   * div {
+   *   'animation': 'rotate 1s ease-in-out, colorchange 2s'
+   * }
+   * @example
+   * // Styles as object usage
+   * const styles = {
+   *   ...animation('rotate', '1s', 'ease-in-out')
+   * }
+   *
+   * // styled-components usage
+   * const div = styled.div`
+   *   ${animation('rotate', '1s', 'ease-in-out')}
+   * `
+   *
+   * // CSS as JS Output
+   *
+   * div {
+   *   'animation': 'rotate 1s ease-in-out'
+   * }
+   */
+  function animation() {
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    // Allow single or multiple animations passed
+    var multiMode = Array.isArray(args[0]);
+
+    if (!multiMode && args.length > 8) {
+      throw new PolishedError(64);
+    }
+
+    var code = args.map(function (arg) {
+      if (multiMode && !Array.isArray(arg) || !multiMode && Array.isArray(arg)) {
+        throw new PolishedError(65);
+      }
+
+      if (Array.isArray(arg) && arg.length > 8) {
+        throw new PolishedError(66);
+      }
+
+      return Array.isArray(arg) ? arg.join(' ') : arg;
+    }).join(', ');
+    return {
+      animation: code
+    };
+  }
+
+  /**
+   * Shorthand that accepts any number of backgroundImage values as parameters for creating a single background statement.
+   * @example
+   * // Styles as object usage
+   * const styles = {
+   *   ...backgroundImages('url("/image/background.jpg")', 'linear-gradient(red, green)')
+   * }
+   *
+   * // styled-components usage
+   * const div = styled.div`
+   *   ${backgroundImages('url("/image/background.jpg")', 'linear-gradient(red, green)')}
+   * `
+   *
+   * // CSS as JS Output
+   *
+   * div {
+   *   'backgroundImage': 'url("/image/background.jpg"), linear-gradient(red, green)'
+   * }
+   */
+  function backgroundImages() {
+    for (var _len = arguments.length, properties = new Array(_len), _key = 0; _key < _len; _key++) {
+      properties[_key] = arguments[_key];
+    }
+
+    return {
+      backgroundImage: properties.join(', ')
+    };
+  }
+
+  /**
+   * Shorthand that accepts any number of background values as parameters for creating a single background statement.
+   * @example
+   * // Styles as object usage
+   * const styles = {
+   *   ...backgrounds('url("/image/background.jpg")', 'linear-gradient(red, green)', 'center no-repeat')
+   * }
+   *
+   * // styled-components usage
+   * const div = styled.div`
+   *   ${backgrounds('url("/image/background.jpg")', 'linear-gradient(red, green)', 'center no-repeat')}
+   * `
+   *
+   * // CSS as JS Output
+   *
+   * div {
+   *   'background': 'url("/image/background.jpg"), linear-gradient(red, green), center no-repeat'
+   * }
+   */
+  function backgrounds() {
+    for (var _len = arguments.length, properties = new Array(_len), _key = 0; _key < _len; _key++) {
+      properties[_key] = arguments[_key];
+    }
+
+    return {
+      background: properties.join(', ')
+    };
+  }
+
+  var sideMap = ['top', 'right', 'bottom', 'left'];
+  /**
+   * Shorthand for the border property that splits out individual properties for use with tools like Fela and Styletron. A side keyword can optionally be passed to target only one side's border properties.
+   *
+   * @example
+   * // Styles as object usage
+   * const styles = {
+   *   ...border('1px', 'solid', 'red')
+   * }
+   *
+   * // styled-components usage
+   * const div = styled.div`
+   *   ${border('1px', 'solid', 'red')}
+   * `
+   *
+   * // CSS as JS Output
+   *
+   * div {
+   *   'borderColor': 'red',
+   *   'borderStyle': 'solid',
+   *   'borderWidth': `1px`,
+   * }
+   *
+   * // Styles as object usage
+   * const styles = {
+   *   ...border('top', '1px', 'solid', 'red')
+   * }
+   *
+   * // styled-components usage
+   * const div = styled.div`
+   *   ${border('top', '1px', 'solid', 'red')}
+   * `
+   *
+   * // CSS as JS Output
+   *
+   * div {
+   *   'borderTopColor': 'red',
+   *   'borderTopStyle': 'solid',
+   *   'borderTopWidth': `1px`,
+   * }
+   */
+
+  function border(sideKeyword) {
+    for (var _len = arguments.length, values = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      values[_key - 1] = arguments[_key];
+    }
+
+    if (typeof sideKeyword === 'string' && sideMap.indexOf(sideKeyword) >= 0) {
+      var _ref;
+
+      return _ref = {}, _ref["border" + capitalizeString(sideKeyword) + "Width"] = values[0], _ref["border" + capitalizeString(sideKeyword) + "Style"] = values[1], _ref["border" + capitalizeString(sideKeyword) + "Color"] = values[2], _ref;
+    } else {
+      values.unshift(sideKeyword);
+      return {
+        borderWidth: values[0],
+        borderStyle: values[1],
+        borderColor: values[2]
+      };
+    }
+  }
+
+  /**
+   * Shorthand that accepts up to four values, including null to skip a value, and maps them to their respective directions.
+   * @example
+   * // Styles as object usage
+   * const styles = {
+   *   ...borderColor('red', 'green', 'blue', 'yellow')
+   * }
+   *
+   * // styled-components usage
+   * const div = styled.div`
+   *   ${borderColor('red', 'green', 'blue', 'yellow')}
+   * `
+   *
+   * // CSS as JS Output
+   *
+   * div {
+   *   'borderTopColor': 'red',
+   *   'borderRightColor': 'green',
+   *   'borderBottomColor': 'blue',
+   *   'borderLeftColor': 'yellow'
+   * }
+   */
+  function borderColor() {
+    for (var _len = arguments.length, values = new Array(_len), _key = 0; _key < _len; _key++) {
+      values[_key] = arguments[_key];
+    }
+
+    return directionalProperty.apply(void 0, ['borderColor'].concat(values));
+  }
+
+  /**
+   * Shorthand that accepts a value for side and a value for radius and applies the radius value to both corners of the side.
+   * @example
+   * // Styles as object usage
+   * const styles = {
+   *   ...borderRadius('top', '5px')
+   * }
+   *
+   * // styled-components usage
+   * const div = styled.div`
+   *   ${borderRadius('top', '5px')}
+   * `
+   *
+   * // CSS as JS Output
+   *
+   * div {
+   *   'borderTopRightRadius': '5px',
+   *   'borderTopLeftRadius': '5px',
+   * }
+   */
+  function borderRadius(side, radius) {
+    var uppercaseSide = capitalizeString(side);
+
+    if (!radius && radius !== 0) {
+      throw new PolishedError(62);
+    }
+
+    if (uppercaseSide === 'Top' || uppercaseSide === 'Bottom') {
+      var _ref;
+
+      return _ref = {}, _ref["border" + uppercaseSide + "RightRadius"] = radius, _ref["border" + uppercaseSide + "LeftRadius"] = radius, _ref;
+    }
+
+    if (uppercaseSide === 'Left' || uppercaseSide === 'Right') {
+      var _ref2;
+
+      return _ref2 = {}, _ref2["borderTop" + uppercaseSide + "Radius"] = radius, _ref2["borderBottom" + uppercaseSide + "Radius"] = radius, _ref2;
+    }
+
+    throw new PolishedError(63);
+  }
+
+  /**
+   * Shorthand that accepts up to four values, including null to skip a value, and maps them to their respective directions.
+   * @example
+   * // Styles as object usage
+   * const styles = {
+   *   ...borderStyle('solid', 'dashed', 'dotted', 'double')
+   * }
+   *
+   * // styled-components usage
+   * const div = styled.div`
+   *   ${borderStyle('solid', 'dashed', 'dotted', 'double')}
+   * `
+   *
+   * // CSS as JS Output
+   *
+   * div {
+   *   'borderTopStyle': 'solid',
+   *   'borderRightStyle': 'dashed',
+   *   'borderBottomStyle': 'dotted',
+   *   'borderLeftStyle': 'double'
+   * }
+   */
+  function borderStyle() {
+    for (var _len = arguments.length, values = new Array(_len), _key = 0; _key < _len; _key++) {
+      values[_key] = arguments[_key];
+    }
+
+    return directionalProperty.apply(void 0, ['borderStyle'].concat(values));
+  }
+
+  /**
+   * Shorthand that accepts up to four values, including null to skip a value, and maps them to their respective directions.
+   * @example
+   * // Styles as object usage
+   * const styles = {
+   *   ...borderWidth('12px', '24px', '36px', '48px')
+   * }
+   *
+   * // styled-components usage
+   * const div = styled.div`
+   *   ${borderWidth('12px', '24px', '36px', '48px')}
+   * `
+   *
+   * // CSS as JS Output
+   *
+   * div {
+   *   'borderTopWidth': '12px',
+   *   'borderRightWidth': '24px',
+   *   'borderBottomWidth': '36px',
+   *   'borderLeftWidth': '48px'
+   * }
+   */
+  function borderWidth() {
+    for (var _len = arguments.length, values = new Array(_len), _key = 0; _key < _len; _key++) {
+      values[_key] = arguments[_key];
+    }
+
+    return directionalProperty.apply(void 0, ['borderWidth'].concat(values));
+  }
+
+  function generateSelectors(template, state) {
+    var stateSuffix = state ? ":" + state : '';
+    return template(stateSuffix);
+  }
+  /**
+   * Function helper that adds an array of states to a template of selectors. Used in textInputs and buttons.
+   * @private
+   */
+
+
+  function statefulSelectors(states, template, stateMap) {
+    if (!template) throw new PolishedError(67);
+    if (states.length === 0) return generateSelectors(template, null);
+    var selectors = [];
+
+    for (var i = 0; i < states.length; i += 1) {
+      if (stateMap && stateMap.indexOf(states[i]) < 0) {
+        throw new PolishedError(68);
+      }
+
+      selectors.push(generateSelectors(template, states[i]));
+    }
+
+    selectors = selectors.join(',');
+    return selectors;
+  }
+
+  var stateMap$1 = [undefined, null, 'active', 'focus', 'hover'];
+
+  function template$1(state) {
+    return "button" + state + ",\n  input[type=\"button\"]" + state + ",\n  input[type=\"reset\"]" + state + ",\n  input[type=\"submit\"]" + state;
+  }
+  /**
+   * Populates selectors that target all buttons. You can pass optional states to append to the selectors.
+   * @example
+   * // Styles as object usage
+   * const styles = {
+   *   [buttons('active')]: {
+   *     'border': 'none'
+   *   }
+   * }
+   *
+   * // styled-components usage
+   * const div = styled.div`
+   *   > ${buttons('active')} {
+   *     border: none;
+   *   }
+   * `
+   *
+   * // CSS in JS Output
+   *
+   *  'button:active,
+   *  'input[type="button"]:active,
+   *  'input[type=\"reset\"]:active,
+   *  'input[type=\"submit\"]:active: {
+   *   'border': 'none'
+   * }
+   */
+
+
+  function buttons() {
+    for (var _len = arguments.length, states = new Array(_len), _key = 0; _key < _len; _key++) {
+      states[_key] = arguments[_key];
+    }
+
+    return statefulSelectors(states, template$1, stateMap$1);
+  }
+
+  /**
+   * Shorthand that accepts up to four values, including null to skip a value, and maps them to their respective directions.
+   * @example
+   * // Styles as object usage
+   * const styles = {
+   *   ...margin('12px', '24px', '36px', '48px')
+   * }
+   *
+   * // styled-components usage
+   * const div = styled.div`
+   *   ${margin('12px', '24px', '36px', '48px')}
+   * `
+   *
+   * // CSS as JS Output
+   *
+   * div {
+   *   'marginTop': '12px',
+   *   'marginRight': '24px',
+   *   'marginBottom': '36px',
+   *   'marginLeft': '48px'
+   * }
+   */
+  function margin() {
+    for (var _len = arguments.length, values = new Array(_len), _key = 0; _key < _len; _key++) {
+      values[_key] = arguments[_key];
+    }
+
+    return directionalProperty.apply(void 0, ['margin'].concat(values));
+  }
+
+  /**
+   * Shorthand that accepts up to four values, including null to skip a value, and maps them to their respective directions.
+   * @example
+   * // Styles as object usage
+   * const styles = {
+   *   ...padding('12px', '24px', '36px', '48px')
+   * }
+   *
+   * // styled-components usage
+   * const div = styled.div`
+   *   ${padding('12px', '24px', '36px', '48px')}
+   * `
+   *
+   * // CSS as JS Output
+   *
+   * div {
+   *   'paddingTop': '12px',
+   *   'paddingRight': '24px',
+   *   'paddingBottom': '36px',
+   *   'paddingLeft': '48px'
+   * }
+   */
+  function padding() {
+    for (var _len = arguments.length, values = new Array(_len), _key = 0; _key < _len; _key++) {
+      values[_key] = arguments[_key];
+    }
+
+    return directionalProperty.apply(void 0, ['padding'].concat(values));
+  }
+
+  var positionMap = ['absolute', 'fixed', 'relative', 'static', 'sticky'];
+  /**
+   * Shorthand accepts up to five values, including null to skip a value, and maps them to their respective directions. The first value can optionally be a position keyword.
+   * @example
+   * // Styles as object usage
+   * const styles = {
+   *   ...position('12px', '24px', '36px', '48px')
+   * }
+   *
+   * // styled-components usage
+   * const div = styled.div`
+   *   ${position('12px', '24px', '36px', '48px')}
+   * `
+   *
+   * // CSS as JS Output
+   *
+   *

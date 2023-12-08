@@ -1,0 +1,508 @@
+oupName) => onSetFieldGroupState(prevState => sanity.setAtPath(prevState, path, groupName)), []);
+  const requiredPermission = value._createdAt ? "update" : "create";
+  const liveEdit = Boolean(schemaType == null ? void 0 : schemaType.liveEdit);
+  const docId = value._id ? value._id : "dummy-id";
+  const docPermissionsInput = React.useMemo(() => {
+    return {
+      ...value,
+      _id: liveEdit ? sanity.getPublishedId(docId) : sanity.getDraftId(docId)
+    };
+  }, [liveEdit, value, docId]);
+  const [permissions, isPermissionsLoading] = sanity.useDocumentValuePermissions({
+    document: docPermissionsInput,
+    permission: requiredPermission
+  });
+  const isNonExistent = !(value == null ? void 0 : value._id);
+  const readOnly = React.useMemo(() => {
+    var _a;
+    const hasNoPermission = !isPermissionsLoading && !(permissions == null ? void 0 : permissions.granted);
+    const updateActionDisabled = !_internal.isActionEnabled(schemaType, "update");
+    const createActionDisabled = isNonExistent && !_internal.isActionEnabled(schemaType, "create");
+    const reconnecting = connectionState === "reconnecting";
+    const isLocked = (_a = editState.transactionSyncLock) == null ? void 0 : _a.enabled;
+    return !ready || revTime !== null || hasNoPermission || updateActionDisabled || createActionDisabled || reconnecting || isLocked;
+  }, [connectionState, isNonExistent, isPermissionsLoading, permissions == null ? void 0 : permissions.granted, ready, revTime, schemaType, editState.transactionSyncLock]);
+  const formState = sanity.useFormState(schemaType, {
+    value: displayed,
+    readOnly,
+    comparisonValue: compareValue,
+    focusPath,
+    openPath,
+    collapsedPaths,
+    presence,
+    validation,
+    collapsedFieldSets,
+    fieldGroupState,
+    changesOpen
+  });
+  const formStateRef = React.useRef(formState);
+  formStateRef.current = formState;
+  const setOpenPath = React.useCallback(path => {
+    const ops = sanity.getExpandOperations(formStateRef.current, path);
+    ops.forEach(op => {
+      if (op.type === "expandPath") {
+        onSetCollapsedPath(prevState => sanity.setAtPath(prevState, op.path, false));
+      }
+      if (op.type === "expandFieldSet") {
+        onSetCollapsedFieldSets(prevState => sanity.setAtPath(prevState, op.path, false));
+      }
+      if (op.type === "setSelectedGroup") {
+        onSetFieldGroupState(prevState => sanity.setAtPath(prevState, op.path, op.groupName));
+      }
+    });
+    onSetOpenPath(path);
+  }, [formStateRef]);
+  const documentPane = {
+    actions,
+    activeViewId,
+    badges,
+    changesOpen,
+    closeInspector,
+    collapsedFieldSets,
+    collapsedPaths,
+    compareValue,
+    connectionState,
+    displayed,
+    documentId,
+    documentIdRaw,
+    documentType,
+    editState,
+    fieldActions,
+    focusPath,
+    inspector: currentInspector || null,
+    inspectors,
+    menuItems,
+    onBlur: handleBlur,
+    onChange: handleChange,
+    onFocus: handleFocus,
+    onPathOpen: setOpenPath,
+    onHistoryClose: handleHistoryClose,
+    onHistoryOpen: handleHistoryOpen,
+    onInspectClose: handleLegacyInspectClose,
+    onKeyUp: handleKeyUp,
+    onMenuAction: handleMenuAction,
+    onPaneClose: handlePaneClose,
+    onPaneSplit: handlePaneSplit,
+    onSetActiveFieldGroup: handleSetActiveFieldGroup,
+    onSetCollapsedPath: handleOnSetCollapsedPath,
+    onSetCollapsedFieldSet: handleOnSetCollapsedFieldSet,
+    openInspector,
+    index,
+    inspectOpen,
+    validation,
+    menuItemGroups: menuItemGroups || [],
+    paneKey,
+    previewUrl,
+    ready,
+    schemaType,
+    isPermissionsLoading,
+    permissions,
+    setTimelineMode,
+    setTimelineRange,
+    timelineError,
+    timelineMode,
+    timelineStore,
+    title,
+    value,
+    views,
+    formState,
+    unstable_languageFilter: languageFilter
+  };
+  React.useEffect(() => {
+    if (connectionState === "reconnecting") {
+      pushToast({
+        id: "sanity/desk/reconnecting",
+        status: "warning",
+        title: /* @__PURE__ */jsxRuntime.jsx(jsxRuntime.Fragment, {
+          children: "Connection lost. Reconnecting\u2026"
+        })
+      });
+    }
+  }, [connectionState, pushToast]);
+  React.useEffect(() => {
+    var _a;
+    if (ready && params.path) {
+      const {
+        path,
+        ...restParams
+      } = params;
+      const pathFromUrl = PathUtils.resolveKeyedPath((_a = formStateRef.current) == null ? void 0 : _a.value, PathUtils.fromString(path));
+      setFocusPath(pathFromUrl);
+      setOpenPath(pathFromUrl);
+      paneRouter.setParams(restParams);
+    }
+  }, [params, documentId, setOpenPath, ready, paneRouter]);
+  const [rootFieldActionNodes, setRootFieldActionNodes] = React.useState([]);
+  return /* @__PURE__ */jsxRuntime.jsxs(DocumentPaneContext.Provider, {
+    value: documentPane,
+    children: [inspectors.length > 0 && /* @__PURE__ */jsxRuntime.jsx(DocumentInspectorMenuItemsResolver, {
+      documentId,
+      documentType,
+      inspectors,
+      onMenuItems: setInspectorMenuItems
+    }), fieldActions.length > 0 && schemaType && /* @__PURE__ */jsxRuntime.jsx(sanity.FieldActionsResolver, {
+      actions: fieldActions,
+      documentId,
+      documentType,
+      onActions: setRootFieldActionNodes,
+      path: sanity.EMPTY_ARRAY,
+      schemaType
+    }), /* @__PURE__ */jsxRuntime.jsx(sanity.FieldActionsProvider, {
+      actions: rootFieldActionNodes,
+      path: sanity.EMPTY_ARRAY,
+      children
+    })]
+  });
+});
+DocumentPaneProvider.displayName = "DocumentPaneProvider";
+var __defProp$e = Object.defineProperty;
+var __defNormalProp$e = (obj, key, value) => key in obj ? __defProp$e(obj, key, {
+  enumerable: true,
+  configurable: true,
+  writable: true,
+  value
+}) : obj[key] = value;
+var __publicField$e = (obj, key, value) => {
+  __defNormalProp$e(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+class SerializeError extends Error {
+  constructor(message, parentPath, pathSegment, hint) {
+    super(message);
+    __publicField$e(this, "path");
+    __publicField$e(this, "helpId");
+    const segment = typeof pathSegment === "undefined" ? "<unknown>" : "".concat(pathSegment);
+    this.path = (parentPath || []).concat(hint ? "".concat(segment, " (").concat(hint, ")") : segment);
+  }
+  withHelpUrl(id) {
+    this.helpId = id;
+    return this;
+  }
+}
+var HELP_URL = /* @__PURE__ */(HELP_URL2 => {
+  HELP_URL2["ID_REQUIRED"] = "structure-node-id-required";
+  HELP_URL2["TITLE_REQUIRED"] = "structure-title-required";
+  HELP_URL2["FILTER_REQUIRED"] = "structure-filter-required";
+  HELP_URL2["INVALID_LIST_ITEM"] = "structure-invalid-list-item";
+  HELP_URL2["COMPONENT_REQUIRED"] = "structure-view-component-required";
+  HELP_URL2["DOCUMENT_ID_REQUIRED"] = "structure-document-id-required";
+  HELP_URL2["DOCUMENT_TYPE_REQUIRED"] = "structure-document-type-required";
+  HELP_URL2["SCHEMA_TYPE_REQUIRED"] = "structure-schema-type-required";
+  HELP_URL2["SCHEMA_TYPE_NOT_FOUND"] = "structure-schema-type-not-found";
+  HELP_URL2["LIST_ITEMS_MUST_BE_ARRAY"] = "structure-list-items-must-be-array";
+  HELP_URL2["QUERY_PROVIDED_FOR_FILTER"] = "structure-query-provided-for-filter";
+  HELP_URL2["ACTION_OR_INTENT_REQUIRED"] = "structure-action-or-intent-required";
+  HELP_URL2["LIST_ITEM_IDS_MUST_BE_UNIQUE"] = "structure-list-item-ids-must-be-unique";
+  HELP_URL2["ACTION_AND_INTENT_MUTUALLY_EXCLUSIVE"] = "structure-action-and-intent-mutually-exclusive";
+  return HELP_URL2;
+})(HELP_URL || {});
+const IMPLICIT_FIELDS = ["_id", "_type", "_createdAt", "_updatedAt", "_rev"];
+function joinReferences(schemaType, path) {
+  const [head, ...tail] = path;
+  if (!("fields" in schemaType)) {
+    return "";
+  }
+  const schemaField = schemaType.fields.find(field => field.name === head);
+  if (!schemaField) {
+    if (!IMPLICIT_FIELDS.includes(head)) {
+      console.warn('The current ordering config targeted the nonexistent field "%s" on schema type "%s". It should be one of %o', head, schemaType.name, schemaType.fields.map(field => field.name));
+    }
+    return "";
+  }
+  if ("to" in schemaField.type && schemaField.type.name === "reference") {
+    const refTypes = schemaField.type.to;
+    return "".concat(head, "->{").concat(refTypes.map(refType => joinReferences(refType, tail)).join(","), "}");
+  }
+  const tailFields = tail.length > 0 && joinReferences(schemaField.type, tail);
+  const tailWrapper = tailFields ? "{".concat(tailFields, "}") : "";
+  return tail.length > 0 ? "".concat(head).concat(tailWrapper) : head;
+}
+function getExtendedProjection(schemaType, orderBy) {
+  return orderBy.map(ordering => joinReferences(schemaType, ordering.field.split("."))).join(", ");
+}
+const ORDER_BY_UPDATED_AT = {
+  title: "Last edited",
+  name: "lastEditedDesc",
+  by: [{
+    field: "_updatedAt",
+    direction: "desc"
+  }]
+};
+const ORDER_BY_CREATED_AT = {
+  title: "Created",
+  name: "lastCreatedDesc",
+  by: [{
+    field: "_createdAt",
+    direction: "desc"
+  }]
+};
+const DEFAULT_SELECTED_ORDERING_OPTION = ORDER_BY_UPDATED_AT;
+const DEFAULT_ORDERING_OPTIONS = [ORDER_BY_UPDATED_AT,
+// _updatedAt
+ORDER_BY_CREATED_AT
+// _createdAt
+];
+
+var __defProp$d = Object.defineProperty;
+var __defNormalProp$d = (obj, key, value) => key in obj ? __defProp$d(obj, key, {
+  enumerable: true,
+  configurable: true,
+  writable: true,
+  value
+}) : obj[key] = value;
+var __publicField$d = (obj, key, value) => {
+  __defNormalProp$d(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+function maybeSerializeMenuItem(item, index, path) {
+  return item instanceof MenuItemBuilder ? item.serialize({
+    path,
+    index
+  }) : item;
+}
+class MenuItemBuilder {
+  constructor(_context, spec) {
+    this._context = _context;
+    /** menu item option object. See {@link PartialMenuItem} */
+    __publicField$d(this, "spec");
+    this.spec = spec ? spec : {};
+  }
+  /**
+   * Set menu item action
+   * @param action - menu item action. See {@link MenuItemActionType}
+   * @returns menu item builder based on action provided. See {@link MenuItemBuilder}
+   */
+  action(action) {
+    return this.clone({
+      action
+    });
+  }
+  /**
+   * Get menu item action
+   * @returns menu item builder action. See {@link PartialMenuItem}
+   */
+  getAction() {
+    return this.spec.action;
+  }
+  /**
+   * Set menu item intent
+   * @param intent - menu item intent. See {@link Intent}
+   * @returns menu item builder based on intent provided. See {@link MenuItemBuilder}
+   */
+  intent(intent) {
+    return this.clone({
+      intent
+    });
+  }
+  /**
+   * Get menu item intent
+   * @returns menu item intent. See {@link PartialMenuItem}
+   */
+  getIntent() {
+    return this.spec.intent;
+  }
+  /**
+   * Set menu item title
+   * @param title - menu item title
+   * @returns menu item builder based on title provided. See {@link MenuItemBuilder}
+   */
+  title(title) {
+    return this.clone({
+      title
+    });
+  }
+  /**
+   * Get menu item title
+   * @returns menu item title
+   */
+  getTitle() {
+    return this.spec.title;
+  }
+  /**
+   * Set menu item group
+   * @param group - menu item group
+   * @returns menu item builder based on group provided. See {@link MenuItemBuilder}
+   */
+  group(group) {
+    return this.clone({
+      group
+    });
+  }
+  /**
+   * Get menu item group
+   * @returns menu item group. See {@link PartialMenuItem}
+   */
+  getGroup() {
+    return this.spec.group;
+  }
+  /**
+   * Set menu item icon
+   * @param icon - menu item icon
+   * @returns menu item builder based on icon provided. See {@link MenuItemBuilder}
+   */
+  icon(icon) {
+    return this.clone({
+      icon
+    });
+  }
+  /**
+   * Get menu item icon
+   * @returns menu item icon. See {@link PartialMenuItem}
+   */
+  getIcon() {
+    return this.spec.icon;
+  }
+  /**
+   * Set menu item parameters
+   * @param params - menu item parameters. See {@link MenuItemParamsType}
+   * @returns menu item builder based on parameters provided. See {@link MenuItemBuilder}
+   */
+  params(params) {
+    return this.clone({
+      params
+    });
+  }
+  /**
+   * Get meny item parameters
+   * @returns menu item parameters. See {@link PartialMenuItem}
+   */
+  getParams() {
+    return this.spec.params;
+  }
+  /**
+   * Set menu item to show as action
+   * @param showAsAction - determine if menu item should show as action
+   * @returns menu item builder based on if it should show as action. See {@link MenuItemBuilder}
+   */
+  showAsAction() {
+    let showAsAction = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+    return this.clone({
+      showAsAction: Boolean(showAsAction)
+    });
+  }
+  /**
+   * Check if menu item should show as action
+   * @returns true if menu item should show as action, false if not. See {@link PartialMenuItem}
+   */
+  getShowAsAction() {
+    return this.spec.showAsAction;
+  }
+  /** Serialize menu item builder
+   * @param options - serialization options. See {@link SerializeOptions}
+   * @returns menu item node based on path provided in options. See {@link MenuItem}
+   */
+  serialize() {
+    let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+      path: []
+    };
+    const {
+      title,
+      action,
+      intent
+    } = this.spec;
+    if (!title) {
+      const hint = typeof action === "string" ? "action: \"".concat(action, "\"") : void 0;
+      throw new SerializeError("`title` is required for menu item", options.path, options.index, hint).withHelpUrl(HELP_URL.TITLE_REQUIRED);
+    }
+    if (!action && !intent) {
+      throw new SerializeError("`action` or `intent` required for menu item with title ".concat(this.spec.title), options.path, options.index, "\"".concat(title, "\"")).withHelpUrl(HELP_URL.ACTION_OR_INTENT_REQUIRED);
+    }
+    if (intent && action) {
+      throw new SerializeError("cannot set both `action` AND `intent`", options.path, options.index, "\"".concat(title, "\"")).withHelpUrl(HELP_URL.ACTION_AND_INTENT_MUTUALLY_EXCLUSIVE);
+    }
+    return {
+      ...this.spec,
+      title
+    };
+  }
+  /** Clone menu item builder
+   * @param withSpec - menu item options. See {@link PartialMenuItem}
+   * @returns menu item builder based on context and spec provided. See {@link MenuItemBuilder}
+   */
+  clone(withSpec) {
+    const builder = new MenuItemBuilder(this._context);
+    builder.spec = {
+      ...this.spec,
+      ...(withSpec || {})
+    };
+    return builder;
+  }
+}
+function getOrderingMenuItem(context, ordering, extendedProjection) {
+  return new MenuItemBuilder(context).group("sorting").title("Sort by ".concat(ordering.title)).icon(icons.SortIcon).action("setSortOrder").params({
+    by: ordering.by,
+    extendedProjection
+  });
+}
+function getOrderingMenuItemsForSchemaType(context, typeName) {
+  const {
+    schema
+  } = context;
+  const type = typeof typeName === "string" ? schema.get(typeName) : typeName;
+  if (!type || !("orderings" in type)) {
+    return [];
+  }
+  return (type.orderings ? type.orderings.concat(DEFAULT_ORDERING_OPTIONS) : DEFAULT_ORDERING_OPTIONS).map(ordering => getOrderingMenuItem(context, ordering, getExtendedProjection(type, ordering.by)));
+}
+var __defProp$c = Object.defineProperty;
+var __defNormalProp$c = (obj, key, value) => key in obj ? __defProp$c(obj, key, {
+  enumerable: true,
+  configurable: true,
+  writable: true,
+  value
+}) : obj[key] = value;
+var __publicField$c = (obj, key, value) => {
+  __defNormalProp$c(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+function maybeSerializeMenuItemGroup(item, index, path) {
+  return item instanceof MenuItemGroupBuilder ? item.serialize({
+    path,
+    index
+  }) : item;
+}
+class MenuItemGroupBuilder {
+  constructor(_context, spec) {
+    this._context = _context;
+    /** Menu item group ID */
+    __publicField$c(this, "_id");
+    /** Menu item group title */
+    __publicField$c(this, "_title");
+    this._id = spec ? spec.id : "";
+    this._title = spec ? spec.title : "";
+  }
+  /**
+   * Set menu item group ID
+   * @param id - menu item group ID
+   * @returns menu item group builder based on ID provided. See {@link MenuItemGroupBuilder}
+   */
+  id(id) {
+    return new MenuItemGroupBuilder(this._context, {
+      id,
+      title: this._title
+    });
+  }
+  /**
+   * Get menu item group ID
+   * @returns menu item group ID
+   */
+  getId() {
+    return this._id;
+  }
+  /**
+   * Set menu item group title
+   * @param title - menu item group title
+   * @returns menu item group builder based on title provided. See {@link MenuItemGroupBuilder}
+   */
+  title(title) {
+    return new MenuItemGroupBuilder(this._context, {
+      id: this._id,
+      title
+    });
+  }
+  /**
+   * Get menu item group title
+   * @returns menu item group title
+   */
+  getTitle() {
+    return th

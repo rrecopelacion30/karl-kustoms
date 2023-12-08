@@ -1,0 +1,202 @@
+/* eslint-disable */ // @ts-nocheck
+// Copied from https://github.com/medialize/ally.js
+// License: MIT
+// Copyright (c) 2015 Rodney Rehm
+//
+// Entrypoint: ally.js/maintain/tab-focus
+import _platform from "next/dist/compiled/platform";
+import cssEscape from "next/dist/compiled/css.escape";
+// input may be undefined, selector-tring, Node, NodeList, HTMLCollection, array of Nodes
+// yes, to some extent this is a bad replica of jQuery's constructor function
+function nodeArray(input) {
+    if (!input) {
+        return [];
+    }
+    if (Array.isArray(input)) {
+        return input;
+    }
+    // instanceof Node - does not work with iframes
+    if (input.nodeType !== undefined) {
+        return [
+            input
+        ];
+    }
+    if (typeof input === "string") {
+        input = document.querySelectorAll(input);
+    }
+    if (input.length !== undefined) {
+        return [].slice.call(input, 0);
+    }
+    throw new TypeError("unexpected input " + String(input));
+}
+function contextToElement(_ref) {
+    var context = _ref.context, _ref$label = _ref.label, label = _ref$label === undefined ? "context-to-element" : _ref$label, resolveDocument = _ref.resolveDocument, defaultToDocument = _ref.defaultToDocument;
+    var element = nodeArray(context)[0];
+    if (resolveDocument && element && element.nodeType === Node.DOCUMENT_NODE) {
+        element = element.documentElement;
+    }
+    if (!element && defaultToDocument) {
+        return document.documentElement;
+    }
+    if (!element) {
+        throw new TypeError(label + " requires valid options.context");
+    }
+    if (element.nodeType !== Node.ELEMENT_NODE && element.nodeType !== Node.DOCUMENT_FRAGMENT_NODE) {
+        throw new TypeError(label + " requires options.context to be an Element");
+    }
+    return element;
+}
+function getShadowHost() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}, context = _ref.context;
+    var element = contextToElement({
+        label: "get/shadow-host",
+        context: context
+    });
+    // walk up to the root
+    var container = null;
+    while(element){
+        container = element;
+        element = element.parentNode;
+    }
+    // https://developer.mozilla.org/en-US/docs/Web/API/Node.nodeType
+    // NOTE: Firefox 34 does not expose ShadowRoot.host (but 37 does)
+    if (container.nodeType === container.DOCUMENT_FRAGMENT_NODE && container.host) {
+        // the root is attached to a fragment node that has a host
+        return container.host;
+    }
+    return null;
+}
+function getDocument(node) {
+    if (!node) {
+        return document;
+    }
+    if (node.nodeType === Node.DOCUMENT_NODE) {
+        return node;
+    }
+    return node.ownerDocument || document;
+}
+function isActiveElement(context) {
+    var element = contextToElement({
+        label: "is/active-element",
+        resolveDocument: true,
+        context: context
+    });
+    var _document = getDocument(element);
+    if (_document.activeElement === element) {
+        return true;
+    }
+    var shadowHost = getShadowHost({
+        context: element
+    });
+    if (shadowHost && shadowHost.shadowRoot.activeElement === element) {
+        return true;
+    }
+    return false;
+}
+// [elem, elem.parent, elem.parent.parent, …, html]
+// will not contain the shadowRoot (DOCUMENT_FRAGMENT_NODE) and shadowHost
+function getParents() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}, context = _ref.context;
+    var list = [];
+    var element = contextToElement({
+        label: "get/parents",
+        context: context
+    });
+    while(element){
+        list.push(element);
+        // IE does know support parentElement on SVGElement
+        element = element.parentNode;
+        if (element && element.nodeType !== Node.ELEMENT_NODE) {
+            element = null;
+        }
+    }
+    return list;
+}
+// Element.prototype.matches may be available at a different name
+// https://developer.mozilla.org/en/docs/Web/API/Element/matches
+var names = [
+    "matches",
+    "webkitMatchesSelector",
+    "mozMatchesSelector",
+    "msMatchesSelector"
+];
+var name = null;
+function findMethodName(element) {
+    names.some(function(_name) {
+        if (!element[_name]) {
+            return false;
+        }
+        name = _name;
+        return true;
+    });
+}
+function elementMatches(element, selector) {
+    if (!name) {
+        findMethodName(element);
+    }
+    return element[name](selector);
+}
+// deep clone of original platform
+var platform = JSON.parse(JSON.stringify(_platform));
+// operating system
+var os = platform.os.family || "";
+var ANDROID = os === "Android";
+var WINDOWS = os.slice(0, 7) === "Windows";
+var OSX = os === "OS X";
+var IOS = os === "iOS";
+// layout
+var BLINK = platform.layout === "Blink";
+var GECKO = platform.layout === "Gecko";
+var TRIDENT = platform.layout === "Trident";
+var EDGE = platform.layout === "EdgeHTML";
+var WEBKIT = platform.layout === "WebKit";
+// browser version (not layout engine version!)
+var version = parseFloat(platform.version);
+var majorVersion = Math.floor(version);
+platform.majorVersion = majorVersion;
+platform.is = {
+    // operating system
+    ANDROID: ANDROID,
+    WINDOWS: WINDOWS,
+    OSX: OSX,
+    IOS: IOS,
+    // layout
+    BLINK: BLINK,
+    GECKO: GECKO,
+    TRIDENT: TRIDENT,
+    EDGE: EDGE,
+    WEBKIT: WEBKIT,
+    // INTERNET EXPLORERS
+    IE9: TRIDENT && majorVersion === 9,
+    IE10: TRIDENT && majorVersion === 10,
+    IE11: TRIDENT && majorVersion === 11
+};
+function before() {
+    var data = {
+        // remember what had focus to restore after test
+        activeElement: document.activeElement,
+        // remember scroll positions to restore after test
+        windowScrollTop: window.scrollTop,
+        windowScrollLeft: window.scrollLeft,
+        bodyScrollTop: document.body.scrollTop,
+        bodyScrollLeft: document.body.scrollLeft
+    };
+    // wrap tests in an element hidden from screen readers to prevent them
+    // from announcing focus, which can be quite irritating to the user
+    var iframe = document.createElement("iframe");
+    iframe.setAttribute("style", "position:absolute; position:fixed; top:0; left:-2px; width:1px; height:1px; overflow:hidden;");
+    iframe.setAttribute("aria-live", "off");
+    iframe.setAttribute("aria-busy", "true");
+    iframe.setAttribute("aria-hidden", "true");
+    document.body.appendChild(iframe);
+    var _window = iframe.contentWindow;
+    var _document = _window.document;
+    _document.open();
+    _document.close();
+    var wrapper = _document.createElement("div");
+    _document.body.appendChild(wrapper);
+    data.iframe = iframe;
+    data.wrapper = wrapper;
+    data.window = _window;
+    data.document = _document;
+    ret

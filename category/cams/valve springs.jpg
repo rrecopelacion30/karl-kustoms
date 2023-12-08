@@ -1,0 +1,153 @@
+         var invokerFunction = new_(Function, args1).apply(null, args2);
+            return invokerFunction;
+        }
+        function ensureOverloadTable(proto, methodName, humanName) {
+            if (undefined === proto[methodName].overloadTable) {
+                var prevFunc = proto[methodName];
+                proto[methodName] = function() {
+                    if (!proto[methodName].overloadTable.hasOwnProperty(arguments.length)) {
+                        throwBindingError("Function '" + humanName + "' called with an invalid number of arguments (" + arguments.length + ") - expects one of (" + proto[methodName].overloadTable + ")!");
+                    }
+                    return proto[methodName].overloadTable[arguments.length].apply(this, arguments);
+                };
+                proto[methodName].overloadTable = [];
+                proto[methodName].overloadTable[prevFunc.argCount] = prevFunc;
+            }
+        }
+        function exposePublicSymbol(name, value, numArguments) {
+            if (Module.hasOwnProperty(name)) {
+                if (undefined === numArguments || undefined !== Module[name].overloadTable && undefined !== Module[name].overloadTable[numArguments]) {
+                    throwBindingError("Cannot register public name '" + name + "' twice");
+                }
+                ensureOverloadTable(Module, name, name);
+                if (Module.hasOwnProperty(numArguments)) {
+                    throwBindingError("Cannot register multiple overloads of a function with the same number of arguments (" + numArguments + ")!");
+                }
+                Module[name].overloadTable[numArguments] = value;
+            } else {
+                Module[name] = value;
+                if (undefined !== numArguments) {
+                    Module[name].numArguments = numArguments;
+                }
+            }
+        }
+        function heap32VectorToArray(count, firstElement) {
+            var array = [];
+            for(var i = 0; i < count; i++){
+                array.push(HEAP32[(firstElement >> 2) + i]);
+            }
+            return array;
+        }
+        function replacePublicSymbol(name, value, numArguments) {
+            if (!Module.hasOwnProperty(name)) {
+                throwInternalError("Replacing nonexistent public symbol");
+            }
+            if (undefined !== Module[name].overloadTable && undefined !== numArguments) {
+                Module[name].overloadTable[numArguments] = value;
+            } else {
+                Module[name] = value;
+                Module[name].argCount = numArguments;
+            }
+        }
+        function dynCallLegacy(sig, ptr, args) {
+            var f = Module["dynCall_" + sig];
+            return args && args.length ? f.apply(null, [
+                ptr
+            ].concat(args)) : f.call(null, ptr);
+        }
+        function dynCall(sig, ptr, args) {
+            if (sig.includes("j")) {
+                return dynCallLegacy(sig, ptr, args);
+            }
+            return wasmTable.get(ptr).apply(null, args);
+        }
+        function getDynCaller(sig, ptr) {
+            var argCache = [];
+            return function() {
+                argCache.length = arguments.length;
+                for(var i = 0; i < arguments.length; i++){
+                    argCache[i] = arguments[i];
+                }
+                return dynCall(sig, ptr, argCache);
+            };
+        }
+        function embind__requireFunction(signature, rawFunction) {
+            signature = readLatin1String(signature);
+            function makeDynCaller() {
+                if (signature.includes("j")) {
+                    return getDynCaller(signature, rawFunction);
+                }
+                return wasmTable.get(rawFunction);
+            }
+            var fp = makeDynCaller();
+            if (typeof fp !== "function") {
+                throwBindingError("unknown function pointer with signature " + signature + ": " + rawFunction);
+            }
+            return fp;
+        }
+        var UnboundTypeError = undefined;
+        function getTypeName(type) {
+            var ptr = ___getTypeName(type);
+            var rv = readLatin1String(ptr);
+            _free(ptr);
+            return rv;
+        }
+        function throwUnboundTypeError(message, types) {
+            var unboundTypes = [];
+            var seen = {};
+            function visit(type) {
+                if (seen[type]) {
+                    return;
+                }
+                if (registeredTypes[type]) {
+                    return;
+                }
+                if (typeDependencies[type]) {
+                    typeDependencies[type].forEach(visit);
+                    return;
+                }
+                unboundTypes.push(type);
+                seen[type] = true;
+            }
+            types.forEach(visit);
+            throw new UnboundTypeError(message + ": " + unboundTypes.map(getTypeName).join([
+                ", "
+            ]));
+        }
+        function __embind_register_function(name, argCount, rawArgTypesAddr, signature, rawInvoker, fn) {
+            var argTypes = heap32VectorToArray(argCount, rawArgTypesAddr);
+            name = readLatin1String(name);
+            rawInvoker = embind__requireFunction(signature, rawInvoker);
+            exposePublicSymbol(name, function() {
+                throwUnboundTypeError("Cannot call " + name + " due to unbound types", argTypes);
+            }, argCount - 1);
+            whenDependentTypesAreResolved([], argTypes, function(argTypes) {
+                var invokerArgsArray = [
+                    argTypes[0],
+                    null
+                ].concat(argTypes.slice(1));
+                replacePublicSymbol(name, craftInvokerFunction(name, invokerArgsArray, null, rawInvoker, fn), argCount - 1);
+                return [];
+            });
+        }
+        function integerReadValueFromPointer(name, shift, signed) {
+            switch(shift){
+                case 0:
+                    return signed ? function readS8FromPointer(pointer) {
+                        return HEAP8[pointer];
+                    } : function readU8FromPointer(pointer) {
+                        return HEAPU8[pointer];
+                    };
+                case 1:
+                    return signed ? function readS16FromPointer(pointer) {
+                        return HEAP16[pointer >> 1];
+                    } : function readU16FromPointer(pointer) {
+                        return HEAPU16[pointer >> 1];
+                    };
+                case 2:
+                    return signed ? function readS32FromPointer(pointer) {
+                        return HEAP32[pointer >> 2];
+                    } : function readU32FromPointer(pointer) {
+                        return HEAPU32[pointer >> 2];
+                    };
+ 

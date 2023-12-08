@@ -1,0 +1,508 @@
+ plugin to be used as a CSS processor.
+   *
+   * PostCSS plugin can be in 4 formats:
+   * * A plugin created by {@link postcss.plugin} method.
+   * * A function. PostCSS will pass the function a @{link Root}
+   *   as the first argument and current {@link Result} instance
+   *   as the second.
+   * * An object with a `postcss` method. PostCSS will use that method
+   *   as described in #2.
+   * * Another {@link Processor} instance. PostCSS will copy plugins
+   *   from that instance into this one.
+   *
+   * Plugins can also be added by passing them as arguments when creating
+   * a `postcss` instance (see [`postcss(plugins)`]).
+   *
+   * Asynchronous plugins should return a `Promise` instance.
+   *
+   * @param {Plugin|pluginFunction|Processor} plugin - PostCSS plugin
+   *                                                   or {@link Processor}
+   *                                                   with plugins
+   *
+   * @example
+   * const processor = postcss()
+   *   .use(autoprefixer)
+   *   .use(precss);
+   *
+   * @return {Processes} current processor to make methods chain
+   */
+
+
+  var _proto = Processor.prototype;
+
+  _proto.use = function use(plugin) {
+    this.plugins = this.plugins.concat(this.normalize([plugin]));
+    return this;
+  }
+  /**
+   * Parses source CSS and returns a {@link LazyResult} Promise proxy.
+   * Because some plugins can be asynchronous it doesn’t make
+   * any transformations. Transformations will be applied
+   * in the {@link LazyResult} methods.
+   *
+   * @param {string|toString|Result} css - String with input CSS or
+   *                                       any object with a `toString()`
+   *                                       method, like a Buffer.
+   *                                       Optionally, send a {@link Result}
+   *                                       instance and the processor will
+   *                                       take the {@link Root} from it.
+   * @param {processOptions} [opts]      - options
+   *
+   * @return {LazyResult} Promise proxy
+   *
+   * @example
+   * processor.process(css, { from: 'a.css', to: 'a.out.css' })
+   *   .then(result => {
+   *      console.log(result.css);
+   *   });
+   */
+  ;
+
+  _proto.process = function process(css, opts) {
+    if (opts === void 0) {
+      opts = {};
+    }
+
+    return new LazyResult(this, css, opts);
+  };
+
+  _proto.normalize = function normalize(plugins) {
+    var normalized = [];
+    plugins.forEach(function (i) {
+      if (i.postcss) i = i.postcss;
+
+      if (typeof i === 'object' && Array.isArray(i.plugins)) {
+        normalized = normalized.concat(i.plugins);
+      } else if (typeof i === 'function') {
+        normalized.push(i);
+      } else {
+        throw new Error(i + " is not a PostCSS plugin");
+      }
+    });
+    return normalized;
+  };
+
+  return Processor;
+}();
+
+/**
+ * Represents a CSS file and contains all its parsed nodes.
+ *
+ * @extends Container
+ *
+ * @example
+ * const root = postcss.parse('a{color:black} b{z-index:2}');
+ * root.type         //=> 'root'
+ * root.nodes.length //=> 2
+ */
+
+var Root = /*#__PURE__*/function (_Container) {
+  _inheritsLoose(Root, _Container);
+
+  function Root(defaults) {
+    var _this;
+
+    _this = _Container.call(this, defaults) || this;
+    _this.type = 'root';
+    if (!_this.nodes) _this.nodes = [];
+    return _this;
+  }
+
+  var _proto = Root.prototype;
+
+  _proto.removeChild = function removeChild(child) {
+    child = this.index(child);
+
+    if (child === 0 && this.nodes.length > 1) {
+      this.nodes[1].raws.before = this.nodes[child].raws.before;
+    }
+
+    return _Container.prototype.removeChild.call(this, child);
+  };
+
+  _proto.normalize = function normalize(child, sample, type) {
+    var nodes = _Container.prototype.normalize.call(this, child);
+
+    if (sample) {
+      if (type === 'prepend') {
+        if (this.nodes.length > 1) {
+          sample.raws.before = this.nodes[1].raws.before;
+        } else {
+          delete sample.raws.before;
+        }
+      } else if (this.first !== sample) {
+        nodes.forEach(function (node) {
+          node.raws.before = sample.raws.before;
+        });
+      }
+    }
+
+    return nodes;
+  }
+  /**
+   * Returns a {@link Result} instance representing the root’s CSS.
+   *
+   * @param {processOptions} [opts] - options with only `to` and `map` keys
+   *
+   * @return {Result} result with current root’s CSS
+   *
+   * @example
+   * const root1 = postcss.parse(css1, { from: 'a.css' });
+   * const root2 = postcss.parse(css2, { from: 'b.css' });
+   * root1.append(root2);
+   * const result = root1.toResult({ to: 'all.css', map: true });
+   */
+  ;
+
+  _proto.toResult = function toResult(opts) {
+    if (opts === void 0) {
+      opts = {};
+    }
+
+    var lazy = new LazyResult(new Processor(), this, opts);
+    return lazy.stringify();
+  };
+
+  _proto.remove = function remove(child) {
+    warnOnce('Root#remove is deprecated. Use Root#removeChild');
+    this.removeChild(child);
+  };
+
+  _proto.prevMap = function prevMap() {
+    warnOnce('Root#prevMap is deprecated. Use Root#source.input.map');
+    return this.source.input.map;
+  }
+  /**
+   * @memberof Root#
+   * @member {object} raws - Information to generate byte-to-byte equal
+   *                         node string as it was in the origin input.
+   *
+   * Every parser saves its own properties,
+   * but the default CSS parser uses:
+   *
+   * * `after`: the space symbols after the last child to the end of file.
+   * * `semicolon`: is the last child has an (optional) semicolon.
+   *
+   * @example
+   * postcss.parse('a {}\n').raws //=> { after: '\n' }
+   * postcss.parse('a {}').raws   //=> { after: '' }
+   */
+  ;
+
+  return Root;
+}(Container);
+
+var sequence = 0;
+/**
+ * @typedef  {object} filePosition
+ * @property {string} file   - path to file
+ * @property {number} line   - source line in file
+ * @property {number} column - source column in file
+ */
+
+/**
+ * Represents the source CSS.
+ *
+ * @example
+ * const root  = postcss.parse(css, { from: file });
+ * const input = root.source.input;
+ */
+
+var Input = /*#__PURE__*/function () {
+  /**
+   * @param {string} css    - input CSS source
+   * @param {object} [opts] - {@link Processor#process} options
+   */
+  function Input(css, opts) {
+    if (opts === void 0) {
+      opts = {};
+    }
+
+    /**
+     * @member {string} - input CSS source
+     *
+     * @example
+     * const input = postcss.parse('a{}', { from: file }).input;
+     * input.css //=> "a{}";
+     */
+    this.css = css.toString();
+
+    if (this.css[0] === "\uFEFF" || this.css[0] === "\uFFFE") {
+      this.css = this.css.slice(1);
+    }
+
+    if (opts.from) {
+      if (/^\w+:\/\//.test(opts.from)) {
+        /**
+         * @member {string} - The absolute path to the CSS source file
+         *                    defined with the `from` option.
+         *
+         * @example
+         * const root = postcss.parse(css, { from: 'a.css' });
+         * root.source.input.file //=> '/home/ai/a.css'
+         */
+        this.file = opts.from;
+      } else {
+        this.file = path.resolve(opts.from);
+      }
+    }
+    /*
+        let map = new PreviousMap(this.css, opts);
+        if ( map.text ) {
+            /!**
+             * @member {PreviousMap} - The input source map passed from
+             *                         a compilation step before PostCSS
+             *                         (for example, from Sass compiler).
+             *
+             * @example
+             * root.source.input.map.consumer().sources //=> ['a.sass']
+             *!/
+            this.map = map;
+            let file = map.consumer().file;
+            if ( !this.file && file ) this.file = this.mapResolve(file);
+        }
+    */
+
+
+    if (!this.file) {
+      sequence += 1;
+      /**
+       * @member {string} - The unique ID of the CSS source. It will be
+       *                    created if `from` option is not provided
+       *                    (because PostCSS does not know the file path).
+       *
+       * @example
+       * const root = postcss.parse(css);
+       * root.source.input.file //=> undefined
+       * root.source.input.id   //=> "<input css 1>"
+       */
+
+      this.id = "<input css " + sequence + ">";
+    }
+
+    if (this.map) this.map.file = this.from;
+  }
+
+  var _proto = Input.prototype;
+
+  _proto.error = function error(message, line, column, opts) {
+    if (opts === void 0) {
+      opts = {};
+    }
+
+    var result;
+    var origin = this.origin(line, column);
+
+    if (origin) {
+      result = new CssSyntaxError(message, origin.line, origin.column, origin.source, origin.file, opts.plugin);
+    } else {
+      result = new CssSyntaxError(message, line, column, this.css, this.file, opts.plugin);
+    }
+
+    result.input = {
+      line: line,
+      column: column,
+      source: this.css
+    };
+    if (this.file) result.input.file = this.file;
+    return result;
+  }
+  /**
+   * Reads the input source map and returns a symbol position
+   * in the input source (e.g., in a Sass file that was compiled
+   * to CSS before being passed to PostCSS).
+   *
+   * @param {number} line   - line in input CSS
+   * @param {number} column - column in input CSS
+   *
+   * @return {filePosition} position in input source
+   *
+   * @example
+   * root.source.input.origin(1, 1) //=> { file: 'a.css', line: 3, column: 1 }
+   */
+  ;
+
+  _proto.origin = function origin(line, column) {
+    if (!this.map) return false;
+    var consumer = this.map.consumer();
+    var from = consumer.originalPositionFor({
+      line: line,
+      column: column
+    });
+    if (!from.source) return false;
+    var result = {
+      file: this.mapResolve(from.source),
+      line: from.line,
+      column: from.column
+    };
+    var source = consumer.sourceContentFor(from.source);
+    if (source) result.source = source;
+    return result;
+  };
+
+  _proto.mapResolve = function mapResolve(file) {
+    if (/^\w+:\/\//.test(file)) {
+      return file;
+    } else {
+      return path.resolve(this.map.consumer().sourceRoot || '.', file);
+    }
+  }
+  /**
+   * The CSS source identifier. Contains {@link Input#file} if the user
+   * set the `from` option, or {@link Input#id} if they did not.
+   * @type {string}
+   *
+   * @example
+   * const root = postcss.parse(css, { from: 'a.css' });
+   * root.source.input.from //=> "/home/ai/a.css"
+   *
+   * const root = postcss.parse(css);
+   * root.source.input.from //=> "<input css 1>"
+   */
+  ;
+
+  _createClass(Input, [{
+    key: "from",
+    get: function get() {
+      return this.file || this.id;
+    }
+  }]);
+
+  return Input;
+}();
+
+var SafeParser = /*#__PURE__*/function (_Parser) {
+  _inheritsLoose(SafeParser, _Parser);
+
+  function SafeParser() {
+    return _Parser.apply(this, arguments) || this;
+  }
+
+  var _proto = SafeParser.prototype;
+
+  _proto.tokenize = function tokenize$1() {
+    this.tokens = tokenize(this.input, {
+      ignoreErrors: true
+    });
+  };
+
+  _proto.comment = function comment(token) {
+    var node = new Comment();
+    this.init(node, token[2], token[3]);
+    node.source.end = {
+      line: token[4],
+      column: token[5]
+    };
+    var text = token[1].slice(2);
+    if (text.slice(-2) === '*/') text = text.slice(0, -2);
+
+    if (/^\s*$/.test(text)) {
+      node.text = '';
+      node.raws.left = text;
+      node.raws.right = '';
+    } else {
+      var match = text.match(/^(\s*)([^]*[^\s])(\s*)$/);
+      node.text = match[2];
+      node.raws.left = match[1];
+      node.raws.right = match[3];
+    }
+  };
+
+  _proto.unclosedBracket = function unclosedBracket() {};
+
+  _proto.unknownWord = function unknownWord(start) {
+    var buffer = this.tokens.slice(start, this.pos + 1);
+    this.spaces += buffer.map(function (i) {
+      return i[1];
+    }).join('');
+  };
+
+  _proto.unexpectedClose = function unexpectedClose() {
+    this.current.raws.after += '}';
+  };
+
+  _proto.doubleColon = function doubleColon() {};
+
+  _proto.unnamedAtrule = function unnamedAtrule(node) {
+    node.name = '';
+  };
+
+  _proto.precheckMissedSemicolon = function precheckMissedSemicolon(tokens) {
+    var colon = this.colon(tokens);
+    if (colon === false) return;
+    var split;
+
+    for (split = colon - 1; split >= 0; split--) {
+      if (tokens[split][0] === 'word') break;
+    }
+
+    for (split -= 1; split >= 0; split--) {
+      if (tokens[split][0] !== 'space') {
+        split += 1;
+        break;
+      }
+    }
+
+    var other = tokens.splice(split, tokens.length - split);
+    this.decl(other);
+  };
+
+  _proto.checkMissedSemicolon = function checkMissedSemicolon() {};
+
+  _proto.endFile = function endFile() {
+    if (this.current.nodes && this.current.nodes.length) {
+      this.current.raws.semicolon = this.semicolon;
+    }
+
+    this.current.raws.after = (this.current.raws.after || '') + this.spaces;
+
+    while (this.current.parent) {
+      this.current = this.current.parent;
+      this.current.raws.after = '';
+    }
+  };
+
+  return SafeParser;
+}(Parser);
+
+//      
+function safeParse(css, opts) {
+  var input = new Input(css, opts);
+  var parser = new SafeParser(input);
+  parser.tokenize();
+  parser.loop();
+  return parser.root;
+}
+
+//      
+var generated = {};
+/*
+ InlineStyle takes arbitrary CSS and generates a flat object
+ */
+
+var _InlineStyle = (function (styleSheet) {
+  var InlineStyle = /*#__PURE__*/function () {
+    function InlineStyle(rules) {
+      this.rules = rules;
+    }
+
+    var _proto = InlineStyle.prototype;
+
+    _proto.generateStyleObject = function generateStyleObject(executionContext) {
+      var flatCSS = flatten(this.rules, executionContext).join('');
+      var hash = generateComponentId(flatCSS);
+
+      if (!generated[hash]) {
+        var root = safeParse(flatCSS);
+        var declPairs = [];
+        root.each(function (node) {
+          if (node.type === 'decl') {
+            declPairs.push([node.prop, node.value]);
+          } else if (process.env.NODE_ENV !== 'production' && node.type !== 'comment') {
+            /* eslint-disable no-console */
+            console.warn("Node of type " + node.type + " not supported as an inline style");
+          }
+        }); // RN currently does not support differing values for the corner radii of Image
+        // components (but does for View). It is almost impossible to tell whether we'll have
+        // support, so we'll just disable multiple values here.
+        // https://github.com/styled-components/css-to-reac

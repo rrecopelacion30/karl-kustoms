@@ -1,0 +1,279 @@
+nd-tool",
+                    "locale": "pl_PL"
+                }
+            ],
+            "itemId": "Adobe Magic Wand Tool",
+            "templateId": "T48SearchResultsViewCurated",
+            "context": {
+                "experienceState": [
+                    3,
+                    6,
+                    8
+                ],
+                "trigger": "search"
+            },
+            "synonyms": []
+        },
+        {
+            "name": "Narzędzie Siatka",
+            "id": "recJH0MsH7SWIHUwd",
+            "sortflag": 74,
+            "cmHelpx": [
+                {
+                    "id": "illustrator/using/tool-techniques/mesh-tool",
+                    "locale": "pl_PL"
+                }
+            ],
+            "cmHelpXDetail": [
+                {
+                    "id": "illustrator/using/tool-techniques/mesh-tool",
+                    "locale": "pl_PL"
+                }
+            ],
+            "itemId": "Adobe Mesh Editing Tool",
+            "templateId": "T47SearchResultsViewToolTech",
+            "context": {
+                "experienceState": [
+                    3,
+                    6,
+                    8
+                ],
+                "trigger": "tool_technique"
+            },
+            "synonyms": []
+        },
+        {
+            "name": "Narzędzie Siatka",
+            "id": "recJKj89KkYsX56kK",
+            "sortflag": 75,
+            "cmHelpx": [
+                {
+                    "id": "illustrator/using/tool-techniques/mesh-tool",
+                    "locale": "pl_PL"
+                }
+            ],
+            "cmHelpXDetail": [
+                {
+                    "id": "illustrator/using/tool-techniques/mesh-tool",
+                    "locale": "pl_PL"
+                }
+            ],
+            "itemId": "Adobe Mesh Editing Tool",
+            "templateId": "T48SearchResultsViewCurated",
+            "context": {
+                "experienceState": [
+                    3,
+                    6,
+                    8
+                ],
+                "trigger": "search"
+            },
+            "synonyms": []
+        },
+        {
+            "name": "Narzędzie Pędzel",
+            "id": "recZpJGGg72E0X65v",
+            "sortflag": 76,
+            "cmHelpx": [
+                {
+                    "id": "illustrator/using/tool-techniques/paintbrush-tool",
+                    "locale": "pl_PL"
+                }
+            ],
+            "cmHelpXDetail": [
+                {
+                    "id": "illustrator/using/tool-techniques/paintbrush-tool",
+                    "locale": "pl_PL"
+                }
+            ],
+            "itemId": "Adobe Brush Tool",
+            "templateId": "T47SearchResultsViewToolTech",
+            "context": {
+                "experienceState": [
+                    3,
+                    6,
+                    8
+                ],
+                "trigger": "tool_technique"
+            },
+            "synonyms": []
+        },
+        {
+            "name": "Narzędzie Pędzel",
+            "id": "recS4JTgxgvOACpvc",
+            "sortflag": 77,
+            "cmHelpx": [
+                {
+                    "id": "illustrator/using/tool-techniques/paintbrush-tool",
+                    "locale": "pl_PL"
+                }
+            ],
+            "cmHelpXDetail": [
+                {
+                    "id": "illustrator/using/tool-techniques/paintbrush-tool",
+                    "locale": "pl_PL"
+                }
+            ],
+            "itemId": "Adobe Brush Tool",
+            "templateId": "T48SearchResultsViewCurated",
+            "context": {
+                "experienceState": [
+                    3,
+                    6,
+                    8
+                ],
+                "trigger": "search"
+            },
+            "synonyms": []
+        },
+        {
+            "name": "Narzędzie Pióro",
+            "id": "rec7ZvDYNPHZoCOoD",
+            "sortflag": 78,
+            "cmHelpx": [
+                {
+                    "id": "illustrator/using/tool-techniques/pen-tool",
+                    "locale": "pl_PL"
+                }
+            ],
+            "cmHelpXDetail": [
+                {
+                    "id": "illustrator/using/tool-techniques/pen-tool",
+                    "locale": "pl_PL"
+                }
+            ],
+            "itemId": "Adobe Pen Tool",
+            "templateId": "T47SearchResultsViewToolTech",
+            "context": {
+                "experienceState": [
+                    3,
+                    6,
+                    8
+                ],
+                "trigger": "tool_technique"
+            },
+            "synonyms": []
+        },
+        {
+            "name": "Narzędzie Pióro",
+            "id": "recgJGwACQUplirsU",
+            "sortflag": 79,
+            "cmHelpx": [
+                {
+                    "id": "illustrator/using/tool-techniques/pen-tool",
+                    "locale": "pl_PL"
+                }
+            ],
+            "cmHelpXDetail": [
+                {
+                    "id": "illustrator/using/tool-techniques/pen-tool",
+                    "locale": "pl_PL"
+                }
+            ],
+            "itemId": "Adobe Pen Tool",
+            "templateId": "T48SearchResultsViewCurated",
+            "context": {
+                "experienceState": [
+                    3,
+                    6,
+                    8
+                ],
+                "trigger": "search"
+            },
+            "synonyms": []
+        },
+        {
+            "name": "Narzędzie Ołówek",
+            "id": "rec1V0dFHw843LUAP",
+            "sortflag": 80,
+            "cmHelpx": [
+                {
+                    "id": "illustrator/using/tool-techniques/pencil-tool",
+                    "locale": "pl_PL"
+                }
+            ],
+            "cmHelpXDetail": [
+                {
+                    "id": "illustrator/using/tool-techniques/pencil-tool",
+                    "locale": "pl_PL"
+                }
+            ],
+            "itemId": "Adobe Freehand Tool",
+            "templateId": "T47SearchResultsViewToolTech",
+            "context": {
+                "experienceState": [
+                    3,
+                    6,
+                    8
+                ],
+                "trigger": "tool_technique"
+            },
+            "synonyms": []
+        },
+        {
+            "name": "Narzędzie Ołówek",
+            "id": "recpA6K12W03oi1oW",
+            "sortflag": 81,
+            "cmHelpx": [
+                {
+                    "id": "illustrator/using/tool-techniques/pencil-tool",
+                    "locale": "pl_PL"
+                }
+            ],
+            "cmHelpXDetail": [
+                {
+                    "id": "illustrator/using/tool-techniques/pencil-tool",
+                    "locale": "pl_PL"
+                }
+            ],
+            "itemId": "Adobe Freehand Tool",
+            "templateId": "T48SearchResultsViewCurated",
+            "context": {
+                "experienceState": [
+                    3,
+                    6,
+                    8
+                ],
+                "trigger": "search"
+            },
+            "synonyms": []
+        },
+        {
+            "name": "Wielokąt",
+            "id": "recRkoGOL6lFYUAWm",
+            "sortflag": 82,
+            "cmHelpx": [
+                {
+                    "id": "illustrator/using/tool-techniques/polygon-tool",
+                    "locale": "pl_PL"
+                }
+            ],
+            "cmHelpXDetail": [
+                {
+                    "id": "illustrator/using/tool-techniques/polygon-tool",
+                    "locale": "pl_PL"
+                }
+            ],
+            "itemId": "Adobe Shape Construction Regular Polygon Tool",
+            "templateId": "T47SearchResultsViewToolTech",
+            "context": {
+                "experienceState": [
+                    3,
+                    6,
+                    8
+                ],
+                "trigger": "tool_technique"
+            },
+            "synonyms": []
+        },
+        {
+            "name": "Wielokąt",
+            "id": "recwM1KTtDGhjgzY2",
+            "sortflag": 83,
+            "cmHelpx": [
+                {
+                    "id": "illustrator/using/tool-techniques/polygon-tool",
+                    "locale": "pl_PL"
+                }
+            ],
+            "cmHe

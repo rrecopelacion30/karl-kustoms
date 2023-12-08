@@ -1,0 +1,123 @@
+endency)=>{
+                const module = moduleGraph.getModule(dependency);
+                if (module) {
+                    modules.add(module);
+                }
+            };
+            entry.dependencies.forEach(addEntriesFromDependency);
+            entry.includeDependencies.forEach(addEntriesFromDependency);
+            const entryMetadata = {
+                wasmBindings: new Map(),
+                assetBindings: new Map()
+            };
+            if (route == null ? void 0 : (_route_middlewareConfig = route.middlewareConfig) == null ? void 0 : _route_middlewareConfig.regions) {
+                entryMetadata.regions = route.middlewareConfig.regions;
+            }
+            if (route == null ? void 0 : route.preferredRegion) {
+                const preferredRegion = route.preferredRegion;
+                entryMetadata.regions = // Ensures preferredRegion is always an array in the manifest.
+                typeof preferredRegion === "string" ? [
+                    preferredRegion
+                ] : preferredRegion;
+            }
+            let ogImageGenerationCount = 0;
+            for (const module of modules){
+                const buildInfo = getModuleBuildInfo(module);
+                /**
+         * Check if it uses the image generation feature.
+         */ if (!dev) {
+                    const resource = module.resource;
+                    const hasOGImageGeneration = resource && /[\\/]node_modules[\\/]@vercel[\\/]og[\\/]dist[\\/]index\.(edge|node)\.js$|[\\/]next[\\/]dist[\\/](esm[\\/])?server[\\/]web[\\/]spec-extension[\\/]image-response\.js$/.test(resource);
+                    if (hasOGImageGeneration) {
+                        ogImageGenerationCount++;
+                    }
+                }
+                /**
+         * When building for production checks if the module is using `eval`
+         * and in such case produces a compilation error. The module has to
+         * be in use.
+         */ if (!dev && buildInfo.usingIndirectEval && isUsingIndirectEvalAndUsedByExports({
+                    module,
+                    moduleGraph,
+                    runtime: wp.util.runtime.getEntryRuntime(compilation, entryName),
+                    usingIndirectEval: buildInfo.usingIndirectEval,
+                    wp
+                })) {
+                    var _route_middlewareConfig1;
+                    const id = module.identifier();
+                    if (/node_modules[\\/]regenerator-runtime[\\/]runtime\.js/.test(id)) {
+                        continue;
+                    }
+                    if (route == null ? void 0 : (_route_middlewareConfig1 = route.middlewareConfig) == null ? void 0 : _route_middlewareConfig1.unstable_allowDynamicGlobs) {
+                        telemetry == null ? void 0 : telemetry.record({
+                            eventName: "NEXT_EDGE_ALLOW_DYNAMIC_USED",
+                            payload: {
+                                file: route == null ? void 0 : route.absolutePagePath.replace(rootDir ?? "", ""),
+                                config: route == null ? void 0 : route.middlewareConfig,
+                                fileWithDynamicCode: module.userRequest.replace(rootDir ?? "", "")
+                            }
+                        });
+                    }
+                    if (!isDynamicCodeEvaluationAllowed(module.userRequest, route == null ? void 0 : route.middlewareConfig, rootDir)) {
+                        compilation.errors.push(buildWebpackError({
+                            message: `Dynamic Code Evaluation (e. g. 'eval', 'new Function', 'WebAssembly.compile') not allowed in Edge Runtime ${typeof buildInfo.usingIndirectEval !== "boolean" ? `\nUsed by ${Array.from(buildInfo.usingIndirectEval).join(", ")}` : ""}\nLearn More: https://nextjs.org/docs/messages/edge-dynamic-code-evaluation`,
+                            entryModule: module,
+                            compilation
+                        }));
+                    }
+                }
+                /**
+         * The entry module has to be either a page or a middleware and hold
+         * the corresponding metadata.
+         */ if (buildInfo == null ? void 0 : buildInfo.nextEdgeSSR) {
+                    entryMetadata.edgeSSR = buildInfo.nextEdgeSSR;
+                } else if (buildInfo == null ? void 0 : buildInfo.nextEdgeMiddleware) {
+                    entryMetadata.edgeMiddleware = buildInfo.nextEdgeMiddleware;
+                } else if (buildInfo == null ? void 0 : buildInfo.nextEdgeApiFunction) {
+                    entryMetadata.edgeApiFunction = buildInfo.nextEdgeApiFunction;
+                }
+                /**
+         * If the module is a WASM module we read the binding information and
+         * append it to the entry wasm bindings.
+         */ if (buildInfo == null ? void 0 : buildInfo.nextWasmMiddlewareBinding) {
+                    entryMetadata.wasmBindings.set(buildInfo.nextWasmMiddlewareBinding.name, buildInfo.nextWasmMiddlewareBinding.filePath);
+                }
+                if (buildInfo == null ? void 0 : buildInfo.nextAssetMiddlewareBinding) {
+                    entryMetadata.assetBindings.set(buildInfo.nextAssetMiddlewareBinding.name, buildInfo.nextAssetMiddlewareBinding.filePath);
+                }
+                /**
+         * Append to the list of modules to process outgoingConnections from
+         * the module that is being processed.
+         */ for (const conn of moduleGraph.getOutgoingConnections(module)){
+                    if (conn.module) {
+                        modules.add(conn.module);
+                    }
+                }
+            }
+            telemetry == null ? void 0 : telemetry.record({
+                eventName: EVENT_BUILD_FEATURE_USAGE,
+                payload: {
+                    featureName: "vercelImageGeneration",
+                    invocationCount: ogImageGenerationCount
+                }
+            });
+            metadataByEntry.set(entryName, entryMetadata);
+        }
+    };
+}
+export default class MiddlewarePlugin {
+    constructor({ dev , sriEnabled  }){
+        this.dev = dev;
+        this.sriEnabled = sriEnabled;
+    }
+    apply(compiler) {
+        compiler.hooks.compilation.tap(NAME, (compilation, params)=>{
+            const { hooks  } = params.normalModuleFactory;
+            /**
+       * This is the static code analysis phase.
+       */ const codeAnalyzer = getCodeAnalyzer({
+                dev: this.dev,
+                compiler,
+                compilation
+            });
+     

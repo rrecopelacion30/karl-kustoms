@@ -1,0 +1,843 @@
+ren: badge.label
+      })
+    }, String(index)))
+  });
+}
+function DocumentBadges() {
+  const {
+    badges,
+    editState
+  } = useDocumentPane();
+  if (!editState || !badges) return null;
+  return /* @__PURE__ */jsx(RenderBadgeCollectionState, {
+    badges,
+    badgeProps: editState,
+    children: _ref19 => {
+      let {
+        states
+      } = _ref19;
+      return /* @__PURE__ */jsx(DocumentBadgesInner, {
+        states
+      });
+    }
+  });
+}
+const Root = styled(Flex)(_templateObject8 || (_templateObject8 = _taggedTemplateLiteral(["\n  cursor: default;\n"])));
+function PublishStatus(props) {
+  const {
+    collapsed,
+    disabled,
+    lastPublished,
+    lastUpdated,
+    liveEdit
+  } = props;
+  const lastPublishedTimeAgo = useTimeAgo(lastPublished || "", {
+    minimal: true,
+    agoSuffix: true
+  });
+  const lastPublishedTime = useTimeAgo(lastPublished || "", {
+    minimal: true
+  });
+  const lastUpdatedTimeAgo = useTimeAgo(lastUpdated || "", {
+    minimal: true,
+    agoSuffix: true
+  });
+  const lastUpdatedTime = useTimeAgo(lastUpdated || "", {
+    minimal: true
+  });
+  return /* @__PURE__ */jsx(Root, {
+    align: "center",
+    "data-ui": "SessionLayout",
+    sizing: "border",
+    children: /* @__PURE__ */jsx(Tooltip, {
+      placement: "top",
+      portal: true,
+      content: /* @__PURE__ */jsx(Stack, {
+        padding: 3,
+        space: 3,
+        children: /* @__PURE__ */jsx(Text, {
+          size: 1,
+          muted: true,
+          children: liveEdit ? /* @__PURE__ */jsxs(Fragment, {
+            children: ["Last updated ", lastUpdated ? lastUpdatedTimeAgo : lastPublishedTimeAgo]
+          }) : /* @__PURE__ */jsxs(Fragment, {
+            children: ["Last published ", lastPublishedTimeAgo]
+          })
+        })
+      }),
+      children: /* @__PURE__ */jsx(Button, {
+        mode: "bleed",
+        tone: liveEdit ? "critical" : "positive",
+        tabIndex: -1,
+        disabled,
+        children: /* @__PURE__ */jsxs(Flex, {
+          align: "center",
+          children: [/* @__PURE__ */jsx(Box, {
+            marginRight: collapsed ? 0 : 3,
+            children: /* @__PURE__ */jsx(Text, {
+              size: 2,
+              children: liveEdit ? /* @__PURE__ */jsx(PlayIcon, {}) : /* @__PURE__ */jsx(PublishIcon, {})
+            })
+          }), !collapsed && /* @__PURE__ */jsx(Text, {
+            size: 1,
+            weight: "medium",
+            children: liveEdit ? /* @__PURE__ */jsx(Fragment, {
+              children: lastUpdated ? lastUpdatedTime : lastPublishedTime
+            }) : lastPublishedTime
+          })]
+        })
+      })
+    })
+  });
+}
+const StyledMotionPath = styled(motion.path)(_templateObject9 || (_templateObject9 = _taggedTemplateLiteral(["\n  transform-origin: center;\n"])));
+const Circle = props => /* @__PURE__ */jsx(motion.circle, {
+  fill: "none",
+  r: "8",
+  cx: "12.5",
+  cy: "12.5",
+  strokeWidth: "1.2",
+  ...props
+});
+const Arrows = props => /* @__PURE__ */jsx(StyledMotionPath, {
+  fill: "none",
+  d: "M14 17.5619L11.5 20.5L14.5 23.0619M11 7.43811L13.5 4.50001L10.5 1.93811",
+  ...props
+});
+const Checkmark = props => /* @__PURE__ */jsx(motion.path, {
+  d: "M9.5 12.1316L11.7414 14.5L16 10",
+  ...props
+});
+const Edit = props => /* @__PURE__ */jsx(motion.path, {
+  d: "M15 7L18 10M6 19L7 15L17 5L20 8L10 18L6 19Z",
+  ...props
+});
+const rotateAnimation = keyframes(_templateObject10 || (_templateObject10 = _taggedTemplateLiteral(["\n  0% {\n    transform: rotate(0);\n  }\n  100% {\n    transform: rotate(360deg);\n  }\n"])));
+const RotateGroup = styled.g(_templateObject11 || (_templateObject11 = _taggedTemplateLiteral(["\n  transform-origin: center;\n\n  &[data-rotate] {\n    animation: ", " 1s ease-in-out infinite;\n  }\n"])), rotateAnimation);
+const root = {
+  syncing: {
+    scale: 1,
+    transition: {
+      duration: 0
+    }
+  },
+  saved: {
+    scale: [1, 0.8, 1.2, 0.9, 1.1, 0.95, 1.05, 0.99, 1],
+    transition: {
+      duration: 0.5,
+      delay: 0.2
+    }
+  },
+  changes: {
+    transition: {
+      duration: 0
+    }
+  }
+};
+const circle = {
+  syncing: {
+    strokeDasharray: "0, 0, 23, 3, 23, 3",
+    strokeDashoffset: 10,
+    opacity: 1,
+    transition: {
+      duration: 0
+    }
+  },
+  saved: {
+    strokeDasharray: "0, 0, 23, 0, 23, 0",
+    strokeDashoffset: 10,
+    opacity: 1,
+    transition: {
+      duration: 0.2
+    }
+  },
+  changes: {
+    strokeDasharray: "0, 60, 23, 0, 23, 0",
+    strokeDashoffset: 0,
+    opacity: 0,
+    transition: {
+      duration: 0.5
+    }
+  }
+};
+const arrows = {
+  syncing: {
+    opacity: 1,
+    transition: {
+      duration: 0
+    }
+  },
+  saved: {
+    opacity: 0,
+    transition: {
+      duration: 0.2
+    }
+  },
+  changes: {
+    opacity: 0
+  }
+};
+const checkmark = {
+  syncing: {
+    pathLength: 0,
+    transition: {
+      duration: 0
+    }
+  },
+  saved: {
+    pathLength: 1,
+    transition: {
+      delay: 0.4,
+      duration: 0.3
+    }
+  },
+  changes: {
+    pathLength: 0,
+    transition: {
+      duration: 0.2
+    }
+  }
+};
+const edit = {
+  syncing: {
+    pathLength: 0,
+    transition: {
+      duration: 0
+    }
+  },
+  saved: {
+    pathLength: 0,
+    transition: {
+      duration: 0
+    }
+  },
+  changes: {
+    pathLength: 1,
+    transition: {
+      duration: 0.4,
+      delay: 0.5
+    }
+  }
+};
+function AnimatedStatusIcon(props) {
+  const {
+    status
+  } = props;
+  if (!status) {
+    return null;
+  }
+  return /* @__PURE__ */jsx("svg", {
+    width: "1em",
+    height: "1em",
+    viewBox: "0 0 25 25",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "1.2",
+    "data-sanity-icon": "",
+    children: /* @__PURE__ */jsxs(motion.g, {
+      variants: root,
+      initial: status,
+      animate: status,
+      children: [/* @__PURE__ */jsxs(RotateGroup, {
+        "data-rotate": status === "changes" ? void 0 : "",
+        children: [/* @__PURE__ */jsx(Arrows, {
+          variants: arrows,
+          initial: status,
+          animate: status
+        }), /* @__PURE__ */jsx(Circle, {
+          variants: circle,
+          initial: status,
+          animate: status
+        })]
+      }), /* @__PURE__ */jsx(Checkmark, {
+        variants: checkmark,
+        initial: status,
+        animate: status
+      }), /* @__PURE__ */jsx(Edit, {
+        variants: edit,
+        initial: status,
+        animate: status
+      })]
+    })
+  });
+}
+const ReviewButton = React.forwardRef(function ReviewButton2(props, ref) {
+  const {
+    collapsed,
+    status,
+    lastUpdated,
+    ...rest
+  } = props;
+  const lastUpdatedTime = useTimeAgo(lastUpdated || "", {
+    minimal: true
+  });
+  const lastUpdatedTimeAgo = useTimeAgo(lastUpdated || "", {
+    minimal: true,
+    agoSuffix: true
+  });
+  const buttonProps = useMemo(() => {
+    if (status === "syncing") {
+      return {
+        text: "Saving...",
+        tone: void 0
+      };
+    }
+    if (status === "changes") {
+      return {
+        text: lastUpdatedTime,
+        tone: "caution"
+      };
+    }
+    if (status === "saved") {
+      return {
+        text: "Saved!",
+        tone: "positive"
+      };
+    }
+    return {};
+  }, [status, lastUpdatedTime]);
+  if (!status) {
+    return null;
+  }
+  return /* @__PURE__ */jsx(Tooltip, {
+    placement: "top",
+    portal: true,
+    disabled: status !== "changes",
+    content: /* @__PURE__ */jsxs(Stack, {
+      padding: 3,
+      space: 3,
+      children: [/* @__PURE__ */jsx(Text, {
+        size: 1,
+        weight: "semibold",
+        children: "Review changes"
+      }), /* @__PURE__ */jsxs(Text, {
+        size: 1,
+        muted: true,
+        children: ["Changes saved ", lastUpdatedTimeAgo]
+      })]
+    }),
+    children: /* @__PURE__ */jsx(Button, {
+      mode: "bleed",
+      justify: "flex-start",
+      tone: buttonProps == null ? void 0 : buttonProps.tone,
+      ...rest,
+      "data-testid": "review-changes-button",
+      ref,
+      children: /* @__PURE__ */jsxs(Flex, {
+        align: "center",
+        children: [/* @__PURE__ */jsx(Box, {
+          marginRight: collapsed ? 0 : 3,
+          children: /* @__PURE__ */jsx(Text, {
+            children: /* @__PURE__ */jsx(AnimatedStatusIcon, {
+              status
+            })
+          })
+        }), !collapsed && /* @__PURE__ */jsx(Text, {
+          size: 1,
+          weight: "medium",
+          children: buttonProps == null ? void 0 : buttonProps.text
+        })]
+      })
+    })
+  });
+});
+const ReviewChangesButton = React.memo(ReviewButton);
+const SYNCING_TIMEOUT = 1e3;
+const SAVED_TIMEOUT = 3e3;
+const DocumentSparkline = memo(function DocumentSparkline2() {
+  var _a;
+  const {
+    changesOpen,
+    documentId,
+    documentType,
+    editState,
+    onHistoryClose,
+    onHistoryOpen,
+    timelineStore,
+    value
+  } = useDocumentPane();
+  const syncState = useSyncState(documentId, documentType);
+  const lastUpdated = value == null ? void 0 : value._updatedAt;
+  const lastPublished = (_a = editState == null ? void 0 : editState.published) == null ? void 0 : _a._updatedAt;
+  const liveEdit = Boolean(editState == null ? void 0 : editState.liveEdit);
+  const published = Boolean(editState == null ? void 0 : editState.published);
+  const changed = Boolean(editState == null ? void 0 : editState.draft);
+  const [rootFlexElement, setRootFlexElement] = useState(null);
+  const rootFlexRect = useElementRect(rootFlexElement);
+  const collapsed = !rootFlexRect || (rootFlexRect == null ? void 0 : rootFlexRect.width) < 300;
+  const [status, setStatus] = useState(null);
+  const showingRevision = useTimelineSelector(timelineStore, state => state.onOlderRevision);
+  useEffect(() => {
+    if (status === "syncing" && !syncState.isSyncing) {
+      const timerId = setTimeout(() => setStatus("saved"), SYNCING_TIMEOUT);
+      return () => clearTimeout(timerId);
+    }
+    if (status === "saved") {
+      const timerId = setTimeout(() => setStatus(null), SAVED_TIMEOUT);
+      return () => clearTimeout(timerId);
+    }
+  }, [status, lastUpdated, syncState.isSyncing]);
+  useLayoutEffect(() => {
+    setStatus(null);
+  }, [documentId]);
+  useLayoutEffect(() => {
+    if (syncState.isSyncing) {
+      setStatus("syncing");
+    }
+  }, [syncState.isSyncing, lastUpdated]);
+  const reviewButton = useMemo(() => /* @__PURE__ */jsx(ReviewChangesButton, {
+    lastUpdated,
+    status: status || (changed ? "changes" : void 0),
+    onClick: changesOpen ? onHistoryClose : onHistoryOpen,
+    disabled: showingRevision,
+    selected: changesOpen,
+    collapsed
+  }), [changed, changesOpen, onHistoryClose, onHistoryOpen, lastUpdated, showingRevision, status, collapsed]);
+  const publishStatus = useMemo(() => (liveEdit || published) && /* @__PURE__ */jsx(Box, {
+    marginRight: 1,
+    children: /* @__PURE__ */jsx(PublishStatus, {
+      disabled: showingRevision,
+      lastPublished,
+      lastUpdated,
+      liveEdit,
+      collapsed
+    })
+  }), [collapsed, lastPublished, lastUpdated, liveEdit, published, showingRevision]);
+  return /* @__PURE__ */jsxs(Flex, {
+    align: "center",
+    "data-ui": "DocumentSparkline",
+    ref: setRootFlexElement,
+    children: [publishStatus, /* @__PURE__ */jsxs(Flex, {
+      align: "center",
+      flex: 1,
+      children: [reviewButton, !collapsed && /* @__PURE__ */jsx(Box, {
+        marginLeft: 3,
+        children: /* @__PURE__ */jsx(DocumentBadges, {})
+      })]
+    })]
+  });
+});
+const DocumentActionsBox = styled(Box)(_templateObject12 || (_templateObject12 = _taggedTemplateLiteral(["\n  min-width: 10em;\n  max-width: 16em;\n"])));
+function DocumentStatusBar(props) {
+  const {
+    actionsBoxRef
+  } = props;
+  const {
+    badges,
+    timelineStore
+  } = useDocumentPane();
+  const showingRevision = useTimelineSelector(timelineStore, state => state.onOlderRevision);
+  return useMemo(() => /* @__PURE__ */jsx(Box, {
+    paddingLeft: 2,
+    paddingRight: [2, 3],
+    paddingY: 2,
+    children: /* @__PURE__ */jsxs(Flex, {
+      align: "center",
+      children: [/* @__PURE__ */jsx(Box, {
+        flex: [1, 2],
+        children: badges && /* @__PURE__ */jsx(DocumentSparkline, {})
+      }), /* @__PURE__ */jsx(DocumentActionsBox, {
+        flex: 1,
+        marginLeft: [1, 3],
+        ref: actionsBoxRef,
+        children: showingRevision ? /* @__PURE__ */jsx(HistoryStatusBarActions, {}) : /* @__PURE__ */jsx(DocumentStatusBarActions, {})
+      })]
+    })
+  }), [actionsBoxRef, badges, showingRevision]);
+}
+function KeyboardShortcutResponder(props) {
+  const {
+    actionsBoxElement,
+    activeIndex,
+    as = "div",
+    children,
+    id,
+    onActionStart,
+    onKeyDown,
+    rootRef,
+    states,
+    ...rest
+  } = props;
+  const activeAction = states[activeIndex];
+  const handleKeyDown = useCallback(event => {
+    const matchingStates = states.filter(state => state.shortcut && isHotkey(state.shortcut, event));
+    const matchingState = matchingStates[0];
+    if (matchingStates.length > 1) {
+      console.warn("Keyboard shortcut conflict: More than one document action matches the shortcut \"".concat(matchingState.shortcut, "\""));
+    }
+    if (matchingState && !matchingState.disabled && matchingState.onHandle) {
+      event.preventDefault();
+      matchingState.onHandle();
+      onActionStart(states.indexOf(matchingState));
+      return;
+    }
+    if (onKeyDown) {
+      onKeyDown(event);
+    }
+  }, [onActionStart, onKeyDown, states]);
+  return createElement(as, {
+    id,
+    onKeyDown: handleKeyDown,
+    tabIndex: -1,
+    ...rest,
+    ref: rootRef
+  }, [children, activeAction && activeAction.dialog && /* @__PURE__ */jsx(LegacyLayerProvider, {
+    zOffset: "paneFooter",
+    children: /* @__PURE__ */jsx(ActionStateDialog, {
+      dialog: activeAction.dialog,
+      referenceElement: actionsBoxElement
+    })
+  })]);
+}
+const DocumentActionShortcuts = React.memo(props => {
+  const {
+    actionsBoxElement,
+    as = "div",
+    children,
+    ...rest
+  } = props;
+  const {
+    actions,
+    editState
+  } = useDocumentPane();
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const onActionStart = useCallback(idx => {
+    setActiveIndex(idx);
+  }, []);
+  const actionProps = useMemo(() => editState && {
+    ...editState,
+    // @todo: what to call here?
+    onComplete: () => void 0,
+    // @todo: get revision string
+    revision: void 0
+  }, [editState]);
+  if (!actionProps || !actions) return null;
+  return /* @__PURE__ */jsx(RenderActionCollectionState, {
+    actionProps,
+    actions,
+    children: _ref20 => {
+      let {
+        states
+      } = _ref20;
+      return /* @__PURE__ */jsx(KeyboardShortcutResponder, {
+        ...rest,
+        activeIndex,
+        actionsBoxElement,
+        as,
+        onActionStart,
+        states,
+        children
+      });
+    }
+  });
+});
+DocumentActionShortcuts.displayName = "DocumentActionShortcuts";
+const DIALOG_PROVIDER_POSITION = [
+// We use the `position: fixed` for dialogs on narrow screens (< 512px).
+"fixed",
+// And we use the `position: absolute` strategy (within panes) on wide screens.
+"absolute"];
+const StyledChangeConnectorRoot = styled(ChangeConnectorRoot)(_templateObject13 || (_templateObject13 = _taggedTemplateLiteral(["\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n  min-height: 0;\n  min-width: 0;\n"])));
+const DocumentPane = memo(function DocumentPane2(props) {
+  const {
+    name: parentSourceName
+  } = useSource();
+  return /* @__PURE__ */jsx(SourceProvider, {
+    name: props.pane.source || parentSourceName,
+    children: /* @__PURE__ */jsx(DocumentPaneInner, {
+      ...props
+    })
+  });
+});
+function DocumentPaneInner(props) {
+  var _a;
+  const {
+    pane,
+    paneKey
+  } = props;
+  const {
+    resolveNewDocumentOptions
+  } = useSource().document;
+  const paneRouter = usePaneRouter();
+  const options = usePaneOptions(pane.options, paneRouter.params);
+  const {
+    documentType,
+    isLoaded: isDocumentLoaded
+  } = useDocumentType(options.id, options.type);
+  const templateItems = useMemo(() => {
+    return resolveNewDocumentOptions({
+      type: "global"
+    });
+  }, [resolveNewDocumentOptions]);
+  const [templatePermissions, isTemplatePermissionsLoading] = useTemplatePermissions({
+    templateItems
+  });
+  const isLoaded = isDocumentLoaded && !isTemplatePermissionsLoading;
+  const providerProps = useMemo(() => {
+    return isLoaded && documentType && options.type !== documentType ? mergeDocumentType(props, options, documentType) : props;
+  }, [props, documentType, isLoaded, options]);
+  const {
+    ReferenceChildLink,
+    handleEditReference,
+    groupIndex,
+    routerPanesState
+  } = paneRouter;
+  const childParams = ((_a = routerPanesState[groupIndex + 1]) == null ? void 0 : _a[0].params) || {};
+  const routerPanesStateLength = routerPanesState.length;
+  const {
+    parentRefPath
+  } = childParams;
+  const activePath = useMemo(() => {
+    return parentRefPath ? {
+      path: fromString(parentRefPath),
+      state:
+      // eslint-disable-next-line no-nested-ternary
+      groupIndex >= routerPanesStateLength - 1 ? "none" : groupIndex >= routerPanesStateLength - 2 ? "selected" : "pressed"
+    } : {
+      path: [],
+      state: "none"
+    };
+  }, [parentRefPath, groupIndex, routerPanesStateLength]);
+  if (options.type === "*" && !isLoaded) {
+    return /* @__PURE__ */jsx(LoadingPane, {
+      flex: 2.5,
+      minWidth: 320,
+      paneKey,
+      title: "Loading document\u2026"
+    });
+  }
+  if (!documentType) {
+    return /* @__PURE__ */jsx(ErrorPane, {
+      flex: 2.5,
+      minWidth: 320,
+      paneKey,
+      title: /* @__PURE__ */jsx(Fragment, {
+        children: "The document was not found"
+      }),
+      children: /* @__PURE__ */jsx(Stack, {
+        space: 4,
+        children: /* @__PURE__ */jsxs(Text, {
+          as: "p",
+          children: ["The document type is not defined, and a document with the ", /* @__PURE__ */jsx("code", {
+            children: options.id
+          }), " ", "identifier could not be found."]
+        })
+      })
+    });
+  }
+  return /* @__PURE__ */jsx(DocumentPaneProvider, {
+    ...providerProps,
+    children: /* @__PURE__ */jsx(ReferenceInputOptionsProvider, {
+      EditReferenceLinkComponent: ReferenceChildLink,
+      onEditReference: handleEditReference,
+      initialValueTemplateItems: templatePermissions,
+      activePath,
+      children: /* @__PURE__ */jsx(InnerDocumentPane, {})
+    })
+  }, "".concat(documentType, "-").concat(options.id));
+}
+function usePaneOptions(options) {
+  let params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  const templates = useTemplates();
+  return useMemo(() => {
+    if (options.type && options.type !== "*") {
+      return options;
+    }
+    const templateName = options.template || params.template;
+    const template = templateName ? templates.find(t => t.id === templateName) : void 0;
+    const documentType = template == null ? void 0 : template.schemaType;
+    if (!documentType) {
+      return options;
+    }
+    return {
+      ...options,
+      type: documentType
+    };
+  }, [options, params.template, templates]);
+}
+function mergeDocumentType(props, options, documentType) {
+  return {
+    ...props,
+    pane: {
+      ...props.pane,
+      options: {
+        ...options,
+        type: documentType
+      }
+    }
+  };
+}
+function InnerDocumentPane() {
+  const {
+    changesOpen,
+    documentType,
+    inspector,
+    inspectOpen,
+    onFocus,
+    onPathOpen,
+    onHistoryOpen,
+    onKeyUp,
+    paneKey,
+    schemaType,
+    value
+  } = useDocumentPane();
+  const {
+    collapsed: layoutCollapsed
+  } = usePaneLayout();
+  const zOffsets = useZIndex();
+  const [rootElement, setRootElement] = useState(null);
+  const [footerElement, setFooterElement] = useState(null);
+  const [actionsBoxElement, setActionsBoxElement] = useState(null);
+  const [documentPanelPortalElement, setDocumentPanelPortalElement] = useState(null);
+  const footerRect = useElementRect(footerElement);
+  const footerH = footerRect == null ? void 0 : footerRect.height;
+  const onConnectorSetFocus = useCallback(path => {
+    onPathOpen(path);
+    onFocus(path);
+  }, [onPathOpen, onFocus]);
+  const currentMinWidth = DOCUMENT_PANEL_INITIAL_MIN_WIDTH + (inspector ? DOCUMENT_INSPECTOR_MIN_WIDTH : 0);
+  const minWidth = DOCUMENT_PANEL_MIN_WIDTH + (inspector ? DOCUMENT_INSPECTOR_MIN_WIDTH : 0);
+  if (!schemaType) {
+    return /* @__PURE__ */jsx(ErrorPane, {
+      currentMinWidth,
+      flex: 2.5,
+      minWidth,
+      paneKey,
+      title: /* @__PURE__ */jsxs(Fragment, {
+        children: ["Unknown document type: ", /* @__PURE__ */jsx("code", {
+          children: documentType
+        })]
+      }),
+      tone: "caution",
+      children: /* @__PURE__ */jsxs(Stack, {
+        space: 4,
+        children: [documentType && /* @__PURE__ */jsxs(Text, {
+          as: "p",
+          children: ["This document has the schema type ", /* @__PURE__ */jsx("code", {
+            children: documentType
+          }), ", which is not defined as a type in the local content studio schema."]
+        }), !documentType && /* @__PURE__ */jsx(Text, {
+          as: "p",
+          children: "This document does not exist, and no schema type was specified for it."
+        }), isDev && value && /* @__PURE__ */jsxs(Fragment, {
+          children: [/* @__PURE__ */jsx(Text, {
+            as: "p",
+            children: "Here is the JSON representation of the document:"
+          }), /* @__PURE__ */jsx(Card, {
+            padding: 3,
+            overflow: "auto",
+            radius: 2,
+            shadow: 1,
+            tone: "inherit",
+            children: /* @__PURE__ */jsx(Code, {
+              language: "json",
+              size: [1, 1, 2],
+              children: JSON.stringify(value, null, 2)
+            })
+          })]
+        })]
+      })
+    });
+  }
+  return /* @__PURE__ */jsxs(DocumentActionShortcuts, {
+    actionsBoxElement,
+    as: Pane,
+    currentMinWidth,
+    "data-testid": "document-pane",
+    flex: 2.5,
+    id: paneKey,
+    minWidth,
+    onKeyUp,
+    rootRef: setRootElement,
+    children: [/* @__PURE__ */jsx(DialogProvider, {
+      position: DIALOG_PROVIDER_POSITION,
+      zOffset: zOffsets.portal,
+      children: /* @__PURE__ */jsx(Flex, {
+        direction: "column",
+        flex: 1,
+        height: layoutCollapsed ? void 0 : "fill",
+        children: /* @__PURE__ */jsx(StyledChangeConnectorRoot, {
+          "data-testid": "change-connector-root",
+          isReviewChangesOpen: changesOpen,
+          onOpenReviewChanges: onHistoryOpen,
+          onSetFocus: onConnectorSetFocus,
+          children: /* @__PURE__ */jsx(DocumentPanel, {
+            footerHeight: footerH || null,
+            isInspectOpen: inspectOpen,
+            rootElement,
+            setDocumentPanelPortalElement
+          })
+        })
+      })
+    }), /* @__PURE__ */jsx(PortalProvider, {
+      __unstable_elements: {
+        [DOCUMENT_PANEL_PORTAL_ELEMENT]: documentPanelPortalElement
+      },
+      children: /* @__PURE__ */jsx(DialogProvider, {
+        position: DIALOG_PROVIDER_POSITION,
+        zOffset: zOffsets.portal,
+        children: /* @__PURE__ */jsx(PaneFooter, {
+          ref: setFooterElement,
+          children: /* @__PURE__ */jsx(DocumentStatusBar, {
+            actionsBoxRef: setActionsBoxElement
+          })
+        })
+      })
+    }), /* @__PURE__ */jsx(DocumentOperationResults, {})]
+  });
+}
+function NoDocumentTypesScreen() {
+  return /* @__PURE__ */jsx(Card, {
+    height: "fill",
+    children: /* @__PURE__ */jsx(Flex, {
+      align: "center",
+      height: "fill",
+      justify: "center",
+      padding: 4,
+      sizing: "border",
+      children: /* @__PURE__ */jsx(Container, {
+        width: 0,
+        children: /* @__PURE__ */jsx(Card, {
+          padding: 4,
+          radius: 2,
+          shadow: 1,
+          tone: "caution",
+          children: /* @__PURE__ */jsxs(Flex, {
+            children: [/* @__PURE__ */jsx(Box, {
+              children: /* @__PURE__ */jsx(Text, {
+                size: 1,
+                children: /* @__PURE__ */jsx(WarningOutlineIcon, {})
+              })
+            }), /* @__PURE__ */jsxs(Stack, {
+              flex: 1,
+              marginLeft: 3,
+              space: 3,
+              children: [/* @__PURE__ */jsx(Text, {
+                as: "h1",
+                size: 1,
+                weight: "bold",
+                children: "No document types"
+              }), /* @__PURE__ */jsx(Text, {
+                as: "p",
+                muted: true,
+                size: 1,
+                children: "Please define at least one document type in your schema."
+              }), /* @__PURE__ */jsx(Text, {
+                as: "p",
+                muted: true,
+                size: 1,
+                children: /* @__PURE__ */jsx("a", {
+                  href: "https://www.sanity.io/docs/create-a-schema-and-configure-sanity-studio",
+                  target: "_blank",
+                  rel: "noreferrer",
+                  children: "Learn how to add a document type \u2192"
+                })
+              })]
+            })]
+          })
+        })
+      })
+    })
+  });
+}
+const StyledPaneLayout = styled(PaneLayout)(_templateObject14 || (_templateObject14 = _tagged

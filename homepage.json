@@ -1,0 +1,1042 @@
+{
+  "pageId": "homepage",
+  "pageName": "Home Page",
+  "pageType": null,
+  "layoutEnabled": true,
+  "moduleCategories": [
+    "header",
+    "images",
+    "text",
+    "search",
+    "categories_products",
+    "forms",
+    "navigation",
+    "footer"
+  ],
+  "VFSPath": "layouts/homepage.json",
+  "requiredModules": [
+    "featured_products"
+  ],
+  "scripts": "",
+  "sections": [
+    {
+      "sectionId": "section_11",
+      "htmlId": "",
+      "htmlClasses": "themeBannerSlider",
+      "contentWidth": "wide",
+      "backgroundColor": "",
+      "backgroundImage": "",
+      "textColor": "dark",
+      "display": "normal",
+      "rows": [
+        {
+          "rowId": "row_12",
+          "rowLayout": 12,
+          "htmlId": null,
+          "htmlClasses": null,
+          "columns": [
+            {
+              "columnId": "column_13",
+              "columnWidth": 12,
+              "htmlId": null,
+              "htmlClasses": null,
+              "moduleArrangement": "block",
+              "textAlignment": "text-left",
+              "modules": [
+                {
+                  "moduleId": "module_29",
+                  "moduleType": "banner_vpicker",
+                  "title": "Banner Vehicle Picker",
+                  "options": {
+                    "banner_slides": {
+                      "name": "Banner Slides",
+                      "type": "object",
+                      "default_value": [],
+                      "value": [
+                        {
+                          "slideId": "slide_101",
+                          "image": "https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/crate-engines.jpg",
+                          "link": "",
+                          "alt": ""
+                        },
+                        {
+                          "slideId": "slide_102",
+                          "image": "https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/Parts.jpg",
+                          "link": "",
+                          "alt": ""
+                        }
+                      ]
+                    },
+                    "overlay_header": {
+                      "name": "Overlay Header",
+                      "type": "string",
+                      "default_value": null,
+                      "value": ""
+                    },
+                    "overlay_content": {
+                      "name": "Overlay Content",
+                      "type": "string",
+                      "default_value": null,
+                      "value": ""
+                    },
+                    "picker_title": {
+                      "name": "Picker Title",
+                      "type": "string",
+                      "default_value": "Select Your Vehicle",
+                      "value": "Select Your Vehicle"
+                    },
+                    "hide_vehicle_picker": {
+                      "name": "Hide Vehicle Picker",
+                      "type": "boolean",
+                      "default_value": false,
+                      "value": true
+                    },
+                    "slider_timeout": {
+                      "name": "Slider Speed",
+                      "type": "string",
+                      "default_value": "4000",
+                      "value": "7000"
+                    },
+                    "banner_height": {
+                      "name": "Banner Height",
+                      "type": "string",
+                      "default_value": "360",
+                      "value": "700"
+                    },
+                    "use_overlay_shadows": {
+                      "name": "Overlay Shadows",
+                      "type": "boolean",
+                      "default_value": false,
+                      "value": false
+                    },
+                    "banner_image_fill": {
+                      "name": "Banner Image Fill",
+                      "type": "select",
+                      "possible_values": [
+                        {
+                          "value": "cover",
+                          "label": "Cover"
+                        },
+                        {
+                          "value": "contain",
+                          "label": "Contain"
+                        }
+                      ],
+                      "default_value": "cover",
+                      "value": "cover"
+                    }
+                  },
+                  "htmlId": "",
+                  "htmlClasses": "",
+                  "minColumnWidth": 0,
+                  "customAdmin": true,
+                  "modulePadding": "padding-0",
+                  "display": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": "section_7",
+      "htmlId": "",
+      "htmlClasses": "themeVehiclePicker",
+      "contentWidth": "wide",
+      "backgroundColor": "",
+      "backgroundImage": "",
+      "textColor": "dark",
+      "display": "normal",
+      "rows": [
+        {
+          "rowId": "row_17",
+          "rowLayout": 12,
+          "htmlId": null,
+          "htmlClasses": null,
+          "columns": [
+            {
+              "columnId": "column_18",
+              "columnWidth": 12,
+              "htmlId": null,
+              "htmlClasses": null,
+              "moduleArrangement": "block",
+              "textAlignment": "text-left",
+              "modules": [
+                {
+                  "moduleId": "module_32",
+                  "moduleType": "vehicle_picker_dropdowns",
+                  "title": "Vehicle Picker Dropdowns",
+                  "options": {
+                    "title": {
+                      "name": "Picker Title",
+                      "type": "string",
+                      "default_value": "Select Your Vehicle",
+                      "value": "Your Vehicle"
+                    },
+                    "redirect_uri": {
+                      "name": "Redirect URL",
+                      "type": "string",
+                      "default_value": null,
+                      "value": ""
+                    },
+                    "select_button_text": {
+                      "name": "Select Button Text",
+                      "type": "string",
+                      "default_value": "Select",
+                      "value": "Browse Catalog"
+                    },
+                    "make_text": {
+                      "name": "Select Make Text",
+                      "type": "string",
+                      "default_value": "",
+                      "value": ""
+                    },
+                    "model_text": {
+                      "name": "Select Model Text",
+                      "type": "string",
+                      "default_value": "",
+                      "value": ""
+                    },
+                    "year_text": {
+                      "name": "Select Year Text",
+                      "type": "string",
+                      "default_value": "",
+                      "value": ""
+                    },
+                    "trim_text": {
+                      "name": "Select Trim Text",
+                      "type": "string",
+                      "default_value": "",
+                      "value": ""
+                    },
+                    "engine_text": {
+                      "name": "Select Engine Text",
+                      "type": "string",
+                      "default_value": "",
+                      "value": ""
+                    },
+                    "use_button_submit": {
+                      "name": "Save on Button Click",
+                      "type": "boolean",
+                      "default_value": false,
+                      "value": true
+                    },
+                    "show_filters": {
+                      "name": "Show filter input in dropdown",
+                      "type": "boolean",
+                      "default_value": true,
+                      "value": true
+                    },
+                    "filter_placeholder": {
+                      "name": "Filter placeholder text",
+                      "type": "string",
+                      "default_value": "Filter",
+                      "value": "Filter"
+                    },
+                    "style": {
+                      "name": "Display",
+                      "type": "select",
+                      "possible_values": [
+                        {
+                          "value": "classic",
+                          "label": "Classic"
+                        },
+                        {
+                          "value": "inline",
+                          "label": "Horizontal"
+                        }
+                      ],
+                      "default_value": "classic",
+                      "value": "classic"
+                    }
+                  },
+                  "htmlId": "",
+                  "htmlClasses": "",
+                  "customAdmin": false,
+                  "modulePadding": "padding-0",
+                  "display": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": "section_1",
+      "htmlId": "",
+      "htmlClasses": "themeBrand",
+      "contentWidth": "wide",
+      "backgroundColor": "",
+      "backgroundImage": "",
+      "textColor": "dark",
+      "display": "normal",
+      "rows": [
+        {
+          "rowId": "row_2",
+          "rowLayout": 12,
+          "htmlId": null,
+          "htmlClasses": null,
+          "columns": [
+            {
+              "columnId": "column_3",
+              "columnWidth": 12,
+              "htmlId": null,
+              "htmlClasses": null,
+              "moduleArrangement": "block",
+              "textAlignment": "text-left",
+              "modules": [
+                {
+                  "moduleId": "module_4",
+                  "moduleType": "custom_html",
+                  "title": "Shop By Brand",
+                  "options": {
+                    "html_content": {
+                      "name": "Custom HTML Content",
+                      "type": "html_content",
+                      "default_value": "",
+                      "value": "<div class=\"themeBrandWrapper\">\n    <div class=\"themeTitleWrapper\">\n        <div class=\"themeTitle\">\n            <h3>Shop By Brand</h3>\n        </div>\n        <div class=\"themeLink\">\n            <a href=\"#\">View All Brand</a>\n        </div>\n    </div>\n    <ul class=\"themeBrandList\">\n        <li>\n            <a href=\"#\">\n                <div class=\"themeBrandImg\">\n                    <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/brand/brand01.png\" alt=\"Karl Kustom Brand\">\n                </div>\n            </a>\n        </li>\n        <li>\n            <a href=\"#\">\n                <div class=\"themeBrandImg\">\n                    <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/brand/brand02.png\" alt=\"Karl Kustom Brand\">\n                </div>\n            </a>\n        </li>\n        <li>\n            <a href=\"#\">\n                <div class=\"themeBrandImg\">\n                    <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/brand/brand03.png\" alt=\"Karl Kustom Brand\">\n                </div>\n            </a>\n        </li>\n        <li>\n            <a href=\"#\">\n                <div class=\"themeBrandImg\">\n                    <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/brand/brand04.png\" alt=\"Karl Kustom Brand\">\n                </div>\n            </a>\n        </li>\n        <li>\n            <a href=\"#\">\n                <div class=\"themeBrandImg\">\n                    <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/brand/brand05.png\" alt=\"Karl Kustom Brand\">\n                </div>\n            </a>\n        </li>\n        <li>\n            <a href=\"#\">\n                <div class=\"themeBrandImg\">\n                    <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/brand/brand06.png\" alt=\"Karl Kustom Brand\">\n                </div>\n            </a>\n        </li>\n    </ul>\n</div>"
+                    },
+                    "force_lazy": {
+                      "name": "Lazy Load Images",
+                      "type": "boolean",
+                      "default_value": false,
+                      "value": false
+                    }
+                  },
+                  "htmlId": "",
+                  "htmlClasses": "",
+                  "minColumnWidth": 0,
+                  "customAdmin": false,
+                  "modulePadding": "padding-0",
+                  "display": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": "section_13",
+      "htmlId": "",
+      "htmlClasses": "themeBuild",
+      "contentWidth": "wide",
+      "backgroundColor": "",
+      "backgroundImage": "",
+      "textColor": "dark",
+      "display": "normal",
+      "rows": [
+        {
+          "rowId": "row_14",
+          "rowLayout": 12,
+          "htmlId": null,
+          "htmlClasses": null,
+          "columns": [
+            {
+              "columnId": "column_15",
+              "columnWidth": 12,
+              "htmlId": null,
+              "htmlClasses": null,
+              "moduleArrangement": "block",
+              "textAlignment": "text-left",
+              "modules": [
+                {
+                  "moduleId": "module_16",
+                  "moduleType": "custom_html",
+                  "title": "Latest by Department",
+                  "options": {
+                    "html_content": {
+                      "name": "Custom HTML Content",
+                      "type": "html_content",
+                      "default_value": "",
+                      "value": "<div class=\"themeBuildWrapper\">\n    <div class=\"themeTitleWrapper\">\n        <div class=\"themeTitle\">\n            <h3>Latest By Department</h3>\n        </div>\n    </div>\n    <ul id=\"\" class=\"themeBuildList\">\n        <li>\n            <a href=\"#\">\n                <div class=\"themeBuildCard\">\n                    <div class=\"themeBuildImg\">\n                        <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/build/01.png\" alt=\"Karl Kustoms Build\">\n                    </div>\n                    <div class=\"themeBuildText\">\n                        <h3>Circle Track</h3>\n                    </div>\n                </div>\n            </a>\n        </li>\n        <li>\n            <a href=\"#\">\n                <div class=\"themeBuildCard\">\n                    <div class=\"themeBuildImg\">\n                        <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/build/02.png\" alt=\"Karl Kustoms Build\">\n                    </div>\n                    <div class=\"themeBuildText\">\n                        <h3>Circle Track</h3>\n                    </div>\n                </div>\n            </a>\n        </li>\n        <li>\n            <a href=\"#\">\n                <div class=\"themeBuildCard\">\n                    <div class=\"themeBuildImg\">\n                        <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/build/03.png\" alt=\"Karl Kustoms Build\">\n                    </div>\n                    <div class=\"themeBuildText\">\n                        <h3>Circle Track</h3>\n                    </div>\n                </div>\n            </a>\n        </li>\n        <li>\n            <a href=\"#\">\n                <div class=\"themeBuildCard\">\n                    <div class=\"themeBuildImg\">\n                        <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/build/03.png\" alt=\"Karl Kustoms Build\">\n                    </div>\n                    <div class=\"themeBuildText\">\n                        <h3>Circle Track</h3>\n                    </div>\n                </div>\n            </a>\n        </li>\n        <li>\n            <a href=\"#\">\n                <div class=\"themeBuildCard\">\n                    <div class=\"themeBuildImg\">\n                        <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/build/03.png\" alt=\"Karl Kustoms Build\">\n                    </div>\n                    <div class=\"themeBuildText\">\n                        <h3>Circle Track</h3>\n                    </div>\n                </div>\n            </a>\n        </li>\n        <li>\n            <a href=\"#\">\n                <div class=\"themeBuildCard\">\n                    <div class=\"themeBuildImg\">\n                        <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/build/03.png\" alt=\"Karl Kustoms Build\">\n                    </div>\n                    <div class=\"themeBuildText\">\n                        <h3>Circle Track</h3>\n                    </div>\n                </div>\n            </a>\n        </li>\n    </ul>\n</div>"
+                    },
+                    "force_lazy": {
+                      "name": "Lazy Load Images",
+                      "type": "boolean",
+                      "default_value": false,
+                      "value": false
+                    }
+                  },
+                  "htmlId": "",
+                  "htmlClasses": "",
+                  "minColumnWidth": 0,
+                  "customAdmin": false,
+                  "modulePadding": "padding-0",
+                  "display": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": "section_3",
+      "htmlId": "",
+      "htmlClasses": "theme_offer_section",
+      "contentWidth": "wide",
+      "backgroundColor": "",
+      "backgroundImage": "",
+      "textColor": "dark",
+      "display": "normal",
+      "rows": [
+        {
+          "rowId": "row_4",
+          "rowLayout": 12,
+          "htmlId": null,
+          "htmlClasses": null,
+          "columns": [
+            {
+              "columnId": "column_5",
+              "columnWidth": 12,
+              "htmlId": null,
+              "htmlClasses": null,
+              "moduleArrangement": "block",
+              "textAlignment": "text-left",
+              "modules": [
+                {
+                  "moduleId": "module_6",
+                  "moduleType": "custom_html",
+                  "title": "What We Offer",
+                  "options": {
+                    "html_content": {
+                      "name": "Custom HTML Content",
+                      "type": "html_content",
+                      "default_value": "",
+                      "value": "<div class=\"theme_offer_wrapper\">\n    <div class=\"theme_title\">\n        <div class=\"theme_title_tabs\">\n            <ul class=\"theme_title_tab_list\">\n                <li>\n                    <a href=\"#\" data-toggle-target=\".theme_tab_content_sale\">Sale Products</a>\n                </li>\n                <li>\n                    <a href=\"#\" data-toggle-target=\".theme_tab_content_rated\">Top Rated Products</a>\n                </li>\n                <li>\n                    <a href=\"#\" data-toggle-target=\".theme_tab_content_latest\">Latest Products</a>\n                </li>\n            </ul>\n        </div>\n    </div>\n    \n    \n    \n</div>"
+                    },
+                    "force_lazy": {
+                      "name": "Lazy Load Images",
+                      "type": "boolean",
+                      "default_value": false,
+                      "value": false
+                    }
+                  },
+                  "htmlId": "",
+                  "htmlClasses": "",
+                  "minColumnWidth": 0,
+                  "customAdmin": false,
+                  "modulePadding": "padding-0",
+                  "display": "normal"
+                },
+                {
+                  "moduleId": "module_7",
+                  "moduleType": "custom_html",
+                  "title": "Sale Products",
+                  "options": {
+                    "html_content": {
+                      "name": "Custom HTML Content",
+                      "type": "html_content",
+                      "default_value": "",
+                      "value": "<div class=\"theme_tab_content_slider theme_tab_content_sale\">\n        <ul class=\"theme_tab_slider\">\n            <li class=\"theme_tab_slider_item\">\n                <a href=\"#\" class=\"theme_tab_slider_link\">\n                    <div class=\"theme_tab_slider_card\">\n                        <div class=\"theme_tab_slider_img\">\n                            <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/img/clients/c618f77d8b3bba74117a789e72ddf35c.png\" alt=\"\">\n                        </div>\n                        <small>Body Parts</small>\n                        <p>All Weather Terrain Braker AS/PRO</p>\n                        <div class=\"theme_tab_slider_price\">\n                            <p class=\"theme_tab_slider_number\">$300.00</p>\n                            <div class=\"theme_tab_slider_cart_icon\">\n                                <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/icons/cart.svg\" alt=\"\">\n                            </div>\n                        </div>\n                    </div>\n                </a>\n            </li>\n            <li class=\"theme_tab_slider_item\">\n                <a href=\"#\" class=\"theme_tab_slider_link\">\n                    <div class=\"theme_tab_slider_card\">\n                        <div class=\"theme_tab_slider_img\">\n                            <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/img/clients/29cdde5e624e996ba6ac49f0626e4d19.jpg\" alt=\"\">\n                        </div>\n                        <small>Lug Knots & Locks</small>\n                        <p>All Weather Terrain Braker AS/PRO</p>\n                        <div class=\"theme_tab_slider_price\">\n                            <p class=\"theme_tab_slider_number\">$300.00</p>\n                            <div class=\"theme_tab_slider_cart_icon\">\n                                <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/icons/cart.svg\" alt=\"\">\n                            </div>\n                        </div>\n                    </div>\n                </a>\n            </li>\n            <li class=\"theme_tab_slider_item\">\n                <a href=\"#\" class=\"theme_tab_slider_link\">\n                    <div class=\"theme_tab_slider_card\">\n                        <div class=\"theme_tab_slider_img\">\n                            <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/img/clients/84f08b8bd82bd10fd3d208eb128a4ddb.jpg\" alt=\"\">\n                        </div>\n                        <small>Body Parts</small>\n                        <p>All Weather Terrain Braker AS/PRO</p>\n                        <div class=\"theme_tab_slider_price\">\n                            <p class=\"theme_tab_slider_number\">$300.00</p>\n                            <div class=\"theme_tab_slider_cart_icon\">\n                                <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/icons/cart.svg\" alt=\"\">\n                            </div>\n                        </div>\n                    </div>\n                </a>\n            </li>\n            <li class=\"theme_tab_slider_item\">\n                <a href=\"#\" class=\"theme_tab_slider_link\">\n                    <div class=\"theme_tab_slider_card\">\n                        <div class=\"theme_tab_slider_img\">\n                            <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/img/clients/33c82e7bdb7f0e41d5f9d695067086fc.png\" alt=\"\">\n                        </div>\n                        <small>Body Parts</small>\n                        <p>All Weather Terrain Braker AS/PRO</p>\n                        <div class=\"theme_tab_slider_price\">\n                            <p class=\"theme_tab_slider_number\">$300.00</p>\n                            <div class=\"theme_tab_slider_cart_icon\">\n                                <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/icons/cart.svg\" alt=\"\">\n                            </div>\n                        </div>\n                    </div>\n                </a>\n            </li>\n        </ul>\n    </div>"
+                    },
+                    "force_lazy": {
+                      "name": "Lazy Load Images",
+                      "type": "boolean",
+                      "default_value": false,
+                      "value": false
+                    }
+                  },
+                  "htmlId": "",
+                  "htmlClasses": "",
+                  "minColumnWidth": 0,
+                  "customAdmin": false,
+                  "modulePadding": "padding-0",
+                  "display": "normal"
+                },
+                {
+                  "moduleId": "module_8",
+                  "moduleType": "custom_html",
+                  "title": "Top Rated Products",
+                  "options": {
+                    "html_content": {
+                      "name": "Custom HTML Content",
+                      "type": "html_content",
+                      "default_value": "",
+                      "value": "<div class=\"theme_tab_content_slider theme_tab_content_rated\">\n        <ul class=\"theme_tab_slider\">\n            <li class=\"theme_tab_slider_item\">\n                <a href=\"#\" class=\"theme_tab_slider_link\">\n                    <div class=\"theme_tab_slider_card\">\n                        <div class=\"theme_tab_slider_img\">\n                            <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/img/clients/29cdde5e624e996ba6ac49f0626e4d19.jpg\" alt=\"\">\n                        </div>\n                        <small>Lug Knots & Locks</small>\n                        <p>All Weather Terrain Braker AS/PRO</p>\n                        <div class=\"theme_tab_slider_price\">\n                            <p class=\"theme_tab_slider_number\">$300.00</p>\n                            <div class=\"theme_tab_slider_cart_icon\">\n                                <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/icons/cart.svg\" alt=\"\">\n                            </div>\n                        </div>\n                    </div>\n                </a>\n            </li>\n            <li class=\"theme_tab_slider_item\">\n                <a href=\"#\" class=\"theme_tab_slider_link\">\n                    <div class=\"theme_tab_slider_card\">\n                        <div class=\"theme_tab_slider_img\">\n                            <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/img/clients/c618f77d8b3bba74117a789e72ddf35c.png\" alt=\"\">\n                        </div>\n                        <small>Body Parts</small>\n                        <p>All Weather Terrain Braker AS/PRO</p>\n                        <div class=\"theme_tab_slider_price\">\n                            <p class=\"theme_tab_slider_number\">$300.00</p>\n                            <div class=\"theme_tab_slider_cart_icon\">\n                                <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/icons/cart.svg\" alt=\"\">\n                            </div>\n                        </div>\n                    </div>\n                </a>\n            </li>\n            <li class=\"theme_tab_slider_item\">\n                <a href=\"#\" class=\"theme_tab_slider_link\">\n                    <div class=\"theme_tab_slider_card\">\n                        <div class=\"theme_tab_slider_img\">\n                            <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/img/clients/33c82e7bdb7f0e41d5f9d695067086fc.png\" alt=\"\">\n                        </div>\n                        <small>Body Parts</small>\n                        <p>All Weather Terrain Braker AS/PRO</p>\n                        <div class=\"theme_tab_slider_price\">\n                            <p class=\"theme_tab_slider_number\">$300.00</p>\n                            <div class=\"theme_tab_slider_cart_icon\">\n                                <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/icons/cart.svg\" alt=\"\">\n                            </div>\n                        </div>\n                    </div>\n                </a>\n            </li>\n            <li class=\"theme_tab_slider_item\">\n                <a href=\"#\" class=\"theme_tab_slider_link\">\n                    <div class=\"theme_tab_slider_card\">\n                        <div class=\"theme_tab_slider_img\">\n                            <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/img/clients/84f08b8bd82bd10fd3d208eb128a4ddb.jpg\" alt=\"\">\n                        </div>\n                        <small>Body Parts</small>\n                        <p>All Weather Terrain Braker AS/PRO</p>\n                        <div class=\"theme_tab_slider_price\">\n                            <p class=\"theme_tab_slider_number\">$300.00</p>\n                            <div class=\"theme_tab_slider_cart_icon\">\n                                <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/icons/cart.svg\" alt=\"\">\n                            </div>\n                        </div>\n                    </div>\n                </a>\n            </li>\n        </ul>\n    </div>"
+                    },
+                    "force_lazy": {
+                      "name": "Lazy Load Images",
+                      "type": "boolean",
+                      "default_value": false,
+                      "value": false
+                    }
+                  },
+                  "htmlId": "",
+                  "htmlClasses": "",
+                  "minColumnWidth": 0,
+                  "customAdmin": false,
+                  "modulePadding": "padding-0",
+                  "display": "normal"
+                },
+                {
+                  "moduleId": "module_9",
+                  "moduleType": "custom_html",
+                  "title": "Latest Products",
+                  "options": {
+                    "html_content": {
+                      "name": "Custom HTML Content",
+                      "type": "html_content",
+                      "default_value": "",
+                      "value": "<div class=\"theme_tab_content_slider theme_tab_content_latest\">\n        <ul class=\"theme_tab_slider\">\n            <li class=\"theme_tab_slider_item\">\n                <a href=\"#\" class=\"theme_tab_slider_link\">\n                    <div class=\"theme_tab_slider_card\">\n                        <div class=\"theme_tab_slider_img\">\n                            <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/img/clients/33c82e7bdb7f0e41d5f9d695067086fc.png\" alt=\"\">\n                        </div>\n                        <small>Body Parts</small>\n                        <p>All Weather Terrain Braker AS/PRO</p>\n                        <div class=\"theme_tab_slider_price\">\n                            <p class=\"theme_tab_slider_number\">$300.00</p>\n                            <div class=\"theme_tab_slider_cart_icon\">\n                                <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/icons/cart.svg\" alt=\"\">\n                            </div>\n                        </div>\n                    </div>\n                </a>\n            </li>\n            <li class=\"theme_tab_slider_item\">\n                <a href=\"#\" class=\"theme_tab_slider_link\">\n                    <div class=\"theme_tab_slider_card\">\n                        <div class=\"theme_tab_slider_img\">\n                            <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/img/clients/29cdde5e624e996ba6ac49f0626e4d19.jpg\" alt=\"\">\n                        </div>\n                        <small>Lug Knots & Locks</small>\n                        <p>All Weather Terrain Braker AS/PRO</p>\n                        <div class=\"theme_tab_slider_price\">\n                            <p class=\"theme_tab_slider_number\">$300.00</p>\n                            <div class=\"theme_tab_slider_cart_icon\">\n                                <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/icons/cart.svg\" alt=\"\">\n                            </div>\n                        </div>\n                    </div>\n                </a>\n            </li>\n            <li class=\"theme_tab_slider_item\">\n                <a href=\"#\" class=\"theme_tab_slider_link\">\n                    <div class=\"theme_tab_slider_card\">\n                        <div class=\"theme_tab_slider_img\">\n                            <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/img/clients/84f08b8bd82bd10fd3d208eb128a4ddb.jpg\" alt=\"\">\n                        </div>\n                        <small>Body Parts</small>\n                        <p>All Weather Terrain Braker AS/PRO</p>\n                        <div class=\"theme_tab_slider_price\">\n                            <p class=\"theme_tab_slider_number\">$300.00</p>\n                            <div class=\"theme_tab_slider_cart_icon\">\n                                <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/icons/cart.svg\" alt=\"\">\n                            </div>\n                        </div>\n                    </div>\n                </a>\n            </li>\n            <li class=\"theme_tab_slider_item\">\n                <a href=\"#\" class=\"theme_tab_slider_link\">\n                    <div class=\"theme_tab_slider_card\">\n                        <div class=\"theme_tab_slider_img\">\n                            <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/img/clients/c618f77d8b3bba74117a789e72ddf35c.png\" alt=\"\">\n                        </div>\n                        <small>Body Parts</small>\n                        <p>All Weather Terrain Braker AS/PRO</p>\n                        <div class=\"theme_tab_slider_price\">\n                            <p class=\"theme_tab_slider_number\">$300.00</p>\n                            <div class=\"theme_tab_slider_cart_icon\">\n                                <img src=\"https://rparts-sites.s3.amazonaws.com/fe24ce93d3a277b22a53498fdd0aad51/design/icons/cart.svg\" alt=\"\">\n                            </div>\n                        </div>\n                    </div>\n                </a>\n            </li>\n        </ul>\n    </div>"
+                    },
+                    "force_lazy": {
+                      "name": "Lazy Load Images",
+                      "type": "boolean",
+                      "default_value": false,
+                      "value": false
+                    }
+                  },
+                  "htmlId": "",
+                  "htmlClasses": "",
+                  "minColumnWidth": 0,
+                  "customAdmin": false,
+                  "modulePadding": "padding-0",
+                  "display": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": "section_22",
+      "htmlId": "",
+      "htmlClasses": "category_section padding_section",
+      "contentWidth": "wide",
+      "backgroundColor": "",
+      "backgroundImage": "",
+      "textColor": "dark",
+      "display": "normal",
+      "rows": [
+        {
+          "rowId": "row_23",
+          "rowLayout": 12,
+          "htmlId": null,
+          "htmlClasses": null,
+          "columns": [
+            {
+              "columnId": "column_24",
+              "columnWidth": 12,
+              "htmlId": null,
+              "htmlClasses": null,
+              "moduleArrangement": "block",
+              "textAlignment": "text-left",
+              "modules": [
+                {
+                  "moduleId": "module_25",
+                  "moduleType": "custom_html",
+                  "title": "Tab Category List",
+                  "options": {
+                    "html_content": {
+                      "name": "Custom HTML Content",
+                      "type": "html_content",
+                      "default_value": "",
+                      "value": "<div class=\"theme_cat_tab_wrapper\">\n    \n    <div class=\"themeTitleWrapper\">\n        <div class=\"themeTitle\">\n            <h3>Power up you Drive Train</h3>\n        </div>\n    </div>\n    \n    <ul class=\"theme_cat_tab_list\">\n        <li class=\"theme_cat_tab_item\">\n            <a href=\"#\" class=\"theme_cat_tab_link\" data-toggle-target=\".tab_content_gm\">GM Engines</a>\n        </li>\n        <li class=\"theme_cat_tab_item\">\n            <a href=\"#\" class=\"theme_cat_tab_link\" data-toggle-target=\".tab_content_ford\">Ford Engines</a>\n        </li>\n        <li class=\"theme_cat_tab_item\">\n            <a href=\"#\" class=\"theme_cat_tab_link\" data-toggle-target=\".tab_content_mopar\">MOPAR Engines</a>\n        </li>\n        <li class=\"theme_cat_tab_item\">\n            <a href=\"#\" class=\"theme_cat_tab_link\" data-toggle-target=\".tab_content_racing\">Racing Engines</a>\n        </li>\n    </ul>\n</div>"
+                    },
+                    "force_lazy": {
+                      "name": "Lazy Load Images",
+                      "type": "boolean",
+                      "default_value": false,
+                      "value": false
+                    }
+                  },
+                  "htmlId": "",
+                  "htmlClasses": "",
+                  "minColumnWidth": 0,
+                  "customAdmin": false,
+                  "modulePadding": "padding-0",
+                  "display": "normal"
+                },
+                {
+                  "moduleId": "module_26",
+                  "moduleType": "custom_html",
+                  "title": "GM Content",
+                  "options": {
+                    "html_content": {
+                      "name": "Custom HTML Content",
+                      "type": "html_content",
+                      "default_value": "",
+                      "value": "<div class=\"theme_cat_tab_content\">\n    <ul class=\"theme_cat_tab_content_list\">\n        <li>\n            <a href=\"#\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/category/gm/connect.avif\" alt=\"Karl Kustoms\">\n                </div>\n                <p>Connect & Cruise</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"#\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/category/gm/lt.avif\" alt=\"Karl Kustoms\" loading=\"lazy\">\n                </div>\n                <p>LT</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"#\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/category/gm/ls.avif\" alt=\"Karl Kustoms\" loading=\"lazy\">\n                </div>\n                <p>LS</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"#\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/category/gm/erod.avif\" alt=\"Karl Kustoms\" loading=\"lazy\">\n                </div>\n                <p>E-ROD</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"#\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/category/gm/small-block.avif\" alt=\"Karl Kustoms\" loading=\"lazy\">\n                </div>\n                <p>Small-Block</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"#\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/category/gm/big-block.avif\" alt=\"Karl Kustoms\" loading=\"lazy\">\n                </div>\n                <p>Big-Block</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"#\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/category/gm/sealed.avif\" alt=\"Karl Kustoms\" loading=\"lazy\">\n                </div>\n                <p>Sealed Crate Engines</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"#\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/category/gm/connect.avif\" alt=\"Karl Kustoms\" loading=\"lazy\">\n                </div>\n                <p>View All</p>\n            </a>\n        </li>\n    </ul>\n</div>"
+                    },
+                    "force_lazy": {
+                      "name": "Lazy Load Images",
+                      "type": "boolean",
+                      "default_value": false,
+                      "value": false
+                    }
+                  },
+                  "htmlId": "",
+                  "htmlClasses": "tab_content tab_content_gm",
+                  "minColumnWidth": 0,
+                  "customAdmin": false,
+                  "modulePadding": "padding-0",
+                  "display": "normal"
+                },
+                {
+                  "moduleId": "module_27",
+                  "moduleType": "custom_html",
+                  "title": "Ford Content",
+                  "options": {
+                    "html_content": {
+                      "name": "Custom HTML Content",
+                      "type": "html_content",
+                      "default_value": "",
+                      "value": "<div class=\"theme_cat_tab_content\">\n    <ul class=\"theme_cat_tab_content_list\">\n        <li>\n            <a href=\"/air-filters\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/car-air-filter.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Air Filter</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"/belts\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/belts-hoses.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Belts & Hoses</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"/air-filters\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/cabin-air-filter.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Cabin Air Filter</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"/fuel-filters\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/fuel-filter.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Fuel Filter</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"/oil-filters\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/oil-filter.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Oil Filter</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"/spark-plugs\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/spark-plugs.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Spark Plugs</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"/thermostat\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/thermostat.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Thermostat</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"/windshield-wiper-blades\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/wiper-blades.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Wiper Blades</p>\n            </a>\n        </li>\n    </ul>\n</div>"
+                    },
+                    "force_lazy": {
+                      "name": "Lazy Load Images",
+                      "type": "boolean",
+                      "default_value": false,
+                      "value": false
+                    }
+                  },
+                  "htmlId": "",
+                  "htmlClasses": "tab_content tab_content_ford",
+                  "minColumnWidth": 0,
+                  "customAdmin": false,
+                  "modulePadding": "padding-0",
+                  "display": "normal"
+                },
+                {
+                  "moduleId": "module_28",
+                  "moduleType": "custom_html",
+                  "title": "MOPAR Content",
+                  "options": {
+                    "html_content": {
+                      "name": "Custom HTML Content",
+                      "type": "html_content",
+                      "default_value": "",
+                      "value": "<div class=\"theme_cat_tab_content\">\n    <ul class=\"theme_cat_tab_content_list\">\n        <li>\n            <a href=\"/cargo-trays\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/cargo-trays.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Cargo Trays</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"/door-sills\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/door-sills.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Door Sills</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"/entertainment\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/entertainment.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Entertainment</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"/floor-mats\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/floor-mats.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Floor Mats</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"/pedal-kits\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/pedal-kits.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Pedal Kits</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"/remote-start\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/remote-start.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Remote Start</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"/shift-knobs\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/shift.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Shift Knobs</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"/sun-shades\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/sun.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Sun Shades</p>\n            </a>\n        </li>\n    </ul>\n</div>"
+                    },
+                    "force_lazy": {
+                      "name": "Lazy Load Images",
+                      "type": "boolean",
+                      "default_value": false,
+                      "value": false
+                    }
+                  },
+                  "htmlId": "",
+                  "htmlClasses": "tab_content tab_content_mopar",
+                  "minColumnWidth": 0,
+                  "customAdmin": false,
+                  "modulePadding": "padding-0",
+                  "display": "normal"
+                },
+                {
+                  "moduleId": "module_30",
+                  "moduleType": "custom_html",
+                  "title": "Racing Content",
+                  "options": {
+                    "html_content": {
+                      "name": "Custom HTML Content",
+                      "type": "html_content",
+                      "default_value": "",
+                      "value": "<div class=\"theme_cat_tab_content\">\n    <ul class=\"theme_cat_tab_content_list\">\n        <li>\n            <a href=\"/car-covers\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/car-cover.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Car Covers</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"/roadside-assistance\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/roadside-assistance.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Roadside Assistance</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"/roof-racks\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/roof-rack.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Roof Racks</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"/splash-guards\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/splash.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Splash Guards</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"/spoilers\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/spoilers.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Spoilers</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"/Step-rails\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/step-rails.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Step Rails</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"/trailer-towing\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/trailer-towing.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Trailer/Towing</p>\n            </a>\n        </li>\n        <li>\n            <a href=\"/Wind-deflectors\">\n                <div class=\"theme_cat_tab_content_img\">\n                    <img src=\"https://d354nuoz4t18d4.cloudfront.net/44996de5516b4b8d20ae7ae4e46ca833/design/img/wind-deflectors.webp\" alt=\"AutoNation National Store\" loading=\"lazy\">\n                </div>\n                <p>Wind Deflectors</p>\n            </a>\n        </li>\n    </ul>\n</div>"
+                    },
+                    "force_lazy": {
+                      "name": "Lazy Load Images",
+                      "type": "boolean",
+                      "default_value": false,
+                      "value": false
+                    }
+                  },
+                  "htmlId": "",
+                  "htmlClasses": "tab_content tab_content_racing",
+                  "minColumnWidth": 0,
+                  "customAdmin": false,
+                  "modulePadding": "padding-0",
+                  "display": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": "section_27",
+      "htmlId": "",
+      "htmlClasses": "themeBuild themeInspired",
+      "contentWidth": "wide",
+      "backgroundColor": "",
+      "backgroundImage": "",
+      "textColor": "dark",
+      "display": "normal",
+      "rows": [
+        {
+          "rowId": "row_30",
+          "rowLayout": 12,
+          "htmlId": null,
+          "htmlClasses": null,
+          "columns": [
+            {
+              "columnId": "column_31",
+              "columnWidth": 12,
+              "htmlId": null,
+              "htmlClasses": null,
+              "moduleArrangement": "block",
+              "textAlignment": "text-left",
+              "modules": [
+                {
+                  "moduleId": "module_34",
+                  "moduleType": "custom_html",
+                  "title": "Get Inspired",
+                  "options": {
+                    "html_content": {
+                      "name": "Custom HTML Content",
+                      "type": "html_content",
+                      "default_value": "",
+                      "value": "<div class=\"themeBuildWrapper\">\n    <div class=\"themeTitleWrapper\">\n        <div class=\"themeTitle\">\n            <h3>Get Inspired by Our Kustom Builds</h3>\n        </div>\n    </div>\n    <ul id=\"themeBuildList02\" class=\"themeBuildList owl-carousel owl-theme\">\n        <li>\n            <a href=\"#\">\n                <div class=\"themeBuildCard\">\n                    <div class=\"themeBuildImg\">\n                        <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/build/01.png\" alt=\"Karl Kustoms Build\">\n                    </div>\n                    <div class=\"themeBuildText\">\n                        <h3>Machine Shop</h3>\n                    </div>\n                </div>\n            </a>\n        </li>\n        <li>\n            <a href=\"#\">\n                <div class=\"themeBuildCard\">\n                    <div class=\"themeBuildImg\">\n                        <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/build/02.png\" alt=\"Karl Kustoms Build\">\n                    </div>\n                    <div class=\"themeBuildText\">\n                        <h3>Machine Shop</h3>\n                    </div>\n                </div>\n            </a>\n        </li>\n        <li>\n            <a href=\"#\">\n                <div class=\"themeBuildCard\">\n                    <div class=\"themeBuildImg\">\n                        <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/build/03.png\" alt=\"Karl Kustoms Build\">\n                    </div>\n                    <div class=\"themeBuildText\">\n                        <h3>Upholstery Shop</h3>\n                    </div>\n                </div>\n            </a>\n        </li>\n        <li>\n            <a href=\"#\">\n                <div class=\"themeBuildCard\">\n                    <div class=\"themeBuildImg\">\n                        <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/build/03.png\" alt=\"Karl Kustoms Build\">\n                    </div>\n                    <div class=\"themeBuildText\">\n                        <h3>Machine Shop</h3>\n                    </div>\n                </div>\n            </a>\n        </li>\n    </ul>\n</div>"
+                    },
+                    "force_lazy": {
+                      "name": "Lazy Load Images",
+                      "type": "boolean",
+                      "default_value": false,
+                      "value": false
+                    }
+                  },
+                  "htmlId": "",
+                  "htmlClasses": "",
+                  "minColumnWidth": 0,
+                  "customAdmin": false,
+                  "modulePadding": "padding-0",
+                  "display": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": "section_2",
+      "htmlId": "",
+      "htmlClasses": "themeProject",
+      "contentWidth": "wide",
+      "backgroundColor": "",
+      "backgroundImage": "",
+      "textColor": "dark",
+      "display": "normal",
+      "rows": [
+        {
+          "rowId": "row_3",
+          "rowLayout": 12,
+          "htmlId": null,
+          "htmlClasses": null,
+          "columns": [
+            {
+              "columnId": "column_4",
+              "columnWidth": 12,
+              "htmlId": null,
+              "htmlClasses": null,
+              "moduleArrangement": "block",
+              "textAlignment": "text-left",
+              "modules": [
+                {
+                  "moduleId": "module_5",
+                  "moduleType": "custom_html",
+                  "title": "Project",
+                  "options": {
+                    "html_content": {
+                      "name": "Custom HTML Content",
+                      "type": "html_content",
+                      "default_value": "",
+                      "value": "<div class=\"themeProjectWrapper\">\n    <div class=\"themeTitleWrapper\"> <div class=\"themeTitle\"> <h3>Get Inspired by Our Kustom Builds</h3> </div> </div>\n    <ul id=\"themeProjectSlider\" class=\"themeProjectList owl-carousel owl-theme\">\n        <li>\n            <div class=\"themeProjectCard\">\n                <div class=\"themeProjectRow\">\n                    <div class=\"themeProjectCol\">\n                        <div class=\"themeProjectImg\">\n                            <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/IMG_5500-1024x683.jpg\">\n                        </div>\n                    </div>\n                    <div class=\"themeProjectCol\">\n                        <div class=\"themeProjectContent\">\n                            <h3>Project 1930 Chevy</h3>\n                            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit voluptas fuga accusantium, modi placeat minima quo, quis eos corporis iure sunt, error similique tempore aliquam hic reprehenderit? Sequi, suscipit tempora.</p>\n                            <div class=\"themeProjectLink\">\n                                <a href=\"#\">Check it Out</a>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </li>\n        <li>\n            <div class=\"themeProjectCard\">\n                <div class=\"themeProjectRow\">\n                    <div class=\"themeProjectCol\">\n                        <div class=\"themeProjectImg\">\n                            <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/IMG_1985-1-2048x1365.jpg\">\n                        </div>\n                    </div>\n                    <div class=\"themeProjectCol\">\n                        <div class=\"themeProjectContent\">\n                            <h3>Project 1930 Chevy</h3>\n                            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit voluptas fuga accusantium, modi placeat minima quo, quis eos corporis iure sunt, error similique tempore aliquam hic reprehenderit? Sequi, suscipit tempora.</p>\n                            <div class=\"themeProjectLink\">\n                                <a href=\"#\">Check it Out</a>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </li>\n    </ul>\n</div>"
+                    },
+                    "force_lazy": {
+                      "name": "Lazy Load Images",
+                      "type": "boolean",
+                      "default_value": false,
+                      "value": false
+                    }
+                  },
+                  "htmlId": "",
+                  "htmlClasses": "",
+                  "minColumnWidth": 0,
+                  "customAdmin": false,
+                  "modulePadding": "padding-0",
+                  "display": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": "section_18",
+      "htmlId": "",
+      "htmlClasses": "themeVideo",
+      "contentWidth": "wide",
+      "backgroundColor": "",
+      "backgroundImage": "",
+      "textColor": "dark",
+      "display": "normal",
+      "rows": [
+        {
+          "rowId": "row_19",
+          "rowLayout": 12,
+          "htmlId": null,
+          "htmlClasses": null,
+          "columns": [
+            {
+              "columnId": "column_20",
+              "columnWidth": 12,
+              "htmlId": null,
+              "htmlClasses": null,
+              "moduleArrangement": "block",
+              "textAlignment": "text-left",
+              "modules": [
+                {
+                  "moduleId": "module_21",
+                  "moduleType": "custom_html",
+                  "title": "Karl Kustoms Video",
+                  "options": {
+                    "html_content": {
+                      "name": "Custom HTML Content",
+                      "type": "html_content",
+                      "default_value": "",
+                      "value": "<div class=\"themeVideoWrapper\">\n    <div class=\"themeVideoRow\">\n        <div class=\"themeVideoCol\">\n            <div class=\"themeVideoContent\">\n                <h3>Find Out What Makes Karl Kustoms Different:</h3>\n                <p>\n                    We chat with Chevrolet Performance's very own Bill Martens about Carl Moyer's involvement with Chevrolet for more than 40 years and how Karl Kustoms is one of the highest volumn Chevrolet Performance dealers in the nation. Our owner eats, sleeps, and breathes hot rods and racing and that translates into a unique experience you won't find anywhere else. <br><br>\n                    Watch this video to learn why Karl Kustoms is your best for all things Chevrolet Performance.\n                </p>\n            </div>\n        </div>\n        <div class=\"themeVideoCol\">\n            <div class=\"themeVideoUrl\">\n                <iframe width=\"100%\" height=\"450\" src=\"https://www.youtube.com/embed/YDl-Ho65xcM\" title=\"Chatting with Bill Martens of Chevrolet Performance\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>\n            </div>\n        </div>\n    </div>\n</div>"
+                    },
+                    "force_lazy": {
+                      "name": "Lazy Load Images",
+                      "type": "boolean",
+                      "default_value": false,
+                      "value": false
+                    }
+                  },
+                  "htmlId": "",
+                  "htmlClasses": "",
+                  "minColumnWidth": 0,
+                  "customAdmin": false,
+                  "modulePadding": "padding-0",
+                  "display": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": "section_30",
+      "htmlId": "",
+      "htmlClasses": "themeExplore",
+      "contentWidth": "wide",
+      "backgroundColor": "",
+      "backgroundImage": "",
+      "textColor": "dark",
+      "display": "normal",
+      "rows": [
+        {
+          "rowId": "row_31",
+          "rowLayout": 12,
+          "htmlId": null,
+          "htmlClasses": null,
+          "columns": [
+            {
+              "columnId": "column_32",
+              "columnWidth": 12,
+              "htmlId": null,
+              "htmlClasses": null,
+              "moduleArrangement": "block",
+              "textAlignment": "text-left",
+              "modules": [
+                {
+                  "moduleId": "module_33",
+                  "moduleType": "custom_html",
+                  "title": "Explore",
+                  "options": {
+                    "html_content": {
+                      "name": "Custom HTML Content",
+                      "type": "html_content",
+                      "default_value": "",
+                      "value": "<div class=\"themeExploreWrapper\">\n    <div class=\"themeTitleWrapper\"> \n        <div class=\"themeTitle\"> \n            <h3>Explore Our Resources</h3> \n        </div> \n    </div>\n    <ul class=\"themeExploreList\">\n        <li>\n            <div class=\"themeExploreCard\">\n                <div class=\"themeExploreImg\">\n                    <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/build/01.png\" alt=\"\">\n                </div>\n                <div class=\"themeExploreContent\">\n                    <div class=\"themeExploreTitle\">\n                        <h3>Articles</h3>\n                    </div>\n                    <p>Dive in-depth on everything from vehicles all the way down to parts!</p>\n                    <div class=\"themeExploreLink\">\n                        <a href=\"#\">\n                            Browse Articles\n                        </a>\n                    </div>\n                </div>\n            </div>\n        </li>\n        <li>\n            <div class=\"themeExploreCard\">\n                <div class=\"themeExploreImg\">\n                    <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/build/02.png\" alt=\"\">\n                </div>\n                <div class=\"themeExploreContent\">\n                    <div class=\"themeExploreTitle\">\n                        <h3>Guides</h3>\n                    </div>\n                    <p>Dive in-depth on everything from vehicles all the way down to parts!</p>\n                    <div class=\"themeExploreLink\">\n                        <a href=\"#\">\n                            Browse Guides\n                        </a>\n                    </div>\n                </div>\n            </div>\n        </li>\n        <li>\n            <div class=\"themeExploreCard\">\n                <div class=\"themeExploreImg\">\n                    <img src=\"https://rparts-sites.s3.amazonaws.com/a007fe930cf7beb62b9fcc61f7bb3b42/design/build/03.png\" alt=\"\">\n                </div>\n                <div class=\"themeExploreContent\">\n                    <div class=\"themeExploreTitle\">\n                        <h3>FAQS</h3>\n                    </div>\n                    <p>Dive in-depth on everything from vehicles all the way down to parts!</p>\n                    <div class=\"themeExploreLink\">\n                        <a href=\"#\">\n                            Browse FAQS\n                        </a>\n                    </div>\n                </div>\n            </div>\n        </li>\n    </ul>\n</div>"
+                    },
+                    "force_lazy": {
+                      "name": "Lazy Load Images",
+                      "type": "boolean",
+                      "default_value": false,
+                      "value": false
+                    }
+                  },
+                  "htmlId": "",
+                  "htmlClasses": "",
+                  "minColumnWidth": 0,
+                  "customAdmin": false,
+                  "modulePadding": "padding-0",
+                  "display": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": "section_44",
+      "htmlId": "",
+      "htmlClasses": "themeAllVideo",
+      "contentWidth": "wide",
+      "backgroundColor": "",
+      "backgroundImage": "",
+      "textColor": "dark",
+      "display": "normal",
+      "rows": [
+        {
+          "rowId": "row_45",
+          "rowLayout": 12,
+          "htmlId": null,
+          "htmlClasses": null,
+          "columns": [
+            {
+              "columnId": "column_46",
+              "columnWidth": 12,
+              "htmlId": null,
+              "htmlClasses": null,
+              "moduleArrangement": "block",
+              "textAlignment": "text-left",
+              "modules": [
+                {
+                  "moduleId": "module_47",
+                  "moduleType": "custom_html",
+                  "title": "All Video",
+                  "options": {
+                    "html_content": {
+                      "name": "Custom HTML Content",
+                      "type": "html_content",
+                      "default_value": "",
+                      "value": "<div class=\"themeAllVideoWrapper\">\n    <div class=\"themeAllVideoTitle\">\n        <h3>Videos</h3>\n    </div>\n    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Blanditiis autem fugit sapiente reprehenderit voluptatibus officiis ab, obcaecati at quam quod. Molestiae explicabo officiis nam sint eveniet tempore a nihil nostrum.</p>\n    <div class=\"themeAllVideoLink\">\n        <a href=\"#\">See All Videos</a>\n    </div>\n</div>"
+                    },
+                    "force_lazy": {
+                      "name": "Lazy Load Images",
+                      "type": "boolean",
+                      "default_value": false,
+                      "value": false
+                    }
+                  },
+                  "htmlId": "",
+                  "htmlClasses": "",
+                  "minColumnWidth": 0,
+                  "customAdmin": false,
+                  "modulePadding": "padding-0",
+                  "display": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": "section_52",
+      "htmlId": "",
+      "htmlClasses": "themeTestimonial",
+      "contentWidth": "wide",
+      "backgroundColor": "",
+      "backgroundImage": "",
+      "textColor": "dark",
+      "display": "normal",
+      "rows": [
+        {
+          "rowId": "row_53",
+          "rowLayout": 12,
+          "htmlId": null,
+          "htmlClasses": null,
+          "columns": [
+            {
+              "columnId": "column_54",
+              "columnWidth": 12,
+              "htmlId": null,
+              "htmlClasses": null,
+              "moduleArrangement": "block",
+              "textAlignment": "text-left",
+              "modules": [
+                {
+                  "moduleId": "module_55",
+                  "moduleType": "custom_html",
+                  "title": "What Our Customer Say",
+                  "options": {
+                    "html_content": {
+                      "name": "Custom HTML Content",
+                      "type": "html_content",
+                      "default_value": "",
+                      "value": "<div class=\"themeTestimonialWrapper\">\n    <h3>What Our Customer Say:</h3>\n    <ul id=\"themeTestimonialList\" class=\"themeTestimonialList owl-carousel owl-theme\">\n        <li>\n            <div class=\"themeTestimonialCard\">\n                <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sint autem alias nam at modi placeat rem exercitationem illum dolorum, laudantium quaerat ipsum corporis, quo, accusamus nihil ullam illo fuga hic.</p>\n                <h4>- Jimbo, NV</h4>\n            </div>\n        </li>\n        <li>\n            <div class=\"themeTestimonialCard\">\n                <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sint autem alias nam at modi placeat rem exercitationem illum dolorum, laudantium quaerat ipsum corporis, quo, accusamus nihil ullam illo fuga hic.</p>\n                <h4>- Reco P. Lacion, NV</h4>\n            </div>\n        </li>\n    </ul>\n</div>"
+                    },
+                    "force_lazy": {
+                      "name": "Lazy Load Images",
+                      "type": "boolean",
+                      "default_value": false,
+                      "value": false
+                    }
+                  },
+                  "htmlId": "",
+                  "htmlClasses": "",
+                  "minColumnWidth": 0,
+                  "customAdmin": false,
+                  "modulePadding": "padding-0",
+                  "display": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": "section_15",
+      "htmlId": "",
+      "htmlClasses": "d-none",
+      "contentWidth": "normal",
+      "backgroundColor": "",
+      "backgroundImage": "",
+      "textColor": "dark",
+      "display": "normal",
+      "rows": [
+        {
+          "rowId": "row_16",
+          "rowLayout": 12,
+          "htmlId": null,
+          "htmlClasses": null,
+          "columns": [
+            {
+              "columnId": "column_17",
+              "columnWidth": 12,
+              "htmlId": null,
+              "htmlClasses": null,
+              "moduleArrangement": "block",
+              "textAlignment": "text-left",
+              "modules": [
+                {
+                  "moduleId": "module_18",
+                  "moduleType": "featured_products",
+                  "title": "Featured Products",
+                  "options": {
+                    "display_as_slider": {
+                      "name": "Display As slider",
+                      "caption": "Displays featured products in a slider format",
+                      "type": "boolean",
+                      "default_value": false,
+                      "value": false
+                    }
+                  },
+                  "htmlId": null,
+                  "htmlClasses": null,
+                  "minColumnWidth": 0,
+                  "customAdmin": false,
+                  "modulePadding": "padding-0",
+                  "display": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

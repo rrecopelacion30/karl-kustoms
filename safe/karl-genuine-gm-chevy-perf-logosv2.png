@@ -1,0 +1,564 @@
+     let [keyA] = _ref19;
+      let [keyB] = _ref20;
+      return keyA.localeCompare(keyB, "en");
+    });
+  };
+  const normalize = v => JSON.parse(JSON.stringify(v));
+  return JSON.stringify(sortObject(normalize(value)));
+};
+const PaneHeaderActions = React.memo(function PaneHeaderActions2(props) {
+  const {
+    initialValueTemplateItems: initialValueTemplateItemsFromStructure = sanity.EMPTY_ARRAY,
+    menuItems = sanity.EMPTY_ARRAY,
+    menuItemGroups = sanity.EMPTY_ARRAY,
+    actionHandlers = sanity.EMPTY_OBJECT
+  } = props;
+  const templates = sanity.useTemplates();
+  const handleAction = React.useCallback(item => {
+    if (typeof item.action === "string" && !(item.action in actionHandlers)) {
+      console.warn("No handler for action:", item.action);
+      return false;
+    }
+    const handler =
+    // eslint-disable-next-line no-nested-ternary
+    typeof item.action === "function" ? item.action : typeof item.action === "string" ? actionHandlers[item.action] : null;
+    if (handler) {
+      handler(item.params);
+      return true;
+    }
+    return false;
+  }, [actionHandlers]);
+  const menuNodes = React.useMemo(() => resolveMenuNodes({
+    actionHandler: handleAction,
+    menuItemGroups,
+    menuItems: menuItems.filter(item => {
+      var _a;
+      return ((_a = item.intent) == null ? void 0 : _a.type) !== "create";
+    })
+  }), [handleAction, menuItemGroups, menuItems]);
+  const actionNodes = React.useMemo(() => menuNodes.filter(isMenuNodeButton), [menuNodes]);
+  const contextMenuNodes = React.useMemo(() => menuNodes.filter(isNotMenuNodeButton), [menuNodes]);
+  const initialValueTemplateItemFromMenuItems = React.useMemo(() => {
+    return menuItems.map((item, menuItemIndex) => {
+      var _a;
+      if (((_a = item.intent) == null ? void 0 : _a.type) !== "create") return null;
+      const {
+        params
+      } = item.intent;
+      if (!params) return null;
+      const intentParams = Array.isArray(params) ? params[0] : params;
+      const templateParams = Array.isArray(params) ? params[1] : void 0;
+      const templateId = intentParams.template || intentParams.type;
+      if (!templateId) return null;
+      const template = templates.find(t => t.id === templateId);
+      if (!template) return null;
+      const initialDocumentId = intentParams.id;
+      return {
+        item,
+        template,
+        templateParams,
+        menuItemIndex,
+        initialDocumentId
+      };
+    }).filter(isNonNullable).map(_ref21 => {
+      let {
+        initialDocumentId,
+        item,
+        template,
+        menuItemIndex,
+        templateParams
+      } = _ref21;
+      const initialValueTemplateItem = {
+        id: "menuItem".concat(menuItemIndex),
+        initialDocumentId,
+        templateId: template.id,
+        type: "initialValueTemplateItem",
+        title: item.title || template.title,
+        icon: item.icon,
+        description: template.description,
+        parameters: templateParams,
+        schemaType: template.schemaType
+      };
+      return initialValueTemplateItem;
+    });
+  }, [menuItems, templates]);
+  const combinedInitialValueTemplates = React.useMemo(() => {
+    return uniqBy__default.default([...initialValueTemplateItemFromMenuItems, ...initialValueTemplateItemsFromStructure], item => hashObject([item.initialDocumentId, item.templateId, item.parameters]));
+  }, [initialValueTemplateItemFromMenuItems, initialValueTemplateItemsFromStructure]);
+  return /* @__PURE__ */jsxRuntime.jsxs(ui.Flex, {
+    gap: 1,
+    children: [combinedInitialValueTemplates.length > 0 && /* @__PURE__ */jsxRuntime.jsx(PaneHeaderCreateButton, {
+      templateItems: combinedInitialValueTemplates
+    }), actionNodes.map(node => /* @__PURE__ */jsxRuntime.jsx(PaneHeaderActionButton, {
+      node
+    }, node.key)), contextMenuNodes.length > 0 && /* @__PURE__ */jsxRuntime.jsx(PaneContextMenuButton, {
+      nodes: contextMenuNodes
+    })]
+  });
+});
+const DISABLED_REASON_TITLE$4 = {
+  NOTHING_TO_DELETE: "This document doesn\u2019t yet exist or is already deleted"
+};
+const DeleteAction = _ref22 => {
+  let {
+    id,
+    type,
+    draft,
+    onComplete
+  } = _ref22;
+  const {
+    delete: deleteOp
+  } = sanity.useDocumentOperation(id, type);
+  const [isDeleting, setIsDeleting] = React.useState(false);
+  const [isConfirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
+  const handleCancel = React.useCallback(() => {
+    setConfirmDialogOpen(false);
+    onComplete();
+  }, [onComplete]);
+  const handleConfirm = React.useCallback(() => {
+    setIsDeleting(true);
+    setConfirmDialogOpen(false);
+    deleteOp.execute();
+    onComplete();
+  }, [deleteOp, onComplete]);
+  const handle = React.useCallback(() => {
+    setConfirmDialogOpen(true);
+  }, []);
+  const [permissions, isPermissionsLoading] = sanity.useDocumentPairPermissions({
+    id,
+    type,
+    permission: "delete"
+  });
+  const currentUser = sanity.useCurrentUser();
+  if (!isPermissionsLoading && !(permissions == null ? void 0 : permissions.granted)) {
+    return {
+      tone: "critical",
+      icon: icons.TrashIcon,
+      disabled: true,
+      label: "Delete",
+      title: /* @__PURE__ */jsxRuntime.jsx(sanity.InsufficientPermissionsMessage, {
+        operationLabel: "delete this document",
+        currentUser
+      })
+    };
+  }
+  return {
+    tone: "critical",
+    icon: icons.TrashIcon,
+    disabled: isDeleting || Boolean(deleteOp.disabled) || isPermissionsLoading,
+    title: deleteOp.disabled && DISABLED_REASON_TITLE$4[deleteOp.disabled] || "",
+    label: isDeleting ? "Deleting\u2026" : "Delete",
+    shortcut: "Ctrl+Alt+D",
+    onHandle: handle,
+    dialog: isConfirmDialogOpen && {
+      type: "custom",
+      component: /* @__PURE__ */jsxRuntime.jsx(ConfirmDeleteDialogContainer, {
+        action: "delete",
+        id: (draft == null ? void 0 : draft._id) || id,
+        type,
+        onCancel: handleCancel,
+        onConfirm: handleConfirm
+      })
+    }
+  };
+};
+DeleteAction.action = "delete";
+const DISABLED_REASON_TITLE$3 = {
+  NO_CHANGES: "This document has no unpublished changes",
+  NOT_PUBLISHED: "This document is not published"
+};
+const DiscardChangesAction = _ref23 => {
+  let {
+    id,
+    type,
+    published,
+    liveEdit,
+    onComplete
+  } = _ref23;
+  const {
+    discardChanges
+  } = sanity.useDocumentOperation(id, type);
+  const [isConfirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
+  const [permissions, isPermissionsLoading] = sanity.useDocumentPairPermissions({
+    id,
+    type,
+    permission: "discardDraft"
+  });
+  const currentUser = sanity.useCurrentUser();
+  const handleConfirm = React.useCallback(() => {
+    discardChanges.execute();
+    onComplete();
+  }, [discardChanges, onComplete]);
+  const handle = React.useCallback(() => {
+    setConfirmDialogOpen(true);
+  }, []);
+  const dialog = React.useMemo(() => isConfirmDialogOpen && {
+    type: "confirm",
+    tone: "critical",
+    onCancel: onComplete,
+    onConfirm: handleConfirm,
+    message: /* @__PURE__ */jsxRuntime.jsx(jsxRuntime.Fragment, {
+      children: "Are you sure you want to discard all changes since last published?"
+    })
+  }, [handleConfirm, isConfirmDialogOpen, onComplete]);
+  if (!published || liveEdit) {
+    return null;
+  }
+  if (!isPermissionsLoading && !(permissions == null ? void 0 : permissions.granted)) {
+    return {
+      tone: "critical",
+      icon: icons.ResetIcon,
+      disabled: true,
+      label: "Discard changes",
+      title: /* @__PURE__ */jsxRuntime.jsx(sanity.InsufficientPermissionsMessage, {
+        operationLabel: "discard changes in this document",
+        currentUser
+      })
+    };
+  }
+  return {
+    tone: "critical",
+    icon: icons.ResetIcon,
+    disabled: Boolean(discardChanges.disabled) || isPermissionsLoading,
+    title: discardChanges.disabled && DISABLED_REASON_TITLE$3[discardChanges.disabled] || "",
+    label: "Discard changes",
+    onHandle: handle,
+    dialog
+  };
+};
+DiscardChangesAction.action = "discardChanges";
+const DISABLED_REASON_TITLE$2 = {
+  NOTHING_TO_DUPLICATE: "This document doesn\u2019t yet exist so there\u2018s nothing to duplicate"
+};
+const DuplicateAction = _ref24 => {
+  let {
+    id,
+    type,
+    onComplete
+  } = _ref24;
+  const {
+    duplicate
+  } = sanity.useDocumentOperation(id, type);
+  const {
+    navigateIntent
+  } = router$1.useRouter();
+  const [isDuplicating, setDuplicating] = React.useState(false);
+  const [permissions, isPermissionsLoading] = sanity.useDocumentPairPermissions({
+    id,
+    type,
+    permission: "duplicate"
+  });
+  const currentUser = sanity.useCurrentUser();
+  const handle = React.useCallback(() => {
+    const dupeId = uuid.uuid();
+    setDuplicating(true);
+    duplicate.execute(dupeId);
+    navigateIntent("edit", {
+      id: dupeId,
+      type
+    });
+    onComplete();
+  }, [duplicate, navigateIntent, onComplete, type]);
+  if (!isPermissionsLoading && !(permissions == null ? void 0 : permissions.granted)) {
+    return {
+      icon: icons.CopyIcon,
+      disabled: true,
+      label: "Duplicate",
+      title: /* @__PURE__ */jsxRuntime.jsx(sanity.InsufficientPermissionsMessage, {
+        operationLabel: "duplicate this document",
+        currentUser
+      })
+    };
+  }
+  return {
+    icon: icons.CopyIcon,
+    disabled: isDuplicating || Boolean(duplicate.disabled) || isPermissionsLoading,
+    label: isDuplicating ? "Duplicating\u2026" : "Duplicate",
+    title: duplicate.disabled && DISABLED_REASON_TITLE$2[duplicate.disabled] || "",
+    onHandle: handle
+  };
+};
+DuplicateAction.action = "duplicate";
+const HistoryRestoreAction = _ref25 => {
+  let {
+    id,
+    type,
+    revision,
+    onComplete
+  } = _ref25;
+  const {
+    restore
+  } = sanity.useDocumentOperation(id, type);
+  const {
+    navigateIntent
+  } = router$1.useRouter();
+  const [isConfirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
+  const handleConfirm = React.useCallback(() => {
+    restore.execute(revision);
+    onComplete();
+    setTimeout(() => navigateIntent("edit", {
+      id,
+      type
+    }), 0);
+  }, [restore, revision, navigateIntent, id, type, onComplete]);
+  const handle = React.useCallback(() => {
+    setConfirmDialogOpen(true);
+  }, []);
+  const dialog = React.useMemo(() => {
+    if (isConfirmDialogOpen) {
+      return {
+        type: "confirm",
+        tone: "critical",
+        onCancel: onComplete,
+        onConfirm: handleConfirm,
+        message: /* @__PURE__ */jsxRuntime.jsx(jsxRuntime.Fragment, {
+          children: "Are you sure you want to restore this document?"
+        })
+      };
+    }
+    return null;
+  }, [handleConfirm, isConfirmDialogOpen, onComplete]);
+  const isRevisionInitialVersion = revision === "@initial";
+  const isRevisionLatestVersion = revision === void 0;
+  if (isRevisionLatestVersion) {
+    return null;
+  }
+  return {
+    label: "Restore",
+    color: "primary",
+    onHandle: handle,
+    title: isRevisionInitialVersion ? "You can't restore to the initial version" : "Restore to this version",
+    icon: icons.RestoreIcon,
+    dialog,
+    disabled: isRevisionInitialVersion
+  };
+};
+HistoryRestoreAction.action = "restore";
+const DocumentPaneContext = React.createContext(null);
+function useDocumentPane() {
+  const documentPane = React.useContext(DocumentPaneContext);
+  if (!documentPane) {
+    throw new Error("DocumentPane: missing context value");
+  }
+  return documentPane;
+}
+const DISABLED_REASON_TITLE$1 = {
+  LIVE_EDIT_ENABLED: "Cannot publish since liveEdit is enabled for this document type",
+  ALREADY_PUBLISHED: "Already published",
+  NO_CHANGES: "No unpublished changes",
+  NOT_READY: "Operation not ready"
+};
+function getDisabledReason(reason, publishedAt) {
+  if (reason === "ALREADY_PUBLISHED" && publishedAt) {
+    return /* @__PURE__ */jsxRuntime.jsx(jsxRuntime.Fragment, {
+      children: /* @__PURE__ */jsxRuntime.jsxs("span", {
+        children: ["Published ", /* @__PURE__ */jsxRuntime.jsx(TimeAgo, {
+          time: publishedAt
+        })]
+      })
+    });
+  }
+  return DISABLED_REASON_TITLE$1[reason];
+}
+const PublishAction = props => {
+  var _a;
+  const {
+    id,
+    type,
+    liveEdit,
+    draft,
+    published
+  } = props;
+  const [publishState, setPublishState] = React.useState(null);
+  const {
+    publish
+  } = sanity.useDocumentOperation(id, type);
+  const validationStatus = sanity.useValidationStatus(id, type);
+  const syncState = sanity.useSyncState(id, type);
+  const {
+    changesOpen,
+    onHistoryOpen,
+    documentId,
+    documentType
+  } = useDocumentPane();
+  const editState = sanity.useEditState(documentId, documentType);
+  const revision = ((editState == null ? void 0 : editState.draft) || (editState == null ? void 0 : editState.published) || {})._rev;
+  const hasValidationErrors = validationStatus.validation.some(types.isValidationErrorMarker);
+  const [publishScheduled, setPublishScheduled] = React.useState(false);
+  const isSyncing = syncState.isSyncing;
+  const isValidating = validationStatus.isValidating;
+  const [permissions, isPermissionsLoading] = sanity.useDocumentPairPermissions({
+    id,
+    type,
+    permission: "publish"
+  });
+  const currentUser = sanity.useCurrentUser();
+  const title = publish.disabled ? getDisabledReason(publish.disabled, (published || {})._updatedAt) || "" : hasValidationErrors ? "There are validation errors that need to be fixed before this document can be published" : "";
+  const hasDraft = Boolean(draft);
+  const doPublish = React.useCallback(() => {
+    publish.execute();
+    setPublishState("publishing");
+  }, [publish]);
+  React.useEffect(() => {
+    const validationComplete = validationStatus.isValidating === false && validationStatus.revision !== revision;
+    if (!publishScheduled || isSyncing || !validationComplete) {
+      return;
+    }
+    if (!hasValidationErrors) {
+      doPublish();
+    }
+    setPublishScheduled(false);
+  }, [isSyncing, doPublish, hasValidationErrors, publishScheduled, validationStatus.revision, revision, isValidating, validationStatus.isValidating]);
+  React.useEffect(() => {
+    const didPublish = publishState === "publishing" && !hasDraft;
+    if (didPublish) {
+      if (changesOpen) {
+        onHistoryOpen();
+      }
+    }
+    const nextState = didPublish ? "published" : null;
+    const delay = didPublish ? 200 : 4e3;
+    const timer = setTimeout(() => {
+      setPublishState(nextState);
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [changesOpen, publishState, hasDraft, onHistoryOpen]);
+  const handle = React.useCallback(() => {
+    if (syncState.isSyncing || validationStatus.isValidating || validationStatus.revision !== revision) {
+      setPublishScheduled(true);
+    } else {
+      doPublish();
+    }
+  }, [syncState.isSyncing, validationStatus.isValidating, validationStatus.revision, revision, doPublish]);
+  if (liveEdit) {
+    return {
+      tone: "positive",
+      label: "Publish",
+      title: "Live Edit is enabled for this content type and publishing happens automatically as you make changes",
+      disabled: true
+    };
+  }
+  if (!isPermissionsLoading && !(permissions == null ? void 0 : permissions.granted)) {
+    return {
+      tone: "positive",
+      label: "Publish",
+      title: /* @__PURE__ */jsxRuntime.jsx(sanity.InsufficientPermissionsMessage, {
+        operationLabel: "publish this document",
+        currentUser
+      }),
+      disabled: true
+    };
+  }
+  const disabled = Boolean(publishScheduled || ((_a = editState == null ? void 0 : editState.transactionSyncLock) == null ? void 0 : _a.enabled) || publishState === "publishing" || publishState === "published" || hasValidationErrors || publish.disabled);
+  return {
+    disabled: disabled || isPermissionsLoading,
+    tone: "positive",
+    label:
+    // eslint-disable-next-line no-nested-ternary
+    publishState === "published" ? "Published" : publishScheduled || publishState === "publishing" ? "Publishing\u2026" : "Publish",
+    // @todo: Implement loading state, to show a `<Button loading />` state
+    // loading: publishScheduled || publishState === 'publishing',
+    icon: publishState === "published" ? icons.CheckmarkIcon : icons.PublishIcon,
+    // eslint-disable-next-line no-nested-ternary
+    title: publishScheduled ? "Waiting for tasks to finish before publishing" : publishState === "published" || publishState === "publishing" ? null : title,
+    shortcut: disabled || publishScheduled ? null : "Ctrl+Alt+P",
+    onHandle: handle
+  };
+};
+PublishAction.action = "publish";
+const DISABLED_REASON_TITLE = {
+  NOT_PUBLISHED: "This document is not published"
+};
+const UnpublishAction = _ref26 => {
+  let {
+    id,
+    type,
+    draft,
+    onComplete,
+    liveEdit
+  } = _ref26;
+  const {
+    unpublish
+  } = sanity.useDocumentOperation(id, type);
+  const [isConfirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
+  const [permissions, isPermissionsLoading] = sanity.useDocumentPairPermissions({
+    id,
+    type,
+    permission: "unpublish"
+  });
+  const currentUser = sanity.useCurrentUser();
+  const handleCancel = React.useCallback(() => {
+    setConfirmDialogOpen(false);
+    onComplete();
+  }, [onComplete]);
+  const handleConfirm = React.useCallback(() => {
+    setConfirmDialogOpen(false);
+    unpublish.execute();
+    onComplete();
+  }, [onComplete, unpublish]);
+  const dialog = React.useMemo(() => {
+    if (isConfirmDialogOpen) {
+      return {
+        type: "dialog",
+        onClose: onComplete,
+        content: /* @__PURE__ */jsxRuntime.jsx(ConfirmDeleteDialogContainer, {
+          id: (draft == null ? void 0 : draft._id) || id,
+          type,
+          action: "unpublish",
+          onCancel: handleCancel,
+          onConfirm: handleConfirm
+        })
+      };
+    }
+    return null;
+  }, [draft, id, handleCancel, handleConfirm, isConfirmDialogOpen, onComplete, type]);
+  if (liveEdit) {
+    return null;
+  }
+  if (!isPermissionsLoading && !(permissions == null ? void 0 : permissions.granted)) {
+    return {
+      tone: "critical",
+      icon: icons.UnpublishIcon,
+      label: "Unpublish",
+      title: /* @__PURE__ */jsxRuntime.jsx(sanity.InsufficientPermissionsMessage, {
+        operationLabel: "unpublish this document",
+        currentUser
+      }),
+      disabled: true
+    };
+  }
+  return {
+    tone: "critical",
+    icon: icons.UnpublishIcon,
+    disabled: Boolean(unpublish.disabled) || isPermissionsLoading,
+    label: "Unpublish",
+    title: unpublish.disabled ? DISABLED_REASON_TITLE[unpublish.disabled] : "",
+    onHandle: () => setConfirmDialogOpen(true),
+    dialog
+  };
+};
+UnpublishAction.action = "unpublish";
+const LiveEditBadge = props => {
+  const {
+    liveEdit
+  } = props;
+  if (liveEdit) {
+    return {
+      label: "Live",
+      color: "danger"
+    };
+  }
+  return null;
+};
+const _DEBUG = false;
+const EMPTY_PARAMS$2 = {};
+const LOADING_PANE = Symbol("LOADING_PANE");
+const DOCUMENT_PANEL_PORTAL_ELEMENT = "documentPanelPortalElement";
+const state = {
+  activePanes: []
+};
+function setActivePanes(panes) {
+  state.activePanes = panes;
+}
+function getIntentState(intent, params, routerState, payload) {
+  var

@@ -1,0 +1,145 @@
+import "./node-environment";
+import "./require-hook";
+import "./node-polyfill-fetch";
+import "./node-polyfill-form";
+import "./node-polyfill-web-streams";
+import "./node-polyfill-crypto";
+import { DecodeError, PageNotFoundError, MiddlewareNotFoundError } from "../shared/lib/utils";
+import { getRouteMatcher } from "../shared/lib/router/utils/route-matcher";
+import { renderToHTML } from "./render";
+import fs from "fs";
+import { join, relative, resolve, sep, isAbsolute } from "path";
+import { IncomingMessage, ServerResponse } from "http";
+import { addRequestMeta, getRequestMeta } from "./request-meta";
+import { PAGES_MANIFEST, BUILD_ID_FILE, MIDDLEWARE_MANIFEST, CLIENT_STATIC_FILES_PATH, CLIENT_STATIC_FILES_RUNTIME, PRERENDER_MANIFEST, ROUTES_MANIFEST, CLIENT_PUBLIC_FILES_PATH, APP_PATHS_MANIFEST, SERVER_DIRECTORY, NEXT_FONT_MANIFEST, PHASE_PRODUCTION_BUILD } from "../shared/lib/constants";
+import { recursiveReadDirSync } from "./lib/recursive-readdir-sync";
+import { findDir } from "../lib/find-pages-dir";
+import { format as formatUrl } from "url";
+import { getPathMatch } from "../shared/lib/router/utils/path-match";
+import { createHeaderRoute, createRedirectRoute } from "./server-route-utils";
+import getRouteFromAssetPath from "../shared/lib/router/utils/get-route-from-asset-path";
+import { NodeNextRequest, NodeNextResponse } from "./base-http/node";
+import { sendRenderResult } from "./send-payload";
+import { getExtension, serveStatic } from "./serve-static";
+import { apiResolver } from "./api-utils/node";
+import { parseUrl } from "../shared/lib/router/utils/parse-url";
+import { parse as nodeParseUrl } from "url";
+import * as Log from "../build/output/log";
+import BaseServer, { NoFallbackError } from "./base-server";
+import { getMaybePagePath, getPagePath, requireFontManifest } from "./require";
+import { denormalizePagePath } from "../shared/lib/page-path/denormalize-page-path";
+import { normalizePagePath } from "../shared/lib/page-path/normalize-page-path";
+import { loadComponents } from "./load-components";
+import isError, { getProperError } from "../lib/is-error";
+import { splitCookiesString, toNodeOutgoingHttpHeaders } from "./web/utils";
+import { relativizeURL } from "../shared/lib/router/utils/relativize-url";
+import { prepareDestination } from "../shared/lib/router/utils/prepare-destination";
+import { getMiddlewareRouteMatcher } from "../shared/lib/router/utils/middleware-route-matcher";
+import { loadEnvConfig } from "@next/env";
+import { getCustomRoute, stringifyQuery } from "./server-route-utils";
+import { urlQueryToSearchParams } from "../shared/lib/router/utils/querystring";
+import { removeTrailingSlash } from "../shared/lib/router/utils/remove-trailing-slash";
+import { getNextPathnameInfo } from "../shared/lib/router/utils/get-next-pathname-info";
+import { getCloneableBody } from "./body-streams";
+import { checkIsOnDemandRevalidate } from "./api-utils";
+import ResponseCache from "./response-cache";
+import { IncrementalCache } from "./lib/incremental-cache";
+import { normalizeAppPath } from "../shared/lib/router/utils/app-paths";
+import { setHttpClientAndAgentOptions } from "./setup-http-agent-env";
+import { RouteKind } from "./future/route-kind";
+import { INSTRUMENTATION_HOOK_FILENAME } from "../lib/constants";
+import { getTracer } from "./lib/trace/tracer";
+import { NextNodeServerSpan } from "./lib/trace/constants";
+import { nodeFs } from "./lib/node-fs-methods";
+import { getRouteRegex } from "../shared/lib/router/utils/route-regex";
+import { removePathPrefix } from "../shared/lib/router/utils/remove-path-prefix";
+import { addPathPrefix } from "../shared/lib/router/utils/add-path-prefix";
+import { pathHasPrefix } from "../shared/lib/router/utils/path-has-prefix";
+import { invokeRequest } from "./lib/server-ipc/invoke-request";
+import { filterReqHeaders } from "./lib/server-ipc/utils";
+import { createRequestResponseMocks } from "./lib/mock-request";
+import chalk from "next/dist/compiled/chalk";
+import { NEXT_RSC_UNION_QUERY } from "../client/components/app-router-headers";
+import { signalFromNodeRequest } from "./web/spec-extension/adapters/next-request";
+import { loadManifest } from "./load-manifest";
+export * from "./base-server";
+const MiddlewareMatcherCache = new WeakMap();
+function getMiddlewareMatcher(info) {
+    const stored = MiddlewareMatcherCache.get(info);
+    if (stored) {
+        return stored;
+    }
+    if (!Array.isArray(info.matchers)) {
+        throw new Error(`Invariant: invalid matchers for middleware ${JSON.stringify(info)}`);
+    }
+    const matcher = getMiddlewareRouteMatcher(info.matchers);
+    MiddlewareMatcherCache.set(info, matcher);
+    return matcher;
+}
+/**
+ * Hardcoded every possible error status code that could be thrown by "serveStatic" method
+ * This is done by searching "this.error" inside "send" module's source code:
+ * https://github.com/pillarjs/send/blob/master/index.js
+ * https://github.com/pillarjs/send/blob/develop/index.js
+ */ const POSSIBLE_ERROR_CODE_FROM_SERVE_STATIC = new Set([
+    // send module will throw 500 when header is already sent or fs.stat error happens
+    // https://github.com/pillarjs/send/blob/53f0ab476145670a9bdd3dc722ab2fdc8d358fc6/index.js#L392
+    // Note: we will use Next.js built-in 500 page to handle 500 errors
+    // 500,
+    // send module will throw 404 when file is missing
+    // https://github.com/pillarjs/send/blob/53f0ab476145670a9bdd3dc722ab2fdc8d358fc6/index.js#L421
+    // Note: we will use Next.js built-in 404 page to handle 404 errors
+    // 404,
+    // send module will throw 403 when redirecting to a directory without enabling directory listing
+    // https://github.com/pillarjs/send/blob/53f0ab476145670a9bdd3dc722ab2fdc8d358fc6/index.js#L484
+    // Note: Next.js throws a different error (without status code) for directory listing
+    // 403,
+    // send module will throw 400 when fails to normalize the path
+    // https://github.com/pillarjs/send/blob/53f0ab476145670a9bdd3dc722ab2fdc8d358fc6/index.js#L520
+    400,
+    // send module will throw 412 with conditional GET request
+    // https://github.com/pillarjs/send/blob/53f0ab476145670a9bdd3dc722ab2fdc8d358fc6/index.js#L632
+    412,
+    // send module will throw 416 when range is not satisfiable
+    // https://github.com/pillarjs/send/blob/53f0ab476145670a9bdd3dc722ab2fdc8d358fc6/index.js#L669
+    416
+]);
+export default class NextNodeServer extends BaseServer {
+    constructor(options){
+        // Initialize super class
+        super(options);
+        this._validFilesystemPathSet = null;
+        /**
+     * This sets environment variable to be used at the time of SSR by head.tsx.
+     * Using this from process.env allows targeting SSR by calling
+     * `process.env.__NEXT_OPTIMIZE_CSS`.
+     */ if (this.renderOpts.optimizeFonts) {
+            process.env.__NEXT_OPTIMIZE_FONTS = JSON.stringify(this.renderOpts.optimizeFonts);
+        }
+        if (this.renderOpts.optimizeCss) {
+            process.env.__NEXT_OPTIMIZE_CSS = JSON.stringify(true);
+        }
+        if (this.renderOpts.nextScriptWorkers) {
+            process.env.__NEXT_SCRIPT_WORKERS = JSON.stringify(true);
+        }
+        if (this.nextConfig.compress) {
+            this.compression = require("next/dist/compiled/compression")();
+        }
+        if (this.nextConfig.experimental.deploymentId) {
+            process.env.NEXT_DEPLOYMENT_ID = this.nextConfig.experimental.deploymentId;
+        }
+        if (!this.minimalMode) {
+            this.imageResponseCache = new ResponseCache(this.minimalMode);
+        }
+        const { appDocumentPreloading  } = this.nextConfig.experimental;
+        const isDefaultEnabled = typeof appDocumentPreloading === "undefined";
+        if (!options.dev && (appDocumentPreloading === true || !(this.minimalMode && isDefaultEnabled))) {
+            // pre-warm _document and _app as these will be
+            // needed for most requests
+            loadComponents({
+                distDir: this.distDir,
+                pathname: "/_document",
+                isAppPath: false
+            }).catch(()=>{});
+            loadComponents({
+                

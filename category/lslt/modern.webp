@@ -1,0 +1,187 @@
+e()){
+        if (walker.currentNode.shadowRoot) {
+            if (_isFocusable(walker.currentNode)) {
+                list.push(walker.currentNode);
+            }
+            list = list.concat(queryFocusableStrict({
+                context: walker.currentNode.shadowRoot,
+                includeOnlyTabbable: includeOnlyTabbable,
+                strategy: strategy
+            }));
+        } else {
+            list.push(walker.currentNode);
+        }
+    }
+    // add context if requested and focusable
+    if (includeContext) {
+        if (strategy === "all") {
+            if (isFocusRelevant(context)) {
+                list.unshift(context);
+            }
+        } else if (_isFocusable(context)) {
+            list.unshift(context);
+        }
+    }
+    return list;
+}
+// NOTE: this selector MUST *never* be used directly,
+var supports$6 = void 0;
+var selector$1 = void 0;
+function selector$2() {
+    if (!supports$6) {
+        supports$6 = _supports();
+    }
+    if (typeof selector$1 === "string") {
+        return selector$1;
+    }
+    // https://www.w3.org/TR/html5/editing.html#sequential-focus-navigation-and-the-tabindex-attribute
+    selector$1 = "" + // IE11 supports.can focus <table> and <td>
+    (supports$6.focusTable ? "table, td," : "") + // IE11 supports.can focus <fieldset>
+    (supports$6.focusFieldset ? "fieldset," : "") + // Namespace problems of [xlink:href] explained in https://stackoverflow.com/a/23047888/515124
+    // svg a[*|href] does not match in IE9, but since we're filtering
+    // through is/focusable we can include all <a> from SVG
+    "svg a," + // may behave as 'svg, svg *,' in chrome as *every* svg element with a focus event listener is focusable
+    // navigational elements
+    "a[href]," + // validity determined by is/valid-area.js
+    "area[href]," + // validity determined by is/disabled.js
+    "input, select, textarea, button," + // browsing context containers
+    "iframe, object, embed," + // interactive content
+    "keygen," + (supports$6.focusAudioWithoutControls ? "audio," : "audio[controls],") + (supports$6.focusVideoWithoutControls ? "video," : "video[controls],") + (supports$6.focusSummary ? "summary," : "") + // validity determined by is/valid-tabindex.js
+    "[tabindex]," + // editing hosts
+    "[contenteditable]";
+    // where ShadowDOM is supported, we also want the shadowed focusable elements (via ">>>" or "/deep/")
+    selector$1 = selectInShadows(selector$1);
+    return selector$1;
+}
+function queryFocusableQuick() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}, context = _ref.context, includeContext = _ref.includeContext, includeOnlyTabbable = _ref.includeOnlyTabbable;
+    var _selector = selector$2();
+    var elements = context.querySelectorAll(_selector);
+    // the selector potentially matches more than really is focusable
+    var _isFocusable = isFocusable.rules.except({
+        onlyTabbable: includeOnlyTabbable
+    });
+    var result = [].filter.call(elements, _isFocusable);
+    // add context if requested and focusable
+    if (includeContext && _isFocusable(context)) {
+        result.unshift(context);
+    }
+    return result;
+}
+function queryFocusable() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}, context = _ref.context, includeContext = _ref.includeContext, includeOnlyTabbable = _ref.includeOnlyTabbable, _ref$strategy = _ref.strategy, strategy = _ref$strategy === undefined ? "quick" : _ref$strategy;
+    var element = contextToElement({
+        label: "query/focusable",
+        resolveDocument: true,
+        defaultToDocument: true,
+        context: context
+    });
+    var options = {
+        context: element,
+        includeContext: includeContext,
+        includeOnlyTabbable: includeOnlyTabbable,
+        strategy: strategy
+    };
+    if (strategy === "quick") {
+        return queryFocusableQuick(options);
+    } else if (strategy === "strict" || strategy === "all") {
+        return queryFocusableStrict(options);
+    }
+    throw new TypeError('query/focusable requires option.strategy to be one of ["quick", "strict", "all"]');
+}
+var supports$7 = void 0;
+// Internet Explorer 11 considers fieldset, table, td focusable, but not tabbable
+// Internet Explorer 11 considers body to have [tabindex=0], but does not allow tabbing to it
+var focusableElementsPattern = /^(fieldset|table|td|body)$/;
+function isTabbableRules() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {}, context = _ref.context, _ref$except = _ref.except, except = _ref$except === undefined ? {
+        flexbox: false,
+        scrollable: false,
+        shadow: false,
+        visible: false,
+        onlyTabbable: false
+    } : _ref$except;
+    if (!supports$7) {
+        supports$7 = _supports();
+    }
+    var element = contextToElement({
+        label: "is/tabbable",
+        resolveDocument: true,
+        context: context
+    });
+    if (platform.is.BLINK && platform.is.ANDROID && platform.majorVersion > 42) {
+        // External keyboard support worked fine in CHrome 42, but stopped working in Chrome 45.
+        // The on-screen keyboard does not provide a way to focus the next input element (like iOS does).
+        // That leaves us with no option to advance focus by keyboard, ergo nothing is tabbable (keyboard focusable).
+        return false;
+    }
+    var frameElement = getFrameElement(element);
+    if (frameElement) {
+        if (platform.is.WEBKIT && platform.is.IOS) {
+            // iOS only does not consider anything from another browsing context keyboard focusable
+            return false;
+        }
+        // iframe[tabindex="-1"] and object[tabindex="-1"] inherit the
+        // tabbable demotion onto elements of their browsing contexts
+        if (tabindexValue(frameElement) < 0) {
+            return false;
+        }
+        if (!except.visible && (platform.is.BLINK || platform.is.WEBKIT) && !isVisible(frameElement)) {
+            // Blink and WebKit consider elements in hidden browsing contexts focusable, but not tabbable
+            return false;
+        }
+        // Webkit and Blink don't consider anything in <object> tabbable
+        // Blink fixed that fixed in Chrome 54, Opera 41
+        var frameNodeName = frameElement.nodeName.toLowerCase();
+        if (frameNodeName === "object") {
+            var isFixedBlink = platform.name === "Chrome" && platform.majorVersion >= 54 || platform.name === "Opera" && platform.majorVersion >= 41;
+            if (platform.is.WEBKIT || platform.is.BLINK && !isFixedBlink) {
+                return false;
+            }
+        }
+    }
+    var nodeName = element.nodeName.toLowerCase();
+    var _tabindex = tabindexValue(element);
+    var tabindex = _tabindex === null ? null : _tabindex >= 0;
+    if (platform.is.EDGE && platform.majorVersion >= 14 && frameElement && element.ownerSVGElement && _tabindex < 0) {
+        // Edge 14+ considers <a xlink:href="…" tabindex="-1"> keyboard focusable
+        // if the element is in a nested browsing context
+        return true;
+    }
+    var hasTabbableTabindexOrNone = tabindex !== false;
+    var hasTabbableTabindex = _tabindex !== null && _tabindex >= 0;
+    // NOTE: Firefox 31 considers [contenteditable] to have [tabindex=-1], but allows tabbing to it
+    // fixed in Firefox 40 the latest - https://bugzilla.mozilla.org/show_bug.cgi?id=1185657
+    if (element.hasAttribute("contenteditable")) {
+        // tabbing can still be disabled by explicitly providing [tabindex="-1"]
+        return hasTabbableTabindexOrNone;
+    }
+    if (focusableElementsPattern.test(nodeName) && tabindex !== true) {
+        return false;
+    }
+    if (platform.is.WEBKIT && platform.is.IOS) {
+        // iOS only considers a hand full of elements tabbable (keyboard focusable)
+        // this holds true even with external keyboards
+        var potentiallyTabbable = nodeName === "input" && element.type === "text" || element.type === "password" || nodeName === "select" || nodeName === "textarea" || element.hasAttribute("contenteditable");
+        if (!potentiallyTabbable) {
+            var style = window.getComputedStyle(element, null);
+            potentiallyTabbable = isUserModifyWritable(style);
+        }
+        if (!potentiallyTabbable) {
+            return false;
+        }
+    }
+    if (nodeName === "use" && _tabindex !== null) {
+        if (platform.is.BLINK || platform.is.WEBKIT && platform.majorVersion === 9) {
+            // In Chrome and Safari 9 the <use> element is keyboard focusable even for tabindex="-1"
+            return true;
+        }
+    }
+    if (elementMatches(element, "svg a") && element.hasAttribute("xlink:href")) {
+        if (hasTabbableTabindexOrNone) {
+            // in Trident and Gecko SVGElement does not handle the tabIndex property properly
+            return true;
+        }
+        if (element.focus && !supports$7.focusSvgNegativeTabindexAttribute) {
+            // Firefox 51 and 52 treat any natively tabbable SVG element with
+            // tabindex="-1" as tabbable and everything el

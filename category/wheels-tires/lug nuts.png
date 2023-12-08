@@ -1,0 +1,2224 @@
+{
+    "MENU_COMMANDS": {
+        "10": [
+            "uusi dokumentti",
+            "uusi tiedosto",
+            "avaa",
+            "aloita käyttö"
+        ],
+        "20": [
+            "avaa tiedosto",
+            "avaa dokumentti",
+            "etsi",
+            "siirry",
+            "käynnistä",
+            "selaa"
+        ],
+        "22": [
+            "beágyazás",
+            "kívül összekapcsolva"
+        ],
+        "30": [
+            "exportálás"
+        ],
+        "31": [
+            "kilépés",
+            "kilép"
+        ],
+        "33": [
+            "tallenna",
+            "tallenna dokumentti",
+            "tallenna tiedosto",
+            "vie"
+        ],
+        "34": [
+            "visszavonás",
+            "visszalépés"
+        ],
+        "36": [
+            "lopeta photoshop",
+            "kilépés",
+            "kilép"
+        ],
+        "37": [
+            "kilépés",
+            "kilép"
+        ],
+        "103": [
+            "törlés"
+        ],
+        "104": [
+            "másolat"
+        ],
+        "106": [
+            "törlés",
+            "eltávolítás"
+        ],
+        "1007": [
+            "ff",
+            "fekete-fehér"
+        ],
+        "1016": [
+            "kijelölt rész"
+        ],
+        "1017": [
+            "kijelölt rész"
+        ],
+        "1018": [
+            "kijelölt rész"
+        ],
+        "1030": [
+            "átméretezés",
+            "nagyítás",
+            "zsugorít",
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "1031": [
+            "kibővítés",
+            "átméretezés"
+        ],
+        "1032": [
+            "intelligens objektum",
+            "importálás",
+            "megnyitás"
+        ],
+        "1038": [
+            "mozaik"
+        ],
+        "1042": [
+            "kuvio",
+            "szkriptelt mintázat",
+            "koristele",
+            "mágikus kitöltés"
+        ],
+        "1044": [
+            "körülvágás",
+            "törlés",
+            "eltávolítás"
+        ],
+        "1080": [
+            "vágás",
+            "lehasít",
+            "eltávolítás"
+        ],
+        "1081": [
+            "átméretezés",
+            "vágás",
+            "újravágás",
+            "méretezés"
+        ],
+        "1099": [
+            "új réteg"
+        ],
+        "1115": [
+            "szegély",
+            "szegély finomítása"
+        ],
+        "1137": [
+            "xmp"
+        ],
+        "1139": [
+            "rétegek egyesítése"
+        ],
+        "1141": [
+            "egyesítés",
+            "elvet"
+        ],
+        "1152": [
+            "kijelölt rész"
+        ],
+        "1153": [
+            "egyesítés",
+            "kever"
+        ],
+        "1154": [
+            "szűrés",
+            "életlenítés"
+        ],
+        "1231": [
+            "elrendezés",
+            "rendszerez",
+            "igazítás"
+        ],
+        "1232": [
+            "elrendezés",
+            "rendszerez",
+            "igazítás"
+        ],
+        "1233": [
+            "elrendezés",
+            "rendszerez",
+            "igazítás"
+        ],
+        "1234": [
+            "elrendezés",
+            "rendszerez",
+            "igazítás"
+        ],
+        "1235": [
+            "elrendezés",
+            "rendszerez",
+            "igazítás"
+        ],
+        "1236": [
+            "elrendezés",
+            "rendszerez",
+            "igazítás"
+        ],
+        "1237": [
+            "vignetta eltávolítása",
+            "szellemképek eltávolítása"
+        ],
+        "1241": [
+            "elrendezés",
+            "rendszerez",
+            "igazítás"
+        ],
+        "1242": [
+            "elrendezés",
+            "rendszerez",
+            "igazítás"
+        ],
+        "1243": [
+            "elrendezés",
+            "rendszerez",
+            "igazítás"
+        ],
+        "1245": [
+            "elrendezés",
+            "rendszerez",
+            "igazítás"
+        ],
+        "1246": [
+            "elrendezés",
+            "rendszerez",
+            "igazítás"
+        ],
+        "1247": [
+            "elrendezés",
+            "rendszerez",
+            "igazítás"
+        ],
+        "1461": [
+            "háttér eltávolítása"
+        ],
+        "1462": [
+            "taivaan vaihto"
+        ],
+        "1502": [
+            "twain"
+        ],
+        "1520": [
+            "keresés",
+            "keresés"
+        ],
+        "1695": [
+            "mentés"
+        ],
+        "1702": [
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "1801": [
+            "fényerő",
+            "kontraszt",
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "1802": [
+            "fényerő",
+            "kontraszt",
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "1803": [
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "1804": [
+            "hőmérséklet",
+            "fehéregyensúly",
+            "színkorrigálás",
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "1805": [
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "1806": [
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "1808": [
+            "világosít",
+            "élénkség",
+            "kiegyenlít",
+            "színkorrigálás",
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "1810": [
+            "világosít",
+            "élénkség",
+            "kiegyenlít",
+            "színkorrigálás",
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "1817": [
+            "színkorrigálás",
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "1822": [
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "1824": [
+            "ff"
+        ],
+        "1943": [
+            "kijelölt rész"
+        ],
+        "1961": [
+            "visszavonás",
+            "mégis",
+            "megfordítás"
+        ],
+        "1962": [
+            "mégis",
+            "visszavonás"
+        ],
+        "2201": [
+            "átméretezés"
+        ],
+        "2202": [
+            "torzít",
+            "dőlés",
+            "nyújtás"
+        ],
+        "2204": [
+            "döntés",
+            "nyújtás",
+            "hajlítás"
+        ],
+        "2207": [
+            "átméretezés",
+            "torzít"
+        ],
+        "2219": [
+            "hajlít",
+            "deformál",
+            "torzít",
+            "cseppfolyósít",
+            "cseppfolyósítás"
+        ],
+        "2220": [
+            "átalakítás",
+            "zsugorít",
+            "kibővítés"
+        ],
+        "2221": [
+            "átalakítás",
+            "torzít",
+            "átrajzolás",
+            "hajlít",
+            "nyírás",
+            "cseppfolyósít",
+            "cseppfolyósítás",
+            "újrapozicionálás"
+        ],
+        "2224": [
+            "mélységélesség",
+            "bokeh",
+            "effektusok",
+            "mozgáseffektusok",
+            "zaj",
+            "torzítás"
+        ],
+        "2225": [
+            "mélységélesség",
+            "bokeh",
+            "effektusok",
+            "mozgáseffektusok",
+            "zaj",
+            "torzítás"
+        ],
+        "2226": [
+            "nagyon kicsi effektus",
+            "bokeh",
+            "effektusok",
+            "mozgáseffektusok",
+            "zaj",
+            "torzítás"
+        ],
+        "2227": [
+            "bemozdulás",
+            "bokeh",
+            "effektusok",
+            "mozgáseffektusok",
+            "zaj",
+            "torzítás"
+        ],
+        "2229": [
+            "bemozdulás",
+            "bokeh",
+            "effektusok",
+            "mozgáseffektusok",
+            "zaj",
+            "torzítás"
+        ],
+        "2231": [
+            "tűz"
+        ],
+        "2260": [
+            "taivas",
+            "korvaa taivas",
+            "vaihda taivas"
+        ],
+        "2304": [
+            "optimalizál",
+            "gpu",
+            "grafikus processzor",
+            "gyorsítótár"
+        ],
+        "2311": [
+            "beállítások"
+        ],
+        "2313": [
+            "rács"
+        ],
+        "2315": [
+            "intelligens segédvonalak"
+        ],
+        "2316": [
+            "generátor"
+        ],
+        "2317": [
+            "automatikus mentés",
+            "automatikus helyreállítás"
+        ],
+        "2323": [
+            "színtéma",
+            "felhasználói felületi szín",
+            "színállomás",
+            "csúcsfény színe"
+        ],
+        "2328": [
+            "teljesítmény"
+        ],
+        "2330": [
+            "túlgörgetés",
+            "elemleírások",
+            "régebbi javítóecset",
+            "nagyítás vagy kicsinyítés beállításai"
+        ],
+        "2332": [
+            "mentés"
+        ],
+        "2344": [
+            "színkorrigálás"
+        ],
+        "2361": [
+            "memória",
+            "teljesítmény"
+        ],
+        "2713": [
+            "elrejtés"
+        ],
+        "2714": [
+            "elrejtés"
+        ],
+        "2911": [
+            "memória",
+            "teljesítmény"
+        ],
+        "2912": [
+            "memória",
+            "teljesítmény"
+        ],
+        "2915": [
+            "memória",
+            "teljesítmény"
+        ],
+        "2920": [
+            "memória",
+            "teljesítmény"
+        ],
+        "2940": [
+            "vonalzó segédvonalai",
+            "igazítás",
+            "zárolás a vonalzóhoz",
+            "precíz elhelyezés",
+            "vonalzó osztásai",
+            "igazít",
+            "rácsvonalak",
+            "vízszintes segédvonalak",
+            "függőleges segédvonalak",
+            "rács"
+        ],
+        "2950": [
+            "vonalzók",
+            "rácsvonalak",
+            "rács törlése"
+        ],
+        "2991": [
+            "elforgatás"
+        ],
+        "2992": [
+            "elforgatás"
+        ],
+        "2993": [
+            "elforgatás"
+        ],
+        "2994": [
+            "elforgatás",
+            "egyenesítés",
+            "ferde",
+            "döntött"
+        ],
+        "2996": [
+            "elforgatás"
+        ],
+        "2997": [
+            "elforgatás"
+        ],
+        "3065": [
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "3066": [
+            "lut",
+            "3d lut"
+        ],
+        "3083": [
+            "világosít",
+            "sötétítés",
+            "kontrasztosabb",
+            "színkorrigálás",
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "3085": [
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "3090": [
+            "intelligens objektum",
+            "importálás",
+            "megnyitás"
+        ],
+        "3092": [
+            "intelligens objektum"
+        ],
+        "3375": [
+            "natív szöveg"
+        ],
+        "3376": [
+            "natív szöveg"
+        ],
+        "3392": [
+            "automatikus javítás",
+            "helyesírás ellenőrzése"
+        ],
+        "3438": [
+            "svg"
+        ],
+        "3439": [
+            "css"
+        ],
+        "3443": [
+            "mentés a webre",
+            "digitális tartalmak exportálása",
+            "svg-fájl exportálása",
+            "gif-fájl exportálása",
+            "jpg-fájl exportálása",
+            "jpeg-fájl exportálása",
+            "png-fájl exportálása"
+        ],
+        "3444": [
+            "mentés"
+        ],
+        "3500": [
+            "kijelölések elrejtése",
+            "kijelölések megjelenítése",
+            "segédvonalak elrejtése",
+            "segédvonalak megjelenítése"
+        ],
+        "3511": [
+            "rózsaszínű vonalak"
+        ],
+        "4008": [
+            "segítség",
+            "dokumentáció"
+        ],
+        "5957": [
+            "keresés"
+        ],
+        "6308": [
+            "szín"
+        ],
+        "6310": [
+            "fényintenzitás megőrzése",
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "6312": [
+            "melegítés",
+            "hűtés",
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "6337": [
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "6340": [
+            "hiányzó kapcsolat"
+        ],
+        "6341": [
+            "hiányzó kapcsolat"
+        ],
+        "6348": [
+            "ff",
+            "fekete-fehér",
+            "szín eltávolítása"
+        ],
+        "7806": [
+            "mentés"
+        ],
+        "8820": [
+            "neural filters",
+            "suodata",
+            "ml",
+            "ai",
+            "ihon tasoittaminen",
+            "pehmeä iho",
+            "tyylin siirto",
+            "siirrä tyyli",
+            "älymuotokuva",
+            "muotokuva",
+            "ehostuksen siirto",
+            "syvyystietoinen utuisuus",
+            "väritä",
+            "väritä mustavalkoiset valokuvat",
+            "superzoom",
+            "JPEG-artefaktien poisto",
+            "poista artefakti"
+        ],
+        "9106": [
+            "repoussé",
+            "3d szöveg"
+        ],
+        "9109": [
+            "teljesítmény"
+        ],
+        "9119": [
+            "lorem ipsum"
+        ],
+        "9123": [
+            "betűtípus felismerése"
+        ],
+        "9220": [
+            "rajz tábla"
+        ],
+        "9221": [
+            "rajz tábla"
+        ],
+        "9222": [
+            "rajz tábla"
+        ],
+        "15003": [
+            "segítség",
+            "oktatóanyag",
+            "oktatóanyagok"
+        ],
+        "15006": [
+            "beépülő modulok"
+        ],
+        "EACH": [
+            "komento",
+            "valikkokomento"
+        ],
+        "File > Export > Layers to Files": [
+            "lut",
+            "3d lut",
+            "tallenna"
+        ],
+        "Image > Adjustments > HDR Toning": [
+            "javít",
+            "palauta",
+            "palautus",
+            "korjaa",
+            "retusoi",
+            "uudelleenmuodostus"
+        ],
+        "Filter > Filter Gallery": [
+            "suotimet",
+            "művészi szűrők",
+            "ecsetvonások szűrői",
+            "torzítási szűrők",
+            "rajzolási szűrők",
+            "stilizálási szűrők",
+            "textúrázási szűrők",
+            "színes ceruza",
+            "aukaisu",
+            "száraz ecset",
+            "film szemcsézettsége",
+            "fresco",
+            "neonfény",
+            "mázolás",
+            "kenőkés",
+            "műanyag borítás",
+            "kontúrfestés",
+            "pasztellkréta",
+            "maszatoló",
+            "szivacs",
+            "alapozás",
+            "akvarell",
+            "hangsúlyos szegélyek",
+            "döntött ecsetvonások",
+            "sraffozás",
+            "sötét tónusok",
+            "tollkontúr",
+            "fröcskölt",
+            "elkent tónusok",
+            "sumi-e",
+            "szórt ragyogás",
+            "üveg",
+            "vízfelszín",
+            "dombormű",
+            "kréta és szén",
+            "króm",
+            "zsírkréta",
+            "tollrajz",
+            "raszterrácsminta",
+            "jegyzetpapír",
+            "fénymásolat",
+            "gipsz",
+            "szövetesítés",
+            "leimasin",
+            "tépett szegélyek",
+            "merített papír",
+            "neon perem",
+            "repedezettség",
+            "mozaiklapok",
+            "foltminta",
+            "festett üveg",
+            "textúrázó",
+            "repedések távolsága",
+            "repedések mélysége",
+            "repedések fényessége",
+            "habarcs",
+            "cella",
+            "tégla",
+            "vászon",
+            "zsákvászon",
+            "homokkő",
+            "szál",
+            "kis lencse",
+            "fagyasztott",
+            "blokkok",
+            "magnitúdó",
+            "valósághű"
+        ],
+        "Filter > Adaptive Wide Angle": [
+            "nagy látószög korrigálása",
+            "objektív",
+            "kamera gyártmánya",
+            "kamera típusa",
+            "halszem",
+            "perspektiivi",
+            "teljes gömb alakú",
+            "gyújtótávolság",
+            "korlátozógörbe",
+            "sokszög"
+        ],
+        "Filter > Camera Raw Filter": [
+            "expozíció",
+            "csúcsfények",
+            "árnyékok",
+            "tisztaság",
+            "lencsekorrekció",
+            "nyers",
+            "álló",
+            "ködfátyol eltávolítása",
+            "fehéregyensúly",
+            "hőmérséklet",
+            "sävy",
+            "kontrasti",
+            "csúcsfények",
+            "árnyékok",
+            "tisztaság",
+            "vibrálás",
+            "kylläisyys",
+            "kamera kalibrálása",
+            "tónusok szétválasztása",
+            "tónusgörbe",
+            "paraméteres",
+            "élesítés",
+            "zajcsökkentés",
+            "sävy",
+            "fénysűrűség",
+            "HSL",
+            "vääristys",
+            "szegélyek elmosása",
+            "vignetta",
+            "vignettálás",
+            "szemcsézettség",
+            "konverzió"
+        ],
+        "Filter > Lens Correction": [
+            "torzítás eltávolítása",
+            "suorista",
+            "kamera típusa",
+            "objektív típusa",
+            "kamera beállításai",
+            "kamera gyártmánya",
+            "kromatikus hiba",
+            "geometriai torzítás",
+            "vignetta",
+            "vignettálás",
+            "perspektiivi"
+        ],
+        "Filter > Liquify": [
+            "cseppfolyósítás",
+            "cseppfolyósít",
+            "vääristä",
+            "retusoi",
+            "arcérzékelés",
+            "hajlítás",
+            "deformál",
+            "előre hajlítás",
+            "örvény",
+            "újbóli összeállítás",
+            "uudelleenmuodostus",
+            "távolító",
+            "felfúvódás",
+            "balra nyomás",
+            "maszk fagyasztása",
+            "maszk felolvasztása",
+            "simítás",
+            "háló",
+            "vääristys",
+            "javít",
+            "palauta",
+            "palautus",
+            "korjaa"
+        ],
+        "Filter > Vanishing Point": [
+            "sík létrehozása",
+            "sík szerkesztése",
+            "perspektiivi",
+            "ruudukot",
+            "exportálás DXF formátumba",
+            "exportálás 3DS formátumba",
+            "DXF",
+            "3DS",
+            "exportálás az After Effectsbe",
+            "After Effects"
+        ],
+        "Filter > Blur > Gaussian Blur": [
+            "sumennus"
+        ],
+        "Filter > Distort > Spherize": [
+            "gömb"
+        ],
+        "Filter > Distort > ZigZag": [
+            "cikcakk"
+        ],
+        "Filter > Render > Lighting Effects": [
+            "fényfolt",
+            "väritä",
+            "fényesség",
+            "fémes",
+            "környezet",
+            "pintakuvio",
+            "reflektorfény",
+            "pontszerű megvilágítás",
+            "zseblámpa",
+            "fényár",
+            "párhuzamosan irányított",
+            "közvetlen lágyfény",
+            "lágy körbevilágítás",
+            "kék körbevilágítás",
+            "2 óra irányából világító reflektor",
+            "fénykör",
+            "keresztezés lefelé",
+            "öt lefelé irányuló lámpa",
+            "öt felfelé irányuló lámpa",
+            "lágy reflektor",
+            "három lefelé",
+            "hármas reflektor"
+        ],
+        "Filter > Sharpen > Shake Reduction": [
+            "javít",
+            "palauta",
+            "palautus",
+            "korjaa",
+            "retusoi",
+            "uudelleenmuodostus"
+        ],
+        "Filter > Sharpen > Sharpen": [
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "Filter > Sharpen > Sharpen Edges": [
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "Filter > Sharpen > Sharpen More": [
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "Filter > Sharpen > Smart Sharpen": [
+            "epäterävä maski",
+            "éles",
+            "javít",
+            "palauta",
+            "palautus",
+            "korjaa",
+            "retusoi",
+            "uudelleenmuodostus"
+        ],
+        "Filter > Sharpen > Unsharp Mask": [
+            "javít",
+            "palauta",
+            "palautus",
+            "korjaa",
+            "retusoi",
+            "uudelleenmuodostus"
+        ],
+        "View > Pixel Aspect Ratio > D1/DV NTSC Widescreen (1.21)": [
+            "szélesvásznú"
+        ],
+        "View > Pixel Aspect Ratio > D1/DV PAL Widescreen (1.46)": [
+            "szélesvásznú"
+        ],
+        "File > Scripts > Statistics": [
+            "tallenna"
+        ],
+        "File > Export > Artboards to Files": [
+            "tallenna"
+        ],
+        "File > Export > Artboards to PDF": [
+            "tallenna"
+        ],
+        "File > Export > Layer Comps to Files": [
+            "tallenna"
+        ],
+        "File > Export > Layer Comps to PDF": [
+            "tallenna"
+        ],
+        "File > Export > Paths to Illustrator": [
+            "tallenna"
+        ],
+        "File > Export > Render Video": [
+            "tallenna"
+        ],
+        "File > Export > Zoomify": [
+            "tallenna"
+        ],
+        "File > Automate > Fit Image": [
+            "muuta kokoa"
+        ],
+        "File > Automate > Merge to HDR Pro": [
+            "valokuvien yhdistäminen",
+            "korosta yksityiskohtia",
+            "színleképzés",
+            "különböző expozíciók",
+            "szellemkép eltávolítása"
+        ],
+        "File > Automate > Photomerge": [
+            "panoráma",
+            "öltés",
+            "automatikus igazítás",
+            "automatikus keverés",
+            "vignetta eltávolítása"
+        ]
+    },
+    "TOOLS": {
+        "EACH": [
+            "työkalu",
+            "työkalut"
+        ],
+        "directSelectTool": [
+            "közvetlen kijelölés",
+            "fehér nyíl eszköz",
+            "kijelölés",
+            "kijelölt rész",
+            "kiválaszt",
+            "objektum aktiválása"
+        ],
+        "pathComponentSelectTool": [
+            "fekete nyíl eszköz",
+            "görbeválasztó",
+            "görbekijelölés",
+            "bézier típusú kijelölés",
+            "több vonalból álló objektum kijelölése",
+            "szegmens kijelölése",
+            "toll kijelölése",
+            "görbeválasztás",
+            "görbe kijelölése",
+            "bézier-kijelölés",
+            "több vonalból álló elem kijelölése",
+            "szegmenskijelölés",
+            "tollválasztás"
+        ],
+        "redEyeTool": [
+            "szemvörösség",
+            "szemvörösség-eltávolító eszköz",
+            "szemvörösség eltávolítása eszköz",
+            "szemvörösség-eltávolítás",
+            "szemvörösség-eltávolítási eszköz",
+            "szemvörösség korrigálása",
+            "szem vörösségének eltávolítása",
+            "szemvörösség eltávolítása",
+            "képjavítás retusálással",
+            "retusálás",
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "újjáépítés"
+        ],
+        "smudgeTool": [
+            "maszatolás",
+            "hankaa",
+            "maalaus",
+            "sulata",
+            "sulata"
+        ],
+        "typeCreateOrEditTool": [
+            "szövegírás",
+            "szövegírási eszköz",
+            "szöveg eszköz",
+            "szöveg",
+            "vízszintes szöveg",
+            "vízszintes szavak",
+            "vízszintes szövegírás",
+            "vízszintes szövegírás",
+            "vízszintes betűtípus",
+            "vízszintesen írt betűk",
+            "vízszintes felirat"
+        ],
+        "zoomTool": [
+            "kicsinyítés vagy nagyítás",
+            "nagyító eszköz",
+            "nagyít",
+            "nagyító",
+            "nagyítás",
+            "kicsinyítés",
+            "navigálás",
+            "nézetváltás"
+        ],
+        "moveTool": [
+            "áthelyez",
+            "eltolás",
+            "újrapozicionálás",
+            "máshová helyez",
+            "pozíció",
+            "húzás"
+        ],
+        "artboardTool": [
+            "rajztábla",
+            "rajztáblák",
+            "vásznak",
+            "több vászon",
+            "több rajztábla",
+            "tervezőalkalmazás"
+        ],
+        "marqueeRectTool": [
+            "kijelölés",
+            "kijelölt rész",
+            "téglalap alakban kijelöl",
+            "téglalap alakú kijelölés",
+            "téglalap alakú kijelölő",
+            "kijelölés téglalappal",
+            "téglalappal kijelöl",
+            "kijelölés téglalap használatával",
+            "téglalap-kijelölő",
+            "téglalap-kijelölés",
+            "négyzetes kijelölés",
+            "kijelölés négyzettel",
+            "négyzetes kijelölő",
+            "négyzet alakú kijelölő"
+        ],
+        "marqueeEllipTool": [
+            "kijelölés",
+            "kijelölt rész",
+            "ellipszis kijelölése",
+            "oválisan kijelöl",
+            "ovális kijelölés",
+            "kijelölés körrel",
+            "kijelölés kör alakkal",
+            "oválissal kijelöl",
+            "kijelölés lekerekítve",
+            "kijelölés ellipszisként",
+            "kijelöl oválisan",
+            "kijelölés oválisan",
+            "körrel kijelöl",
+            "kijelöl körrel",
+            "kijelölés oválissal",
+            "kijelölés lekerekítése",
+            "ellipszis kijelölés",
+            "ellipszis alakkal kijelöl",
+            "ellipszis alakú kijelölő",
+            "kör alakú kijelölés",
+            "kör alakú kijelölés",
+            "ovális kijelölés",
+            "lekerekített kijelölés",
+            "ellipszis kijelölő",
+            "ellipszis alakban kijelöl",
+            "ellipszis alakú kijelölés",
+            "kör alakú kijelölő",
+            "kör alakú kijelölő",
+            "oválisan kijelöl",
+            "lekerekített kijelölés"
+        ],
+        "polySelTool": [
+            "sokszög lasszó",
+            "kijelölés",
+            "kijelölt rész",
+            "kijelölés sokszög lasszóval",
+            "sokszög lasszóval történő kijelölés",
+            "sokszög lasszóval kijelöl",
+            "sokszög lasszós kijelölés",
+            "sokszög lasszó"
+        ],
+        "magneticLassoTool": [
+            "mágneses lasszó",
+            "kijelölés",
+            "kijelölt rész",
+            "kijelölés mágneses lasszóval",
+            "mágneses lasszóval kijelöl",
+            "szabadkézi kijelölés"
+        ],
+        "quickSelectTool": [
+            "gyors kijelölés",
+            "kijelölés",
+            "kijelölt rész",
+            "mágikus kijelölés",
+            "bűvös kijelölés",
+            "gyorsan kijelöl",
+            "lazán kijelöl",
+            "kijelölés festéssel"
+        ],
+        "magicWandTool": [
+            "varázspálca",
+            "varázspálca eszköz",
+            "mágikus kijelölés",
+            "bűvös kijelölés",
+            "hasonló színű elemek kijelölése"
+        ],
+        "cropTool": [
+            "vágás",
+            "tartalomérzékeny vágás",
+            "egyenesítés",
+            "kép elforgatása",
+            "kép elforgatása",
+            "szélesség és magasság módosítása",
+            "méretarány megváltoztatása"
+        ],
+        "eyedropperTool": [
+            "pipetta",
+            "pipetta eszköz",
+            "színelhelyező",
+            "színpipetta",
+            "színválasztó",
+            "színmintavételező egy színhez",
+            "szín pipetta",
+            "színtár kiválasztása"
+        ],
+        "3DMaterialSelectTool": [
+            "pipettás anyagelhelyezés",
+            "anyagpipetta eszköz",
+            "3d anyagelhelyező",
+            "3d anyagpipetta",
+            "3d anyagválasztó",
+            "3d anyag-mintavételező",
+            "3d anyag pipetta"
+        ],
+        "colorSamplerTool": [
+            "színmintavételező",
+            "szín-mintavételező eszköz",
+            "több színelhelyező",
+            "több pipettás színelhelyező",
+            "több színválasztó",
+            "több pipettás színválasztó",
+            "sok színelhelyező",
+            "sok pipettás színelhelyező",
+            "sok színválasztó",
+            "sok pipettás színválasztó",
+            "színtárak kiválasztása"
+        ],
+        "spotHealingBrushTool": [
+            "helyi javítóecset",
+            "helyi javítóecset eszköz",
+            "képretusálás",
+            "töröl",
+            "szennyeződés eltávolítása",
+            "szennyeződés javítása",
+            "képhiba eltávolítása",
+            "szennyeződés eltüntetése",
+            "képhiba korrigálása",
+            "szennyeződés eltüntetése",
+            "képhiba kijavítása",
+            "automaattinen korjaussivellin",
+            "ehosta",
+            "retusoi",
+            "palauta",
+            "retusointi",
+            "korjaus",
+            "uudelleenmuodostus"
+        ],
+        "magicStampTool": [
+            "javítóecset",
+            "javítóecset eszköz",
+            "képretusálás",
+            "töröl",
+            "szennyeződés eltávolítása",
+            "szennyeződés javítása",
+            "képjavítás retusálással",
+            "javítóeszköz",
+            "szennyeződés eltüntetése",
+            "képhiba eltávolítása",
+            "szennyeződés eltüntetése",
+            "képhiba korrigálása",
+            "képhiba kijavítása",
+            "textúra klónozása",
+            "textúra másolása",
+            "textúra keverése",
+            "képjavítás retusálással",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "újjáépítés"
+        ],
+        "paintbrushTool": [
+            "ecset",
+            "festőecset",
+            "festés",
+            "festőecset",
+            "festékszóró",
+            "fest",
+            "rajzol"
+        ],
+        "colorReplacementBrushTool": [
+            "színcsere",
+            "színcserélő eszköz",
+            "háttérszín festése",
+            "hasonló szín cseréje",
+            "színkorrigálás"
+        ],
+        "wetBrushTool": [
+            "keverőecset",
+            "festés",
+            "keverőecset",
+            "színkeverő ecset",
+            "nedves ecset",
+            "festékkeverés"
+        ],
+        "cloneStampTool": [
+            "klónozó bélyegző",
+            "klónozó eszköz",
+            "retusálás",
+            "képretusálás",
+            "töröl",
+            "szennyeződés eltávolítása",
+            "szennyeződés javítása",
+            "képhiba eltávolítása",
+            "szennyeződés eltüntetése",
+            "képhiba korrigálása",
+            "gumi bélyegző",
+            "foltozás másolása",
+            "foltozás másolása",
+            "képjavítás retusálással",
+            "visszaállítás",
+            "helyreállítás",
+            "újjáépítés",
+            "uudelleenmuodostus"
+        ],
+        "dodgeTool": [
+            "fakítás",
+            "világosítás",
+            "csúcsfények festése"
+        ],
+        "burnInTool": [
+            "színégetés",
+            "sötétítés",
+            "árnyékok festése"
+        ],
+        "saturationTool": [
+            "szivacs",
+            "telítés eszköz",
+            "telítettség csökkentése eszköz",
+            "telítettség ecset",
+            "telítettségcsökkentő ecset",
+            "telítés",
+            "telítettség csökkentése",
+            "helyileg telít",
+            "telítettség csökkentése helyileg",
+            "szín intenzívebbé tétele",
+            "szín tompítása"
+        ],
+        "penTool": [
+            "görbe",
+            "görbék",
+            "görbe rajzolása",
+            "kijelölés rajzolása",
+            "folyamatos görbe",
+            "rajzol",
+            "görbe",
+            "bézier-görbe",
+            "egyenessorozat",
+            "kerekített szegmens",
+            "toll",
+            "nyom",
+            "toll eszköz",
+            "íves görbe",
+            "görbült vonal",
+            "szerkesztőpontok"
+        ],
+        "freeformPenTool": [
+            "szabadkézi toll",
+            "szabadkézi toll eszköz",
+            "szabadkézi rajz",
+            "szabadkézi görbe",
+            "mágneses toll",
+            "görbe",
+            "görbe",
+            "bézier-görbe",
+            "egyenessorozat",
+            "kerekített szegmens",
+            "toll",
+            "nyom",
+            "toll eszköz",
+            "íves görbe",
+            "rajzol",
+            "görbült vonal",
+            "szerkesztőpontok"
+        ],
+        "typeVerticalCreateOrEditTool": [
+            "merőleges szöveg",
+            "elforgatott szöveg",
+            "margóra írása",
+            "szöveg fejjel lefelé",
+            "fentről lefelé írt szöveg",
+            "lentről felfelé írt szöveg",
+            "függőleges szöveg",
+            "függőleges szavak",
+            "függőlegesen írt szöveg",
+            "függőleges szövegírás",
+            "függőleges betűtípus",
+            "függőlegesen írt betűk",
+            "függőleges felirat"
+        ],
+        "rectangleTool": [
+            "téglalap",
+            "téglalap rajzolása",
+            "négyzet rajzolása",
+            "doboz eszköz",
+            "doboz rajzolása",
+            "négyszög rajzolása",
+            "téglalap alakzat",
+            "téglalap alakú alakzat",
+            "négyzet alakzat",
+            "rombusz alakzat",
+            "alakzat rajzolása"
+        ],
+        "ellipseTool": [
+            "ellipszis",
+            "kör eszköz",
+            "kör rajzolása",
+            "ellipszis alakzat",
+            "ellipszis alakú alakzat",
+            "ovális alakzat",
+            "kör alakzat",
+            "köralakzat",
+            "ovális alakzat",
+            "kerek alakzat",
+            "alakzat rajzolása"
+        ],
+        "polygonTool": [
+            "sokszög",
+            "ötszög",
+            "nyolcszög",
+            "sokszög rajzolása",
+            "alakzat rajzolása",
+            "egyéni sokszög",
+            "n oldalú sokszög",
+            "egyéni oldalszámú alakzat"
+        ],
+        "handTool": [
+            "kéz",
+            "pásztáz",
+            "pásztázás eszköz",
+            "nézet áthelyezése",
+            "nézetváltás",
+            "navigálás",
+            "nézet eltolása",
+            "nézet áthelyezése húzással"
+        ],
+        "rotateTool": [
+            "nézet elforgatása",
+            "vászon elforgatása",
+            "nézet döntése",
+            "döntött nézet",
+            "navigálás",
+            "nézetváltás"
+        ],
+        "addKnotTool": [
+            "szerkesztőpont hozzáadása",
+            "vezérlőpont hozzáadása",
+            "görbe pontjának hozzáadása",
+            "görbe fogópontjának hozzáadása",
+            "szerkesztőpont hozzáadása",
+            "fogópont hozzáadása görbéhez",
+            "bézier-pont hozzáadása",
+            "bézier-fogópont hozzáadása",
+            "szerkesztőpont beszúrása",
+            "vezérlőpont beszúrása",
+            "görbe pontjának beszúrása",
+            "görbe fogópontjának beszúrása",
+            "szerkesztőpont beszúrása",
+            "görbefogópont beszúrása",
+            "bézier-pont beszúrása",
+            "bézier-fogópont beszúrása"
+        ],
+        "artBrushTool": [
+            "művészi előzményecset",
+            "művészecset",
+            "stilizáló ecset",
+            "stilizált körvonalak",
+            "művészi ecset",
+            "festés hatású ecset",
+            "festés"
+        ],
+        "backgroundEraserTool": [
+            "háttérradír",
+            "bűvös radír",
+            "háttér törlése",
+            "háttér kivágása",
+            "háttér eltávolítása"
+        ],
+        "blurTool": [
+            "életlenítés",
+            "helyileg életlen",
+            "helyileg életlenít",
+            "lágyítóeszköz",
+            "gauss-életlenítés eszköz"
+        ],
+        "recomposeSelection": [
+            "tartalomérzékeny áthelyezés",
+            "tartalomérzékeny újrapozicionálás",
+            "tartalomérzékeny áthelyezés",
+            "tartalomérzékeny pozicionálás",
+            "tartalomérzékeny húzás",
+            "foltozás tartalomérzékeny kivágása és beillesztése",
+            "foltozás tartalomérzékeny mozgatása",
+            "mágikus újrapozicionálás",
+            "mágikus áthelyezés",
+            "mágikus elhelyezés",
+            "mágikus húzás",
+            "foltozás mágikus kivágása és beillesztése",
+            "foltozás mágikus mozgatása",
+            "javít",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "retusálás",
+            "újjáépítés"
+        ],
+        "convertKnotTool": [
+            "pont transzformációja",
+            "szerkesztőpont átalakítása",
+            "vezérlőpont átalakítása",
+            "görbe pontjának átalakítása",
+            "görbe fogópontjának átalakítása",
+            "görbén lévő pont átalakítása",
+            "görbefogópont átalakítása",
+            "bézier-pont átalakítása",
+            "bézier-fogópont átalakítása",
+            "görbe dőlésmentesítése",
+            "görbék dőlésmentesítése",
+            "bézier-elem dőlésmentesítése",
+            "több vonalból álló objektum dőlésmentesítése",
+            "íves szegmens dőlésmentesítése",
+            "görbeszegmens dőlésmentesítése",
+            "görbe vonalszegmenssé alakítása"
+        ],
+        "countTool": [
+            "számlál",
+            "tally",
+            "elemek száma"
+        ],
+        "customShapeTool": [
+            "egyéni alakzat",
+            "clipart",
+            "szív alakzat",
+            "csillag alakzat",
+            "hópehely alakzat",
+            "nyíl alakzat",
+            "kész alakzatok",
+            "alakzatgyűjtemény",
+            "alakzat rajzolása"
+        ],
+        "deleteKnotTool": [
+            "szerkesztőpont törlése",
+            "vezérlőpont törlése",
+            "görbe pontjának törlése",
+            "görbe fogópontjának törlése",
+            "szerkesztőpont törlése",
+            "fogópont törlése görbéről",
+            "bézier-pont törlése",
+            "bézier-fogópont törlése",
+            "szerkesztőpont eltávolítása",
+            "vezérlőpont eltávolítása",
+            "görbe pontjának eltávolítása",
+            "görbe fogópontjának eltávolítása",
+            "szerkesztőpont eltávolítása",
+            "fogópont eltávolítása görbéről",
+            "bézier-pont eltávolítása",
+            "bézier-fogópont eltávolítása"
+        ],
+        "eraserTool": [
+            "radír",
+            "töröl",
+            "radírozás"
+        ],
+        "gradientTool": [
+            "színátmenet",
+            "visszavert színátmenet",
+            "sugaras színátmenet",
+            "lineáris színátmenet",
+            "fokozatos színkeverés",
+            "szivárványos színátmenet",
+            "árnyalás színe",
+            "átmenetes szín"
+        ],
+        "historyBrushTool": [
+            "előzményecset",
+            "kép visszaállítása ecset",
+            "javítások visszaállítása ecset",
+            "szerkesztés visszavonása helyileg"
+        ],
+        "typeCreateMaskTool": [
+            "vízszintes szöveg kijelölése",
+            "vízszintes szavak kijelölése",
+            "vízszintesen írt szöveg kijelölése",
+            "vízszintes betűtípus kiválasztása",
+            "vízszintes betűk kiválasztása",
+            "vízszintes felirat kiválasztása",
+            "vízszintes szöveget kijelöl",
+            "vízszintes szavakat kijelöl",
+            "vízszintesen írott szöveg kijelölése",
+            "vízszintes betűtípus kiválasztása",
+            "vízszintes betűket kijelöl",
+            "vízszintes feliratkijelölés",
+            "vízszintes szövegmaszk",
+            "vízszintes betűmaszk",
+            "vízszintes szövegmaszk",
+            "vízszintes betűtípusmaszk",
+            "vízszintes betűmaszk",
+            "vízszintes feliratmaszk",
+            "vízszintes szövegkijelölés",
+            "vízszintes szavak kijelölése",
+            "vízszintesen írt szöveg kijelölése",
+            "vízszintes betűtípus kijelölése",
+            "vízszintes betűk kijelölése",
+            "vízszintes felirat kijelölése"
+        ],
+        "lassoTool": [
+            "lasszó",
+            "kijelölés lasszóval",
+            "lasszós kijelölés",
+            "szabadkézi kijelölés",
+            "szabadkézi lasszó"
+        ],
+        "lineTool": [
+            "vonal",
+            "vonal rajzolása",
+            "egyenes vonalak"
+        ],
+        "magicEraserTool": [
+            "bűvös radír",
+            "hasonló színek törlése"
+        ],
+        "3DMaterialDropTool": [
+            "anyagelhelyezés",
+            "3d anyagelhelyezés"
+        ],
+        "textAnnotTool": [
+            "jegyzet",
+            "magyarázat",
+            "cetli",
+            "jegyzet írása",
+            "szöveges jegyzet",
+            "jegyzetírás",
+            "szövegjegyzet írása"
+        ],
+        "bucketTool": [
+            "festékesvödör",
+            "kitöltés",
+            "terület elárasztása",
+            "elárasztás",
+            "kijelölés kitöltése"
+        ],
+        "patchSelection": [
+            "foltozás",
+            "szennyeződés eltávolítása",
+            "szennyeződés javítása",
+            "képhiba eltávolítása",
+            "szennyeződés eltüntetése",
+            "képhiba korrigálása",
+            "szennyeződés eltüntetése",
+            "képhiba kijavítása",
+            "klónozás keverés foltozás",
+            "képjavítás retusálással",
+            "retusálás",
+            "visszaállítás",
+            "helyreállítás",
+            "javítás",
+            "újjáépítés"
+        ],
+        "patternStampTool": [
+            "mintázat bélyegző",
+            "gumi bélyegző",
+            "ismétlődő textúra bélyegző",
+            "toistuvan pintakuvion leimasin"
+        ],
+        "pencilTool": [
+            "ceruza",
+            "kemény szegélyű ecset",
+            "rajzol",
+            "nyom"
+        ],
+        "perspectiveCropTool": [
+            "perspektivikus vágás",
+            "egyenesítés",
+            "ferde kép hajlítása"
+        ],
+        "rulerTool": [
+            "vonalzó",
+            "mér",
+            "egyenesítés",
+            "kép elforgatása",
+            "kép elforgatása",
+            "segédvonal",
+            "ferde horizont korrigálása",
+            "ferde kép korrigálása",
+            "mérőszalag",
+            "távolságmérés",
+            "mérés",
+            "horizontvonal"
+        ],
+        "sharpenTool": [
+            "élesít",
+            "helyi élesítés",
+            "részletesség növelése"
+        ],
+        "marqueeSingleColumnTool": [
+            "egyoszlopos kijelölő",
+            "függőleges vonal kiválasztása",
+            "függőleges vonal kijelölése",
+            "függőleges vonalkijelölés",
+            "függőlegesvonal-kijelölés",
+            "egysoros kijelölés",
+            "egy sor kijelölése",
+            "egysoros kijelölő",
+            "egysoros kijelölő"
+        ],
+        "marqueeSingleRowTool": [
+            "egy sort kijelöl",
+            "vízszintes vonal kiválasztása",
+            "vízszintes vonalat kiválaszt",
+            "vízszintes vonalkijelölés",
+            "vízszintes vonal kijelölése",
+            "egysoros kijelölés",
+            "egy sor kijelölése",
+            "egysoros kijelölő",
+            "egysoros kijelölő"
+        ],
+        "sliceSelectTool": [
+            "szelet kijelölése",
+            "szeletek kijelölése",
+            "szeletet kijelöl"
+        ],
+        "sliceTool": [
+            "szelet",
+            "szeletek",
+            "téglalapszeletek felosztása",
+            "téglalap alakú szakaszok"
+        ],
+        "typeVerticalCreateMaskTool": [
+            "függőleges szöveg kijelölése",
+            "függőleges szavak kijelölése",
+            "függőlegesen írt szöveg kijelölése",
+            "függőleges betűtípus kiválasztása",
+            "függőleges betűk kiválasztása",
+            "függőleges felirat kiválasztása",
+            "függőleges szöveg kijelölése",
+            "függőleges szavak kijelölése",
+            "függőleges szöveget kijelöl",
+            "függőleges betűtípus kiválasztása",
+            "függőleges betűk kijelölése",
+            "függőlegesen írt felirat kijelölése",
+            "függőleges szövegmaszk",
+            "függőleges betűmaszk",
+            "függőleges szövegírásmaszk",
+            "függőleges betűtípusmaszk",
+            "függőleges betűmaszk",
+            "függőleges feliratmaszk",
+            "függőlegesen írt szöveget kijelöl",
+            "függőleges szavak kijelölése",
+            "függőleges szövegírást kijelöl",
+            "függőleges betűtípust kijelöl",
+            "függőleges betűket kijelöl",
+            "függőleges felirat kijelölése"
+        ]
+    },
+    "PANELS": {
+        "EACH": [
+            "paneeli",
+            "paneelit"
+        ],
+        "panelid.static.swatches": [
+            "színtárak használata",
+            "színtárak panel",
+            "színtár könyvtára",
+            "színtárkönyvtárak",
+            "felülbírálások"
+        ],
+        "panelid.static.actions": [
+            "photoshop műveletei",
+            "szkriptelés",
+            "makrók",
+            "automatizálási szkriptek",
+            "automatizálás eszköz",
+            "műveletek automatizálása",
+            "műveletek paletta",
+            "művelet paletta",
+            "makró",
+            "szkript",
+            "felvesz"
+        ],
+        "panelid.static.picker": [
+            "színválasztó",
+            "színtár",
+            "színtár könyvtára",
+            "színkorrigálás"
+        ],
+        "panelid.static.animation": [
+            "videó",
+            "film",
+            "filmek"
+        ],
+        "panelid.static.history": [
+            "visszavonás",
+            "előzmények paletta",
+            "előzményállapot",
+            "visszavonási előzmények",
+            "pillanatkép",
+            "megfordítás",
+            "visszalépés"
+        ],
+        "panelid.static.textcharacter": [
+            "szöveg",
+            "szövegírás",
+            "betűtípus",
+            "szedés",
+            "betűkészlet típusa",
+            "szövegréteg",
+            "szöveg igazítása",
+            "szöveg formázása",
+            "szövegméret",
+            "karakterjelek"
+        ],
+        "panelid.static.textparagraph": [
+            "szöveg",
+            "szövegírás",
+            "behúzás",
+            "sorkizárás",
+            "bekezdésformázás",
+            "bekezdésstílus"
+        ],
+        "panelid.static.textcharstyle": [
+            "szöveg",
+            "szövegírás",
+            "szövegméret",
+            "betűtípus",
+            "karakterjelek"
+        ],
+        "panelid.static.textparastyle": [
+            "szöveg",
+            "szövegírás",
+            "behúzás",
+            "sorkizárás",
+            "bekezdésformázás",
+            "bekezdésstílus"
+        ],
+        "panelid.static.textglyphspanel": [
+            "szöveg",
+            "szövegírás",
+            "szerzői jogi információk",
+            "szimbólum",
+            "karakter"
+        ],
+        "panelid.dynamic.swf.csxs.com.adobe.ccx.open": [
+            "bezárt fájlok",
+            "nemrég bezárt fájlok",
+            "legutóbbi dokumentumok",
+            "nemrég bezárt dokumentumok"
+        ],
+        "panelid.dynamic.swf.csxs.com.adobe.DesignLibraries.angular": [
+            "creative cloud libraries",
+            "cc libraries",
+            "könyvtárelemek",
+            "könyvtár digitális tartalmai"
+        ],
+        "panelid.static.histogram": [
+            "hisztogram paletta",
+            "hisztogram"
+        ],
+        "panelid.static.info": [
+            "infópaletta",
+            "élő előnézet"
+        ],
+        "panelid.static.paths": [
+            "görbék paletta",
+            "munkagörbe",
+            "rajzol",
+            "körvonal"
+        ],
+        "panelid.static.toolpresets": [
+            "alapértelmezett beállítások"
+        ],
+        "panelid.static.channels": [
+            "csatornák paletta",
+            "csatornák lap",
+            "alfa"
+        ],
+        "panelid.static.layers": [
+            "rétegek paletta",
+            "rétegek egyesítése",
+            "réteg kijelölése"
+        ],
+        "panelid.static.comps": [
+            "rétegállapot mentése"
+        ],
+        "panelid.static.clonesource": [
+            "klónozás"
+        ],
+        "panelid.static.navigator": [
+            "nagyítás",
+            "nagyítás vagy kicsinyítés százalékos értéke",
+            "navigátor paletta",
+            "nagyít"
+        ],
+        "panelid.static.brushstyler": [
+            "festés",
+            "festőecset",
+            "festőecset",
+            "fest",
+            "rajzol"
+        ],
+        "panelid.static.brushpresets": [
+            "festés",
+            "festőecset",
+            "festőecset",
+            "fest",
+            "rajzol"
+        ]
+    },
+    "ACTIONS": {
+        "addVignetteTalent": [
+            "suotimet",
+            "pikatoiminto",
+            "makro",
+            "klassinen",
+            "vanha",
+            "nostalginen",
+            "kohdevalo",
+            "bokeh",
+            "muotokuva",
+            "kasvot",
+            "tehoste",
+            "käytä tehosteita"
+        ],
+        "blackAndWhiteTalent": [
+            "suotimet",
+            "yhdistely",
+            "tausta",
+            "pikatoiminto",
+            "makro",
+            "valinta ja maski",
+            "maski",
+            "mustavalkoinen",
+            "musta",
+            "valkoinen",
+            "m/v",
+            "haalista",
+            "etuala",
+            "muokkaa taustaa",
+            "käytä tehosteita"
+        ],
+        "blurBackgroundTalent": [
+            "yhdistely",
+            "sumennus",
+            "gauss-sumennus",
+            "gauss-sumennus",
+            "tausta",
+            "pikatoiminto",
+            "makro",
+            "valinta ja maski",
+            "maski",
+            "etuala",
+            "muokkaa taustaa",
+            "käytä tehosteita"
+        ],
+        "charcoalFilterTalent": [
+            "suotimet",
+            "pikatoiminto",
+            "makro",
+            "mustavalkoinen",
+            "musta",
+            "valkoinen",
+            "m/v",
+            "haalista",
+            "luonnos",
+            "taiteellinen",
+            "tyylittele"
+        ],
+        "colorizeTalent": [
+            "suotimet",
+            "pikatoiminto",
+            "makro",
+            "mustavalkoinen",
+            "musta",
+            "valkoinen",
+            "m/v",
+            "telítés",
+            "väri",
+            "klassinen",
+            "vanha",
+            "neuraalinen suodin",
+            "valokuvauksellinen",
+            "retusoi"
+        ],
+        "diffuseGlowFilterTalent": [
+            "suotimet",
+            "pikatoiminto",
+            "makro",
+            "enkelimäinen",
+            "pehmeä valo",
+            "kaste",
+            "kirkas",
+            "tehoste",
+            "käytä tehosteita"
+        ],
+        "duotoneEffectTalent": [
+            "pikatoiminto",
+            "makro",
+            "kontrasti",
+            "väri",
+            "sävy",
+            "kaksivärisävyt",
+            "trendi",
+            "sininen",
+            "pinkki",
+            "tehoste",
+            "tyylittele"
+        ],
+        "enhanceImageTalent": [
+            "suotimet",
+            "parantele",
+            "säädä",
+            "automaattinen",
+            "valaistus",
+            "pikatoiminto",
+            "makro",
+            "kasvot",
+            "valokuvauksellinen",
+            "retusoi"
+        ],
+        "jpegArtifactRemovalTalent": [
+            "suotimet",
+            "eltávolítás",
+            "artefaktit",
+            "pikseli",
+            "pikselöinti",
+            "pikatoiminto",
+            "makro",
+            "neuraalinen suodin",
+            "valokuvauksellinen",
+            "retusoi"
+        ],
+        "lensFlareTalent": [
+            "suotimet",
+            "pikatoiminto",
+            "makro",
+            "valaistus",
+            "tehoste",
+            "käytä tehosteita"
+        ],
+        "makeBlackAndWhiteTalent": [
+            "pikatoiminto",
+            "makro",
+            "mustavalkoinen",
+            "musta",
+            "valkoinen",
+            "m/v",
+            "haalista",
+            "klassinen",
+            "vanha",
+            "perinteinen",
+            "vanhanaikainen",
+            "valokuvauksellinen",
+            "tehoste",
+            "käytä tehosteita"
+        ],
+        "removeBackgroundTalent": [
+            "yhdistely",
+            "korvaa",
+            "eltávolítás",
+            "tausta",
+            "pikatoiminto",
+            "makro",
+            "valinta ja maski",
+            "maski",
+            "törlés",
+            "piilota",
+            "etuala",
+            "muokkaa",
+            "muokkaa taustaa"
+        ],
+        "selectBackgroundTalent": [
+            "yhdistely",
+            "pikatoiminto",
+            "makro",
+            "valitse",
+            "kohde",
+            "etuala",
+            "tausta",
+            "valinta",
+            "tee valinnat",
+            "muokkaa taustaa"
+        ],
+        "selectSkyTalent": [
+            "yhdistely",
+            "pikatoiminto",
+            "makro",
+            "valitse",
+            "kohde",
+            "etuala",
+            "tausta",
+            "taivas",
+            "valinta",
+            "tee valinnat"
+        ],
+        "selectSubjectTalent": [
+            "yhdistely",
+            "pikatoiminto",
+            "makro",
+            "valitse",
+            "kohde",
+            "etuala",
+            "muotokuva",
+            "valinta",
+            "kasvot",
+            "tee valinnat"
+        ],
+        "skinSmoothTalent": [
+            "suotimet",
+            "simítás",
+            "iho",
+            "akne",
+            "kauneusvirhe",
+            "pikatoiminto",
+            "makro",
+            "etuala",
+            "muotokuva",
+            "kasvot",
+            "retusoi"
+        ],
+        "stainedGlassTalent": [
+            "suotimet",
+            "pikatoiminto",
+            "makro",
+            "enkelimäinen",
+            "pikselöity",
+            "8 b",
+            "tyylittele"
+        ],
+        "styleVanGoghSelfTalent": [
+            "suotimet",
+            "pikatoiminto",
+            "makro",
+            "van gogh",
+            "korva",
+            "olki",
+            "keltainen",
+            "öljymaalaus",
+            "neuraalinen suodin",
+            "muotokuva",
+            "kasvot",
+            "tyylittele"
+        ],
+        "styleVanGoghTalent": [
+            "suotimet",
+            "pikatoiminto",
+            "makro",
+            "van gogh",
+            "tähtiyö",
+            "sininen",
+            "öljymaalaus",
+            "neuraalinen suodin",
+            "taivas",
+            "tyylittele"
+        ],
+        "styleWaveTalent": [
+            "suotimet",
+            "pikatoiminto",
+            "makro",
+            "aalto",
+            "kanagawa",
+            "tulosta",
+            "hokusai",
+            "sininen",
+            "neuraalinen suodin",
+            "vesi",
+            "tyylittele"
+        ]
+    },
+    "NEURAL_FILTERS": {
+        "EACH": [
+            "neural filters",
+            "suodata",
+            "ml",
+            "ai"
+        ],
+        "internal.SkinSmoothing": [],
+        "internal.StyleTransfer": [],
+        "internal.SmartPortrait": [
+            "kasvot",
+            "ilme",
+            "iloinen",
+            "onnellisuus",
+            "hymy",
+            "yllätys",
+            "viha",
+            "vihainen",
+            "ikä",
+            "katse",
+            "hiusten paksuus",
+            "pään suunta",
+            "valon suunta"
+        ],
+        "internal.MakeupTransfer": [],
+        "internal.Hazy": [],
+        "internal.Colorize": [
+            "väritä uudelleen"
+        ],
+        "internal.SuperZoom": [
+            "tasokas"
+        ],
+        "internal.JpegArtefactsRemoval": [],
+        "internal.PhotoRestoration": [
+            "palautus"
+        ],
+        "internal.DustAndScratches": [],
+        "internal.NoiseReduction": [],
+        "internal.FaceCleanup": [],
+        "internal.PhotoToSketch": [],
+        "internal.SketchToPortrait": [],
+        "internal.PencilArt": [],
+        "internal.FaceCaricature": []
+    }
+}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 

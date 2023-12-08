@@ -1,0 +1,813 @@
+params: '"UTF-8"' });  // at-rule
+   * root.append({ selector: 'a' });                       // rule
+   * rule.append({ prop: 'color', value: 'black' });       // declaration
+   * rule.append({ text: 'Comment' })                      // comment
+   *
+   * root.append('a {}');
+   * root.first.append('color: black; z-index: 1');
+   */
+  ;
+
+  _proto.append = function append() {
+    var _this = this;
+
+    for (var _len = arguments.length, children = new Array(_len), _key = 0; _key < _len; _key++) {
+      children[_key] = arguments[_key];
+    }
+
+    children.forEach(function (child) {
+      var nodes = _this.normalize(child, _this.last);
+
+      nodes.forEach(function (node) {
+        return _this.nodes.push(node);
+      });
+    });
+    return this;
+  }
+  /**
+   * Inserts new nodes to the end of the container.
+   *
+   * @param {...(Node|object|string|Node[])} children - new nodes
+   *
+   * @return {Node} this node for methods chain
+   *
+   * @example
+   * const decl1 = postcss.decl({ prop: 'color', value: 'black' });
+   * const decl2 = postcss.decl({ prop: 'background-color', value: 'white' });
+   * rule.prepend(decl1, decl2);
+   *
+   * root.append({ name: 'charset', params: '"UTF-8"' });  // at-rule
+   * root.append({ selector: 'a' });                       // rule
+   * rule.append({ prop: 'color', value: 'black' });       // declaration
+   * rule.append({ text: 'Comment' })                      // comment
+   *
+   * root.append('a {}');
+   * root.first.append('color: black; z-index: 1');
+   */
+  ;
+
+  _proto.prepend = function prepend() {
+    var _this2 = this;
+
+    for (var _len2 = arguments.length, children = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      children[_key2] = arguments[_key2];
+    }
+
+    children = children.reverse();
+    children.forEach(function (child) {
+      var nodes = _this2.normalize(child, _this2.first, 'prepend').reverse();
+
+      nodes.forEach(function (node) {
+        return _this2.nodes.unshift(node);
+      });
+
+      for (var id in _this2.indexes) {
+        _this2.indexes[id] = _this2.indexes[id] + nodes.length;
+      }
+    });
+    return this;
+  };
+
+  _proto.cleanRaws = function cleanRaws(keepBetween) {
+    _Node.prototype.cleanRaws.call(this, keepBetween);
+
+    if (this.nodes) {
+      this.nodes.forEach(function (node) {
+        return node.cleanRaws(keepBetween);
+      });
+    }
+  }
+  /**
+   * Insert new node before old node within the container.
+   *
+   * @param {Node|number} exist             - child or child’s index.
+   * @param {Node|object|string|Node[]} add - new node
+   *
+   * @return {Node} this node for methods chain
+   *
+   * @example
+   * rule.insertBefore(decl, decl.clone({ prop: '-webkit-' + decl.prop }));
+   */
+  ;
+
+  _proto.insertBefore = function insertBefore(exist, add) {
+    var _this3 = this;
+
+    exist = this.index(exist);
+    var type = exist === 0 ? 'prepend' : false;
+    var nodes = this.normalize(add, this.nodes[exist], type).reverse();
+    nodes.forEach(function (node) {
+      return _this3.nodes.splice(exist, 0, node);
+    });
+    var index;
+
+    for (var id in this.indexes) {
+      index = this.indexes[id];
+
+      if (exist <= index) {
+        this.indexes[id] = index + nodes.length;
+      }
+    }
+
+    return this;
+  }
+  /**
+   * Insert new node after old node within the container.
+   *
+   * @param {Node|number} exist             - child or child’s index
+   * @param {Node|object|string|Node[]} add - new node
+   *
+   * @return {Node} this node for methods chain
+   */
+  ;
+
+  _proto.insertAfter = function insertAfter(exist, add) {
+    var _this4 = this;
+
+    exist = this.index(exist);
+    var nodes = this.normalize(add, this.nodes[exist]).reverse();
+    nodes.forEach(function (node) {
+      return _this4.nodes.splice(exist + 1, 0, node);
+    });
+    var index;
+
+    for (var id in this.indexes) {
+      index = this.indexes[id];
+
+      if (exist < index) {
+        this.indexes[id] = index + nodes.length;
+      }
+    }
+
+    return this;
+  };
+
+  _proto.remove = function remove(child) {
+    if (typeof child !== 'undefined') {
+      warnOnce('Container#remove is deprecated. ' + 'Use Container#removeChild');
+      this.removeChild(child);
+    } else {
+      _Node.prototype.remove.call(this);
+    }
+
+    return this;
+  }
+  /**
+   * Removes node from the container and cleans the parent properties
+   * from the node and its children.
+   *
+   * @param {Node|number} child - child or child’s index
+   *
+   * @return {Node} this node for methods chain
+   *
+   * @example
+   * rule.nodes.length  //=> 5
+   * rule.removeChild(decl);
+   * rule.nodes.length  //=> 4
+   * decl.parent        //=> undefined
+   */
+  ;
+
+  _proto.removeChild = function removeChild(child) {
+    child = this.index(child);
+    this.nodes[child].parent = undefined;
+    this.nodes.splice(child, 1);
+    var index;
+
+    for (var id in this.indexes) {
+      index = this.indexes[id];
+
+      if (index >= child) {
+        this.indexes[id] = index - 1;
+      }
+    }
+
+    return this;
+  }
+  /**
+   * Removes all children from the container
+   * and cleans their parent properties.
+   *
+   * @return {Node} this node for methods chain
+   *
+   * @example
+   * rule.removeAll();
+   * rule.nodes.length //=> 0
+   */
+  ;
+
+  _proto.removeAll = function removeAll() {
+    this.nodes.forEach(function (node) {
+      return node.parent = undefined;
+    });
+    this.nodes = [];
+    return this;
+  }
+  /**
+     * Passes all declaration values within the container that match pattern
+     * through callback, replacing those values with the returned result
+     * of callback.
+     *
+     * This method is useful if you are using a custom unit or function
+     * and need to iterate through all values.
+     *
+     * @param {string|RegExp} pattern      - replace pattern
+     * @param {object} opts                - options to speed up the search
+     * @param {string|string[]} opts.props - an array of property names
+     * @param {string} opts.fast           - string that’s used
+     *                                       to narrow down values and speed up
+                                             the regexp search
+     * @param {function|string} callback   - string to replace pattern
+     *                                       or callback that returns a new
+     *                                       value.
+     *                                       The callback will receive
+     *                                       the same arguments as those
+     *                                       passed to a function parameter
+     *                                       of `String#replace`.
+     *
+     * @return {Node} this node for methods chain
+     *
+     * @example
+     * root.replaceValues(/\d+rem/, { fast: 'rem' }, string => {
+     *   return 15 * parseInt(string) + 'px';
+     * });
+     */
+  ;
+
+  _proto.replaceValues = function replaceValues(pattern, opts, callback) {
+    if (!callback) {
+      callback = opts;
+      opts = {};
+    }
+
+    this.walkDecls(function (decl) {
+      if (opts.props && opts.props.indexOf(decl.prop) === -1) return;
+      if (opts.fast && decl.value.indexOf(opts.fast) === -1) return;
+      decl.value = decl.value.replace(pattern, callback);
+    });
+    return this;
+  }
+  /**
+   * Returns `true` if callback returns `true`
+   * for all of the container’s children.
+   *
+   * @param {childCondition} condition - iterator returns true or false.
+   *
+   * @return {boolean} is every child pass condition
+   *
+   * @example
+   * const noPrefixes = rule.every(i => i.prop[0] !== '-');
+   */
+  ;
+
+  _proto.every = function every(condition) {
+    return this.nodes.every(condition);
+  }
+  /**
+   * Returns `true` if callback returns `true` for (at least) one
+   * of the container’s children.
+   *
+   * @param {childCondition} condition - iterator returns true or false.
+   *
+   * @return {boolean} is some child pass condition
+   *
+   * @example
+   * const hasPrefix = rule.some(i => i.prop[0] === '-');
+   */
+  ;
+
+  _proto.some = function some(condition) {
+    return this.nodes.some(condition);
+  }
+  /**
+   * Returns a `child`’s index within the {@link Container#nodes} array.
+   *
+   * @param {Node} child - child of the current container.
+   *
+   * @return {number} child index
+   *
+   * @example
+   * rule.index( rule.nodes[2] ) //=> 2
+   */
+  ;
+
+  _proto.index = function index(child) {
+    if (typeof child === 'number') {
+      return child;
+    } else {
+      return this.nodes.indexOf(child);
+    }
+  }
+  /**
+   * The container’s first child.
+   *
+   * @type {Node}
+   *
+   * @example
+   * rule.first == rules.nodes[0];
+   */
+  ;
+
+  _proto.normalize = function normalize(nodes, sample) {
+    var _this5 = this;
+
+    if (typeof nodes === 'string') {
+      nodes = cleanSource(parse(nodes).nodes);
+    } else if (!Array.isArray(nodes)) {
+      if (nodes.type === 'root') {
+        nodes = nodes.nodes;
+      } else if (nodes.type) {
+        nodes = [nodes];
+      } else if (nodes.prop) {
+        if (typeof nodes.value === 'undefined') {
+          throw new Error('Value field is missed in node creation');
+        } else if (typeof nodes.value !== 'string') {
+          nodes.value = String(nodes.value);
+        }
+
+        nodes = [new Declaration(nodes)];
+      } else if (nodes.selector) {
+        nodes = [new Rule(nodes)];
+      } else if (nodes.name) {
+        nodes = [new AtRule(nodes)];
+      } else if (nodes.text) {
+        nodes = [new Comment(nodes)];
+      } else {
+        throw new Error('Unknown node type in node creation');
+      }
+    }
+
+    var processed = nodes.map(function (i) {
+      if (typeof i.raws === 'undefined') i = _this5.rebuild(i);
+      if (i.parent) i = i.clone();
+
+      if (typeof i.raws.before === 'undefined') {
+        if (sample && typeof sample.raws.before !== 'undefined') {
+          i.raws.before = sample.raws.before.replace(/[^\s]/g, '');
+        }
+      }
+
+      i.parent = _this5;
+      return i;
+    });
+    return processed;
+  };
+
+  _proto.rebuild = function rebuild(node, parent) {
+    var _this6 = this;
+
+    var fix;
+
+    if (node.type === 'root') {
+      fix = new Root();
+    } else if (node.type === 'atrule') {
+      fix = new AtRule();
+    } else if (node.type === 'rule') {
+      fix = new Rule();
+    } else if (node.type === 'decl') {
+      fix = new Declaration();
+    } else if (node.type === 'comment') {
+      fix = new Comment();
+    }
+
+    for (var i in node) {
+      if (i === 'nodes') {
+        fix.nodes = node.nodes.map(function (j) {
+          return _this6.rebuild(j, fix);
+        });
+      } else if (i === 'parent' && parent) {
+        fix.parent = parent;
+      } else if (node.hasOwnProperty(i)) {
+        fix[i] = node[i];
+      }
+    }
+
+    return fix;
+  };
+
+  _proto.eachInside = function eachInside(callback) {
+    warnOnce('Container#eachInside is deprecated. ' + 'Use Container#walk instead.');
+    return this.walk(callback);
+  };
+
+  _proto.eachDecl = function eachDecl(prop, callback) {
+    warnOnce('Container#eachDecl is deprecated. ' + 'Use Container#walkDecls instead.');
+    return this.walkDecls(prop, callback);
+  };
+
+  _proto.eachRule = function eachRule(selector, callback) {
+    warnOnce('Container#eachRule is deprecated. ' + 'Use Container#walkRules instead.');
+    return this.walkRules(selector, callback);
+  };
+
+  _proto.eachAtRule = function eachAtRule(name, callback) {
+    warnOnce('Container#eachAtRule is deprecated. ' + 'Use Container#walkAtRules instead.');
+    return this.walkAtRules(name, callback);
+  };
+
+  _proto.eachComment = function eachComment(callback) {
+    warnOnce('Container#eachComment is deprecated. ' + 'Use Container#walkComments instead.');
+    return this.walkComments(callback);
+  };
+
+  _createClass(Container, [{
+    key: "first",
+    get: function get() {
+      if (!this.nodes) return undefined;
+      return this.nodes[0];
+    }
+    /**
+     * The container’s last child.
+     *
+     * @type {Node}
+     *
+     * @example
+     * rule.last == rule.nodes[rule.nodes.length - 1];
+     */
+
+  }, {
+    key: "last",
+    get: function get() {
+      if (!this.nodes) return undefined;
+      return this.nodes[this.nodes.length - 1];
+    }
+  }, {
+    key: "semicolon",
+    get: function get() {
+      warnOnce('Node#semicolon is deprecated. Use Node#raws.semicolon');
+      return this.raws.semicolon;
+    },
+    set: function set(val) {
+      warnOnce('Node#semicolon is deprecated. Use Node#raws.semicolon');
+      this.raws.semicolon = val;
+    }
+  }, {
+    key: "after",
+    get: function get() {
+      warnOnce('Node#after is deprecated. Use Node#raws.after');
+      return this.raws.after;
+    },
+    set: function set(val) {
+      warnOnce('Node#after is deprecated. Use Node#raws.after');
+      this.raws.after = val;
+    }
+    /**
+     * @memberof Container#
+     * @member {Node[]} nodes - an array containing the container’s children
+     *
+     * @example
+     * const root = postcss.parse('a { color: black }');
+     * root.nodes.length           //=> 1
+     * root.nodes[0].selector      //=> 'a'
+     * root.nodes[0].nodes[0].prop //=> 'color'
+     */
+
+  }]);
+
+  return Container;
+}(Node);
+
+/**
+ * Represents an at-rule.
+ *
+ * If it’s followed in the CSS by a {} block, this node will have
+ * a nodes property representing its children.
+ *
+ * @extends Container
+ *
+ * @example
+ * const root = postcss.parse('@charset "UTF-8"; @media print {}');
+ *
+ * const charset = root.first;
+ * charset.type  //=> 'atrule'
+ * charset.nodes //=> undefined
+ *
+ * const media = root.last;
+ * media.nodes   //=> []
+ */
+
+var AtRule = /*#__PURE__*/function (_Container) {
+  _inheritsLoose(AtRule, _Container);
+
+  function AtRule(defaults) {
+    var _this;
+
+    _this = _Container.call(this, defaults) || this;
+    _this.type = 'atrule';
+    return _this;
+  }
+
+  var _proto = AtRule.prototype;
+
+  _proto.append = function append() {
+    var _Container$prototype$;
+
+    if (!this.nodes) this.nodes = [];
+
+    for (var _len = arguments.length, children = new Array(_len), _key = 0; _key < _len; _key++) {
+      children[_key] = arguments[_key];
+    }
+
+    return (_Container$prototype$ = _Container.prototype.append).call.apply(_Container$prototype$, [this].concat(children));
+  };
+
+  _proto.prepend = function prepend() {
+    var _Container$prototype$2;
+
+    if (!this.nodes) this.nodes = [];
+
+    for (var _len2 = arguments.length, children = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      children[_key2] = arguments[_key2];
+    }
+
+    return (_Container$prototype$2 = _Container.prototype.prepend).call.apply(_Container$prototype$2, [this].concat(children));
+  };
+
+  _createClass(AtRule, [{
+    key: "afterName",
+    get: function get() {
+      warnOnce('AtRule#afterName was deprecated. Use AtRule#raws.afterName');
+      return this.raws.afterName;
+    },
+    set: function set(val) {
+      warnOnce('AtRule#afterName was deprecated. Use AtRule#raws.afterName');
+      this.raws.afterName = val;
+    }
+  }, {
+    key: "_params",
+    get: function get() {
+      warnOnce('AtRule#_params was deprecated. Use AtRule#raws.params');
+      return this.raws.params;
+    },
+    set: function set(val) {
+      warnOnce('AtRule#_params was deprecated. Use AtRule#raws.params');
+      this.raws.params = val;
+    }
+    /**
+     * @memberof AtRule#
+     * @member {string} name - the at-rule’s name immediately follows the `@`
+     *
+     * @example
+     * const root  = postcss.parse('@media print {}');
+     * media.name //=> 'media'
+     * const media = root.first;
+     */
+
+    /**
+     * @memberof AtRule#
+     * @member {string} params - the at-rule’s parameters, the values
+     *                           that follow the at-rule’s name but precede
+     *                           any {} block
+     *
+     * @example
+     * const root  = postcss.parse('@media print, screen {}');
+     * const media = root.first;
+     * media.params //=> 'print, screen'
+     */
+
+    /**
+     * @memberof AtRule#
+     * @member {object} raws - Information to generate byte-to-byte equal
+     *                         node string as it was in the origin input.
+     *
+     * Every parser saves its own properties,
+     * but the default CSS parser uses:
+     *
+     * * `before`: the space symbols before the node. It also stores `*`
+     *   and `_` symbols before the declaration (IE hack).
+     * * `after`: the space symbols after the last child of the node
+     *   to the end of the node.
+     * * `between`: the symbols between the property and value
+     *   for declarations, selector and `{` for rules, or last parameter
+     *   and `{` for at-rules.
+     * * `semicolon`: contains true if the last child has
+     *   an (optional) semicolon.
+     * * `afterName`: the space between the at-rule name and its parameters.
+     *
+     * PostCSS cleans at-rule parameters from comments and extra spaces,
+     * but it stores origin content in raws properties.
+     * As such, if you don’t change a declaration’s value,
+     * PostCSS will use the raw value with comments.
+     *
+     * @example
+     * const root = postcss.parse('  @media\nprint {\n}')
+     * root.first.first.raws //=> { before: '  ',
+     *                       //     between: ' ',
+     *                       //     afterName: '\n',
+     *                       //     after: '\n' }
+     */
+
+  }]);
+
+  return AtRule;
+}(Container);
+
+//      
+
+/**
+ * Contains helpers for safely splitting lists of CSS values,
+ * preserving parentheses and quotes.
+ *
+ * @example
+ * const list = postcss.list;
+ *
+ * @namespace list
+ */
+var list = {
+  split: function split(string, separators, last) {
+    var array = [];
+    var current = '';
+    var split = false;
+    var func = 0;
+    var quote = false;
+    var escape = false;
+
+    for (var i = 0; i < string.length; i++) {
+      var letter = string[i];
+
+      if (quote) {
+        if (escape) {
+          escape = false;
+        } else if (letter === '\\') {
+          escape = true;
+        } else if (letter === quote) {
+          quote = false;
+        }
+      } else if (letter === '"' || letter === "'") {
+        quote = letter;
+      } else if (letter === '(') {
+        func += 1;
+      } else if (letter === ')') {
+        if (func > 0) func -= 1;
+      } else if (func === 0) {
+        if (separators.indexOf(letter) !== -1) split = true;
+      }
+
+      if (split) {
+        if (current !== '') array.push(current.trim());
+        current = '';
+        split = false;
+      } else {
+        current += letter;
+      }
+    }
+
+    if (last || current !== '') array.push(current.trim());
+    return array;
+  },
+
+  /**
+   * Safely splits space-separated values (such as those for `background`,
+   * `border-radius`, and other shorthand properties).
+   *
+   * @param {string} string - space-separated values
+   *
+   * @return {string[]} splitted values
+   *
+   * @example
+   * postcss.list.space('1px calc(10% + 1px)') //=> ['1px', 'calc(10% + 1px)']
+   */
+  space: function space(string) {
+    var spaces = [' ', '\n', '\t'];
+    return list.split(string, spaces);
+  },
+
+  /**
+   * Safely splits comma-separated values (such as those for `transition-*`
+   * and `background` properties).
+   *
+   * @param {string} string - comma-separated values
+   *
+   * @return {string[]} splitted values
+   *
+   * @example
+   * postcss.list.comma('black, linear-gradient(white, black)')
+   * //=> ['black', 'linear-gradient(white, black)']
+   */
+  comma: function comma(string) {
+    var comma = ',';
+    return list.split(string, [comma], true);
+  }
+};
+
+/**
+ * Represents a CSS rule: a selector followed by a declaration block.
+ *
+ * @extends Container
+ *
+ * @example
+ * const root = postcss.parse('a{}');
+ * const rule = root.first;
+ * rule.type       //=> 'rule'
+ * rule.toString() //=> 'a{}'
+ */
+
+var Rule = /*#__PURE__*/function (_Container) {
+  _inheritsLoose(Rule, _Container);
+
+  function Rule(defaults) {
+    var _this;
+
+    _this = _Container.call(this, defaults) || this;
+    _this.type = 'rule';
+    if (!_this.nodes) _this.nodes = [];
+    return _this;
+  }
+  /**
+   * An array containing the rule’s individual selectors.
+   * Groups of selectors are split at commas.
+   *
+   * @type {string[]}
+   *
+   * @example
+   * const root = postcss.parse('a, b { }');
+   * const rule = root.first;
+   *
+   * rule.selector  //=> 'a, b'
+   * rule.selectors //=> ['a', 'b']
+   *
+   * rule.selectors = ['a', 'strong'];
+   * rule.selector //=> 'a, strong'
+   */
+
+
+  _createClass(Rule, [{
+    key: "selectors",
+    get: function get() {
+      return list.comma(this.selector);
+    },
+    set: function set(values) {
+      var match = this.selector ? this.selector.match(/,\s*/) : null;
+      var sep = match ? match[0] : "," + this.raw('between', 'beforeOpen');
+      this.selector = values.join(sep);
+    }
+  }, {
+    key: "_selector",
+    get: function get() {
+      warnOnce('Rule#_selector is deprecated. Use Rule#raws.selector');
+      return this.raws.selector;
+    },
+    set: function set(val) {
+      warnOnce('Rule#_selector is deprecated. Use Rule#raws.selector');
+      this.raws.selector = val;
+    }
+    /**
+     * @memberof Rule#
+     * @member {string} selector - the rule’s full selector represented
+     *                             as a string
+     *
+     * @example
+     * const root = postcss.parse('a, b { }');
+     * const rule = root.first;
+     * rule.selector //=> 'a, b'
+     */
+
+    /**
+     * @memberof Rule#
+     * @member {object} raws - Information to generate byte-to-byte equal
+     *                         node string as it was in the origin input.
+     *
+     * Every parser saves its own properties,
+     * but the default CSS parser uses:
+     *
+     * * `before`: the space symbols before the node. It also stores `*`
+     *   and `_` symbols before the declaration (IE hack).
+     * * `after`: the space symbols after the last child of the node
+     *   to the end of the node.
+     * * `between`: the symbols between the property and value
+     *   for declarations, selector and `{` for rules, or last parameter
+     *   and `{` for at-rules.
+     * * `semicolon`: contains true if the last child has
+     *   an (optional) semicolon.
+     *
+     * PostCSS cleans selectors from comments and extra spaces,
+     * but it stores origin content in raws properties.
+     * As such, if you don’t change a declaration’s value,
+     * PostCSS will use the raw value with comments.
+     *
+     * @example
+     * const root = postcss.parse('a {\n  color:black\n}')
+     * root.first.first.raws //=> { before: '', between: ' ', after: '\n' }
+     */
+
+  }]);
+
+  return Rule;
+}(Container);
+
+//      
+
+/**
+ * Represents a plugin’s warning. It can be created using {@link Node#warn}.
+ *
+ * @example
+ * if ( decl.important ) {
+ *     decl.warn(result, 'Avoid !important', { word: '!important' });
+ * }
+ */
+var Warning = /*#__PURE__*/function () {
+  /**
+   * @param {string} text        - warning message
+   * @param {Object} [opts]      - warning options
+   * @param {Node}   opts.node   - CSS node that caused the warning
+   * @param

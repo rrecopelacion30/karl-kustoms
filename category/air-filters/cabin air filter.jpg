@@ -1,0 +1,510 @@
+fter is deprecated. Use Node#raws.after');
+      this.raws.after = val;
+    }
+    /**
+     * @memberof Container#
+     * @member {Node[]} nodes - an array containing the container’s children
+     *
+     * @example
+     * const root = postcss.parse('a { color: black }');
+     * root.nodes.length           //=> 1
+     * root.nodes[0].selector      //=> 'a'
+     * root.nodes[0].nodes[0].prop //=> 'color'
+     */
+
+  }]);
+
+  return Container;
+}(Node);
+
+/**
+ * Represents an at-rule.
+ *
+ * If it’s followed in the CSS by a {} block, this node will have
+ * a nodes property representing its children.
+ *
+ * @extends Container
+ *
+ * @example
+ * const root = postcss.parse('@charset "UTF-8"; @media print {}');
+ *
+ * const charset = root.first;
+ * charset.type  //=> 'atrule'
+ * charset.nodes //=> undefined
+ *
+ * const media = root.last;
+ * media.nodes   //=> []
+ */
+
+var AtRule = /*#__PURE__*/function (_Container) {
+  _inheritsLoose(AtRule, _Container);
+
+  function AtRule(defaults) {
+    var _this;
+
+    _this = _Container.call(this, defaults) || this;
+    _this.type = 'atrule';
+    return _this;
+  }
+
+  var _proto = AtRule.prototype;
+
+  _proto.append = function append() {
+    var _Container$prototype$;
+
+    if (!this.nodes) this.nodes = [];
+
+    for (var _len = arguments.length, children = new Array(_len), _key = 0; _key < _len; _key++) {
+      children[_key] = arguments[_key];
+    }
+
+    return (_Container$prototype$ = _Container.prototype.append).call.apply(_Container$prototype$, [this].concat(children));
+  };
+
+  _proto.prepend = function prepend() {
+    var _Container$prototype$2;
+
+    if (!this.nodes) this.nodes = [];
+
+    for (var _len2 = arguments.length, children = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      children[_key2] = arguments[_key2];
+    }
+
+    return (_Container$prototype$2 = _Container.prototype.prepend).call.apply(_Container$prototype$2, [this].concat(children));
+  };
+
+  _createClass(AtRule, [{
+    key: "afterName",
+    get: function get() {
+      warnOnce('AtRule#afterName was deprecated. Use AtRule#raws.afterName');
+      return this.raws.afterName;
+    },
+    set: function set(val) {
+      warnOnce('AtRule#afterName was deprecated. Use AtRule#raws.afterName');
+      this.raws.afterName = val;
+    }
+  }, {
+    key: "_params",
+    get: function get() {
+      warnOnce('AtRule#_params was deprecated. Use AtRule#raws.params');
+      return this.raws.params;
+    },
+    set: function set(val) {
+      warnOnce('AtRule#_params was deprecated. Use AtRule#raws.params');
+      this.raws.params = val;
+    }
+    /**
+     * @memberof AtRule#
+     * @member {string} name - the at-rule’s name immediately follows the `@`
+     *
+     * @example
+     * const root  = postcss.parse('@media print {}');
+     * media.name //=> 'media'
+     * const media = root.first;
+     */
+
+    /**
+     * @memberof AtRule#
+     * @member {string} params - the at-rule’s parameters, the values
+     *                           that follow the at-rule’s name but precede
+     *                           any {} block
+     *
+     * @example
+     * const root  = postcss.parse('@media print, screen {}');
+     * const media = root.first;
+     * media.params //=> 'print, screen'
+     */
+
+    /**
+     * @memberof AtRule#
+     * @member {object} raws - Information to generate byte-to-byte equal
+     *                         node string as it was in the origin input.
+     *
+     * Every parser saves its own properties,
+     * but the default CSS parser uses:
+     *
+     * * `before`: the space symbols before the node. It also stores `*`
+     *   and `_` symbols before the declaration (IE hack).
+     * * `after`: the space symbols after the last child of the node
+     *   to the end of the node.
+     * * `between`: the symbols between the property and value
+     *   for declarations, selector and `{` for rules, or last parameter
+     *   and `{` for at-rules.
+     * * `semicolon`: contains true if the last child has
+     *   an (optional) semicolon.
+     * * `afterName`: the space between the at-rule name and its parameters.
+     *
+     * PostCSS cleans at-rule parameters from comments and extra spaces,
+     * but it stores origin content in raws properties.
+     * As such, if you don’t change a declaration’s value,
+     * PostCSS will use the raw value with comments.
+     *
+     * @example
+     * const root = postcss.parse('  @media\nprint {\n}')
+     * root.first.first.raws //=> { before: '  ',
+     *                       //     between: ' ',
+     *                       //     afterName: '\n',
+     *                       //     after: '\n' }
+     */
+
+  }]);
+
+  return AtRule;
+}(Container);
+
+//      
+
+/**
+ * Contains helpers for safely splitting lists of CSS values,
+ * preserving parentheses and quotes.
+ *
+ * @example
+ * const list = postcss.list;
+ *
+ * @namespace list
+ */
+var list = {
+  split: function split(string, separators, last) {
+    var array = [];
+    var current = '';
+    var split = false;
+    var func = 0;
+    var quote = false;
+    var escape = false;
+
+    for (var i = 0; i < string.length; i++) {
+      var letter = string[i];
+
+      if (quote) {
+        if (escape) {
+          escape = false;
+        } else if (letter === '\\') {
+          escape = true;
+        } else if (letter === quote) {
+          quote = false;
+        }
+      } else if (letter === '"' || letter === "'") {
+        quote = letter;
+      } else if (letter === '(') {
+        func += 1;
+      } else if (letter === ')') {
+        if (func > 0) func -= 1;
+      } else if (func === 0) {
+        if (separators.indexOf(letter) !== -1) split = true;
+      }
+
+      if (split) {
+        if (current !== '') array.push(current.trim());
+        current = '';
+        split = false;
+      } else {
+        current += letter;
+      }
+    }
+
+    if (last || current !== '') array.push(current.trim());
+    return array;
+  },
+
+  /**
+   * Safely splits space-separated values (such as those for `background`,
+   * `border-radius`, and other shorthand properties).
+   *
+   * @param {string} string - space-separated values
+   *
+   * @return {string[]} splitted values
+   *
+   * @example
+   * postcss.list.space('1px calc(10% + 1px)') //=> ['1px', 'calc(10% + 1px)']
+   */
+  space: function space(string) {
+    var spaces = [' ', '\n', '\t'];
+    return list.split(string, spaces);
+  },
+
+  /**
+   * Safely splits comma-separated values (such as those for `transition-*`
+   * and `background` properties).
+   *
+   * @param {string} string - comma-separated values
+   *
+   * @return {string[]} splitted values
+   *
+   * @example
+   * postcss.list.comma('black, linear-gradient(white, black)')
+   * //=> ['black', 'linear-gradient(white, black)']
+   */
+  comma: function comma(string) {
+    var comma = ',';
+    return list.split(string, [comma], true);
+  }
+};
+
+/**
+ * Represents a CSS rule: a selector followed by a declaration block.
+ *
+ * @extends Container
+ *
+ * @example
+ * const root = postcss.parse('a{}');
+ * const rule = root.first;
+ * rule.type       //=> 'rule'
+ * rule.toString() //=> 'a{}'
+ */
+
+var Rule = /*#__PURE__*/function (_Container) {
+  _inheritsLoose(Rule, _Container);
+
+  function Rule(defaults) {
+    var _this;
+
+    _this = _Container.call(this, defaults) || this;
+    _this.type = 'rule';
+    if (!_this.nodes) _this.nodes = [];
+    return _this;
+  }
+  /**
+   * An array containing the rule’s individual selectors.
+   * Groups of selectors are split at commas.
+   *
+   * @type {string[]}
+   *
+   * @example
+   * const root = postcss.parse('a, b { }');
+   * const rule = root.first;
+   *
+   * rule.selector  //=> 'a, b'
+   * rule.selectors //=> ['a', 'b']
+   *
+   * rule.selectors = ['a', 'strong'];
+   * rule.selector //=> 'a, strong'
+   */
+
+
+  _createClass(Rule, [{
+    key: "selectors",
+    get: function get() {
+      return list.comma(this.selector);
+    },
+    set: function set(values) {
+      var match = this.selector ? this.selector.match(/,\s*/) : null;
+      var sep = match ? match[0] : "," + this.raw('between', 'beforeOpen');
+      this.selector = values.join(sep);
+    }
+  }, {
+    key: "_selector",
+    get: function get() {
+      warnOnce('Rule#_selector is deprecated. Use Rule#raws.selector');
+      return this.raws.selector;
+    },
+    set: function set(val) {
+      warnOnce('Rule#_selector is deprecated. Use Rule#raws.selector');
+      this.raws.selector = val;
+    }
+    /**
+     * @memberof Rule#
+     * @member {string} selector - the rule’s full selector represented
+     *                             as a string
+     *
+     * @example
+     * const root = postcss.parse('a, b { }');
+     * const rule = root.first;
+     * rule.selector //=> 'a, b'
+     */
+
+    /**
+     * @memberof Rule#
+     * @member {object} raws - Information to generate byte-to-byte equal
+     *                         node string as it was in the origin input.
+     *
+     * Every parser saves its own properties,
+     * but the default CSS parser uses:
+     *
+     * * `before`: the space symbols before the node. It also stores `*`
+     *   and `_` symbols before the declaration (IE hack).
+     * * `after`: the space symbols after the last child of the node
+     *   to the end of the node.
+     * * `between`: the symbols between the property and value
+     *   for declarations, selector and `{` for rules, or last parameter
+     *   and `{` for at-rules.
+     * * `semicolon`: contains true if the last child has
+     *   an (optional) semicolon.
+     *
+     * PostCSS cleans selectors from comments and extra spaces,
+     * but it stores origin content in raws properties.
+     * As such, if you don’t change a declaration’s value,
+     * PostCSS will use the raw value with comments.
+     *
+     * @example
+     * const root = postcss.parse('a {\n  color:black\n}')
+     * root.first.first.raws //=> { before: '', between: ' ', after: '\n' }
+     */
+
+  }]);
+
+  return Rule;
+}(Container);
+
+//      
+
+/**
+ * Represents a plugin’s warning. It can be created using {@link Node#warn}.
+ *
+ * @example
+ * if ( decl.important ) {
+ *     decl.warn(result, 'Avoid !important', { word: '!important' });
+ * }
+ */
+var Warning = /*#__PURE__*/function () {
+  /**
+   * @param {string} text        - warning message
+   * @param {Object} [opts]      - warning options
+   * @param {Node}   opts.node   - CSS node that caused the warning
+   * @param {string} opts.word   - word in CSS source that caused the warning
+   * @param {number} opts.index  - index in CSS node string that caused
+   *                               the warning
+   * @param {string} opts.plugin - name of the plugin that created
+   *                               this warning. {@link Result#warn} fills
+   *                               this property automatically.
+   */
+  function Warning(text, opts) {
+    if (opts === void 0) {
+      opts = {};
+    }
+
+    /**
+     * @member {string} - Type to filter warnings from
+     *                    {@link Result#messages}. Always equal
+     *                    to `"warning"`.
+     *
+     * @example
+     * const nonWarning = result.messages.filter(i => i.type !== 'warning')
+     */
+    this.type = 'warning';
+    /**
+     * @member {string} - The warning message.
+     *
+     * @example
+     * warning.text //=> 'Try to avoid !important'
+     */
+
+    this.text = text;
+
+    if (opts.node && opts.node.source) {
+      var pos = opts.node.positionBy(opts);
+      /**
+       * @member {number} - Line in the input file
+       *                    with this warning’s source
+       *
+       * @example
+       * warning.line //=> 5
+       */
+
+      this.line = pos.line;
+      /**
+       * @member {number} - Column in the input file
+       *                    with this warning’s source.
+       *
+       * @example
+       * warning.column //=> 6
+       */
+
+      this.column = pos.column;
+    }
+
+    for (var opt in opts) {
+      this[opt] = opts[opt];
+    }
+  }
+  /**
+   * Returns a warning position and message.
+   *
+   * @example
+   * warning.toString() //=> 'postcss-lint:a.css:10:14: Avoid !important'
+   *
+   * @return {string} warning position and message
+   */
+
+
+  var _proto = Warning.prototype;
+
+  _proto.toString = function toString() {
+    if (this.node) {
+      return this.node.error(this.text, {
+        plugin: this.plugin,
+        index: this.index,
+        word: this.word
+      }).message;
+    } else if (this.plugin) {
+      return this.plugin + ": " + this.text;
+    } else {
+      return this.text;
+    }
+  }
+  /**
+   * @memberof Warning#
+   * @member {string} plugin - The name of the plugin that created
+   *                           it will fill this property automatically.
+   *                           this warning. When you call {@link Node#warn}
+   *
+   * @example
+   * warning.plugin //=> 'postcss-important'
+   */
+
+  /**
+   * @memberof Warning#
+   * @member {Node} node - Contains the CSS node that caused the warning.
+   *
+   * @example
+   * warning.node.toString() //=> 'color: white !important'
+   */
+  ;
+
+  return Warning;
+}();
+
+/**
+ * @typedef  {object} Message
+ * @property {string} type   - message type
+ * @property {string} plugin - source PostCSS plugin name
+ */
+
+/**
+ * Provides the result of the PostCSS transformations.
+ *
+ * A Result instance is returned by {@link LazyResult#then}
+ * or {@link Root#toResult} methods.
+ *
+ * @example
+ * postcss([cssnext]).process(css).then(function (result) {
+ *    console.log(result.css);
+ * });
+ *
+ * @example
+ * var result2 = postcss.parse(css).toResult();
+ */
+
+var Result = /*#__PURE__*/function () {
+  /**
+   * @param {Processor} processor - processor used for this transformation.
+   * @param {Root}      root      - Root node after all transformations.
+   * @param {processOptions} opts - options from the {@link Processor#process}
+   *                                or {@link Root#toResult}
+   */
+  function Result(processor, root, opts) {
+    /**
+     * @member {Processor} - The Processor instance used
+     *                       for this transformation.
+     *
+     * @example
+     * for ( let plugin of result.processor.plugins) {
+     *   if ( plugin.postcssPlugin === 'postcss-bad' ) {
+     *     throw 'postcss-good is incompatible with postcss-bad';
+     *   }
+     * });
+     */
+    this.processor = processor;
+    /**
+     * @member {Message[]} - Contains messages from plugins
+     *                       (e.g., warnings or custom messages).
+    

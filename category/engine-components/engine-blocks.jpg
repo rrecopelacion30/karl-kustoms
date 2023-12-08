@@ -1,0 +1,446 @@
+_MIN_WIDTH = 320;
+const DOCUMENT_PANEL_INITIAL_MIN_WIDTH = 600;
+const DOCUMENT_INSPECTOR_MIN_WIDTH = 320;
+const DOCUMENT_INSPECTOR_MAX_WIDTH = 540;
+const EMPTY_PARAMS = {};
+const INSPECT_ACTION_PREFIX = "inspect:";
+const DEFAULT_MENU_ITEM_GROUPS = [{
+  id: "inspectors"
+}, {
+  id: "links"
+}];
+const HISTORY_INSPECTOR_NAME = "sanity/desk/history";
+const VALIDATION_INSPECTOR_NAME = "sanity/desk/validation";
+const Root$5 = styled(Card)({
+  position: "relative",
+  zIndex: 1,
+  lineHeight: 0,
+  "&:after": {
+    content: '""',
+    display: "block",
+    position: "absolute",
+    left: 0,
+    bottom: -1,
+    right: 0,
+    borderBottom: "1px solid var(--card-border-color)",
+    opacity: 0.5
+  }
+});
+function DocumentInspectorHeader(props) {
+  const {
+    as: forwardedAs,
+    children,
+    closeButtonLabel,
+    onClose,
+    title,
+    ...restProps
+  } = props;
+  return /* @__PURE__ */jsxs(Root$5, {
+    ...restProps,
+    as: forwardedAs,
+    children: [/* @__PURE__ */jsxs(Flex, {
+      padding: 2,
+      children: [/* @__PURE__ */jsx(Box, {
+        flex: 1,
+        padding: 3,
+        children: /* @__PURE__ */jsx(Text, {
+          as: "h1",
+          size: 1,
+          weight: "semibold",
+          children: title
+        })
+      }), /* @__PURE__ */jsx(Box, {
+        flex: "none",
+        padding: 1,
+        children: /* @__PURE__ */jsx(Button, {
+          "aria-label": closeButtonLabel,
+          fontSize: 1,
+          icon: CloseIcon,
+          mode: "bleed",
+          onClick: onClose,
+          padding: 2
+        })
+      })]
+    }), children]
+  });
+}
+const DeskToolContext = createContext(null);
+function useDeskTool() {
+  const deskTool = useContext(DeskToolContext);
+  if (!deskTool) throw new Error("DeskTool: missing context value");
+  return deskTool;
+}
+const Root$4 = styled.div(_templateObject22 || (_templateObject22 = _taggedTemplateLiteral(["\n  position: absolute;\n  top: 0;\n  left: -4px;\n  bottom: 0;\n  width: 9px;\n  z-index: 201;\n  cursor: ew-resize;\n\n  /* Border */\n  & > span:nth-child(1) {\n    display: block;\n    border-left: 1px solid var(--card-border-color);\n    position: absolute;\n    top: 0;\n    left: 4px;\n    bottom: 0;\n    transition: opacity 200ms;\n    opacity: 0.5;\n  }\n\n  /* Hover effect */\n  & > span:nth-child(2) {\n    display: block;\n    position: absolute;\n    top: 0;\n    left: 0;\n    width: 9px;\n    bottom: 0;\n    background-color: var(--card-border-color);\n    opacity: 0;\n    transition: opacity 150ms;\n  }\n\n  @media (hover: hover) {\n    &:hover > span:nth-child(2) {\n      opacity: 0.2;\n    }\n  }\n"])));
+function Resizer(props) {
+  const {
+    onResize,
+    onResizeStart
+  } = props;
+  const mouseXRef = useRef(0);
+  const handleMouseDown = useCallback(event => {
+    event.preventDefault();
+    mouseXRef.current = event.pageX;
+    onResizeStart();
+    const handleMouseMove = e => {
+      e.preventDefault();
+      onResize(e.pageX - mouseXRef.current);
+    };
+    const handleMouseUp = () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+  }, [onResize, onResizeStart]);
+  return /* @__PURE__ */jsxs(Root$4, {
+    onMouseDown: handleMouseDown,
+    children: [/* @__PURE__ */jsx("span", {}), /* @__PURE__ */jsx("span", {})]
+  });
+}
+const Root$3 = styled(Box)(_templateObject23 || (_templateObject23 = _taggedTemplateLiteral(["\n  position: relative;\n  flex: 1;\n  padding-left: 1px;\n"])));
+function Resizable(props) {
+  const {
+    as: forwardedAs,
+    children,
+    minWidth,
+    maxWidth,
+    ...restProps
+  } = props;
+  const [element, setElement] = useState(null);
+  const elementWidthRef = useRef();
+  const [targetWidth, setTargetWidth] = useState();
+  const handleResizeStart = useCallback(() => {
+    elementWidthRef.current = element == null ? void 0 : element.offsetWidth;
+  }, [element]);
+  const handleResize = useCallback(deltaX => {
+    const w = elementWidthRef.current;
+    if (!w) return;
+    setTargetWidth(Math.min(Math.max(w - deltaX, minWidth), maxWidth));
+  }, [minWidth, maxWidth]);
+  const style = useMemo(() => targetWidth ? {
+    flex: "none",
+    width: targetWidth
+  } : {
+    minWidth,
+    maxWidth
+  }, [minWidth, maxWidth, targetWidth]);
+  return /* @__PURE__ */jsxs(Root$3, {
+    as: forwardedAs,
+    ...restProps,
+    ref: setElement,
+    style,
+    children: [children, /* @__PURE__ */jsx(Resizer, {
+      onResize: handleResize,
+      onResizeStart: handleResizeStart
+    })]
+  });
+}
+function getPathTypes(options) {
+  const {
+    path,
+    schemaType,
+    value
+  } = options;
+  const result = [];
+  let s = schemaType;
+  let v = value;
+  for (const segment of path) {
+    if (typeof segment === "string") {
+      if (!isRecord(v) && v !== void 0) {
+        throw new Error("Parent value is not an object, cannot get path segment: .".concat(segment));
+      }
+      if (s.jsonType !== "object") {
+        throw new Error("Parent type is not an object schema type, cannot get path segment: .".concat(segment));
+      }
+      v = v == null ? void 0 : v[segment];
+      const field = s.fields.find(f => f.name === segment);
+      if (!field) {
+        throw new Error("Field type not found: .".concat(segment));
+      }
+      s = field.type;
+      result.push(s);
+      continue;
+    }
+    if (typeof segment === "number") {
+      if (!isArray(v) && v !== void 0) {
+        throw new Error("Parent value is not an array, cannot get path segment: [".concat(segment, "]"));
+      }
+      if (s.jsonType !== "array") {
+        throw new Error("Parent type is not an array schema type, cannot get path segment: [".concat(segment, "]"));
+      }
+      v = v == null ? void 0 : v[segment];
+      const itemType = s.of.find(ofType => {
+        if (typeof v === "string") {
+          return ofType.jsonType === "string";
+        }
+        if (typeof v === "number") {
+          return ofType.jsonType === "number";
+        }
+        if (typeof v === "boolean") {
+          return ofType.jsonType === "boolean";
+        }
+        if (isRecord(v)) {
+          return ofType.name === (v == null ? void 0 : v._type);
+        }
+        return false;
+      });
+      if (!itemType) {
+        throw new Error("Item type not found: [".concat(segment, "]"));
+      }
+      s = itemType;
+      result.push(s);
+      continue;
+    }
+    if (isRecord(segment) && segment._key) {
+      if (!isArray(v)) {
+        throw new Error("Parent value is not an anrray, cannot get path segment: [_key == ".concat(segment, "]"));
+      }
+      if (s.jsonType !== "array") {
+        throw new Error("Parent type is not an array schema type, cannot get path segment: .".concat(segment));
+      }
+      const values = v != null ? v : [];
+      v = values.find(i => isRecord(i) && i._key === segment._key);
+      if (!isRecord(v)) {
+        throw new Error("Array item not found: [_key == ".concat(segment._key, "]"));
+      }
+      const ofType = s.of.find(i => isRecord(v) && i.name === (v == null ? void 0 : v._type));
+      if (!ofType) {
+        throw new Error("Array item type not found: .".concat(v == null ? void 0 : v._type));
+      }
+      s = ofType;
+      result.push(s);
+      continue;
+    }
+    throw new Error("Invalid path segment: ".concat(JSON.stringify(segment)));
+  }
+  return result;
+}
+const MARKER_ICON = {
+  error: ErrorOutlineIcon,
+  warning: WarningOutlineIcon,
+  info: InfoOutlineIcon
+};
+const MARKER_TONE = {
+  error: "critical",
+  warning: "caution",
+  info: "primary"
+};
+function ValidationInspector(props) {
+  const {
+    onClose
+  } = props;
+  const {
+    onFocus,
+    onPathOpen,
+    schemaType,
+    validation,
+    value
+  } = useDocumentPane();
+  const handleOpen = useCallback(path => {
+    onPathOpen(path);
+    onFocus(path);
+  }, [onFocus, onPathOpen]);
+  return /* @__PURE__ */jsxs(Flex, {
+    direction: "column",
+    height: "fill",
+    overflow: "hidden",
+    children: [/* @__PURE__ */jsx(DocumentInspectorHeader, {
+      as: "header",
+      closeButtonLabel: "Close validation",
+      flex: "none",
+      onClose,
+      title: "Validation"
+    }), /* @__PURE__ */jsxs(Card, {
+      flex: 1,
+      overflow: "auto",
+      padding: 3,
+      children: [validation.length === 0 && /* @__PURE__ */jsx(Box, {
+        padding: 2,
+        children: /* @__PURE__ */jsx(Text, {
+          muted: true,
+          size: 1,
+          children: "No validation errors"
+        })
+      }), validation.length > 0 && /* @__PURE__ */jsx(Stack, {
+        space: 2,
+        children: validation.map(marker => /* @__PURE__ */jsx(ValidationCard, {
+          marker,
+          onOpen: handleOpen,
+          schemaType,
+          value
+        }, pathToString(marker.path)))
+      })]
+    })]
+  });
+}
+function ValidationCard(props) {
+  const {
+    marker,
+    onOpen,
+    schemaType,
+    value
+  } = props;
+  const handleOpen = useCallback(() => onOpen(marker.path), [marker, onOpen]);
+  const [errorInfo, setErrorInfo] = useState(null);
+  return /* @__PURE__ */jsxs(ErrorBoundary, {
+    onCatch: setErrorInfo,
+    children: [errorInfo && /* @__PURE__ */jsx(Card, {
+      padding: 3,
+      radius: 2,
+      tone: "critical",
+      children: /* @__PURE__ */jsxs(Text, {
+        size: 1,
+        children: ["ERROR: ", errorInfo.error.message]
+      })
+    }), !errorInfo && /* @__PURE__ */jsx(Card, {
+      __unstable_focusRing: true,
+      as: "button",
+      onClick: handleOpen,
+      padding: 3,
+      radius: 2,
+      tone: MARKER_TONE[marker.level],
+      children: /* @__PURE__ */jsxs(Flex, {
+        align: "flex-start",
+        gap: 3,
+        children: [/* @__PURE__ */jsx(Box, {
+          flex: "none",
+          children: /* @__PURE__ */jsx(Text, {
+            size: 1,
+            children: createElement(MARKER_ICON[marker.level])
+          })
+        }), /* @__PURE__ */jsxs(Stack, {
+          flex: 1,
+          space: 2,
+          children: [/* @__PURE__ */jsx(DocumentNodePathBreadcrumbs, {
+            path: marker.path,
+            schemaType,
+            value
+          }), /* @__PURE__ */jsx(Text, {
+            muted: true,
+            size: 1,
+            children: marker.item.message
+          })]
+        })]
+      })
+    })]
+  });
+}
+function DocumentNodePathBreadcrumbs(props) {
+  const {
+    path,
+    schemaType,
+    value
+  } = props;
+  const pathTypes = useMemo(() => getPathTypes({
+    path,
+    schemaType,
+    value
+  }), [path, schemaType, value]);
+  return /* @__PURE__ */jsx(Text, {
+    size: 1,
+    children: pathTypes.map((t, i) => /* @__PURE__ */jsxs(Fragment$1, {
+      children: [i > 0 && /* @__PURE__ */jsx("span", {
+        style: {
+          color: "var(--card-muted-fg-color)",
+          opacity: 0.5
+        },
+        children: " / "
+      }), /* @__PURE__ */jsx("span", {
+        style: {
+          fontWeight: 500
+        },
+        children: t.title || t.name
+      })]
+    }, i))
+  });
+}
+function useMenuItem(props) {
+  const {
+    documentId,
+    documentType
+  } = props;
+  const {
+    validation: validationMarkers
+  } = useValidationStatus(documentId, documentType);
+  const validation = useMemo(() => validationMarkers.map(item => ({
+    level: item.level,
+    message: item.item.message,
+    path: item.path
+  })), [validationMarkers]);
+  const hasErrors = validation.some(isValidationError);
+  const hasWarnings = validation.some(isValidationWarning);
+  const icon = useMemo(() => {
+    if (hasErrors) return ErrorOutlineIcon;
+    if (hasWarnings) return WarningOutlineIcon;
+    return CheckmarkCircleIcon;
+  }, [hasErrors, hasWarnings]);
+  const tone = useMemo(() => {
+    if (hasErrors) return "critical";
+    if (hasWarnings) return "caution";
+    return "positive";
+  }, [hasErrors, hasWarnings]);
+  return {
+    hidden: validation.length === 0,
+    icon,
+    title: "Validation",
+    tone,
+    showAsAction: true
+  };
+}
+const validationInspector = {
+  name: VALIDATION_INSPECTOR_NAME,
+  component: ValidationInspector,
+  useMenuItem
+};
+const TIMELINE_LABELS = {
+  create: "created",
+  delete: "deleted",
+  discardDraft: "discarded draft",
+  initial: "created",
+  editDraft: "edited",
+  editLive: "live edited",
+  publish: "published",
+  unpublish: "unpublished"
+};
+const TIMELINE_ICON_COMPONENTS = {
+  create: AddCircleIcon,
+  delete: TrashIcon,
+  discardDraft: CloseIcon,
+  initial: AddCircleIcon,
+  editDraft: EditIcon,
+  editLive: EditIcon,
+  publish: PublishIcon,
+  unpublish: UnpublishIcon
+};
+function formatTimelineEventLabel(type) {
+  return TIMELINE_LABELS[type];
+}
+function getTimelineEventIconComponent(type) {
+  return TIMELINE_ICON_COMPONENTS[type];
+}
+function UserAvatarStack(_ref28) {
+  let {
+    maxLength,
+    userIds
+  } = _ref28;
+  return /* @__PURE__ */jsx(AvatarStack, {
+    maxLength,
+    children: userIds.map(userId => /* @__PURE__ */jsx(UserAvatar, {
+      user: userId,
+      withTooltip: true
+    }, userId))
+  });
+}
+const IconWrapper = styled(Flex)(_ref29 => {
+  let {
+    theme
+  } = _ref29;
+  var _a;
+  const borderColor = (_a = theme.sanity.color.base.skeleton) == null ? void 0 : _a.from;
+  return css(_templateObject24 || (_templateObject24 = _taggedTemplateLiteral(["\n    --timeline-hairline-width: 1px;\n    position: relative;\n    z-index: 2;\n    margin: 0;\n    padding: 0;\n\n    &::before {\n      position: absolute;\n      content: '';\n      height: 100%;\n      width: var(--timeline-hairline-width);\n      background: ", ";\n      top: 0;\n      left: calc((100% - var(--timeline-hairline-width)) / 2);\n      z-index: 1;\n    }\n  "])), borderColor);
+});
+const Root$2 = styled(Button)(_ref30 => {
+  let {
+    $selected
+  } = _ref30;
+  return css(_templateObject25 || (_templateObject25 = _taggedTemplateLiteral(["\n    position: relative;\n    width: 100%;\n\n    /* Line styling */\n    &[data-first] ", "::before {\n      height: 50%;\n      top: unset;\n      bottom: 

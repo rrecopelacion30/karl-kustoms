@@ -1,0 +1,188 @@
+     return {};
+        }
+        function callRuntimeCallbacks(callbacks) {
+            while(callbacks.length > 0){
+                var callback = callbacks.shift();
+                if (typeof callback == "function") {
+                    callback(Module);
+                    continue;
+                }
+                var func = callback.func;
+                if (typeof func === "number") {
+                    if (callback.arg === undefined) {
+                        wasmTable.get(func)();
+                    } else {
+                        wasmTable.get(func)(callback.arg);
+                    }
+                } else {
+                    func(callback.arg === undefined ? null : callback.arg);
+                }
+            }
+        }
+        var runtimeKeepaliveCounter = 0;
+        function keepRuntimeAlive() {
+            return noExitRuntime || runtimeKeepaliveCounter > 0;
+        }
+        function _atexit(func, arg) {}
+        function ___cxa_thread_atexit(a0, a1) {
+            return _atexit(a0, a1);
+        }
+        var structRegistrations = {};
+        function runDestructors(destructors) {
+            while(destructors.length){
+                var ptr = destructors.pop();
+                var del = destructors.pop();
+                del(ptr);
+            }
+        }
+        function simpleReadValueFromPointer(pointer) {
+            return this["fromWireType"](HEAPU32[pointer >> 2]);
+        }
+        var awaitingDependencies = {};
+        var registeredTypes = {};
+        var typeDependencies = {};
+        var char_0 = 48;
+        var char_9 = 57;
+        function makeLegalFunctionName(name) {
+            if (undefined === name) {
+                return "_unknown";
+            }
+            name = name.replace(/[^a-zA-Z0-9_]/g, "$");
+            var f = name.charCodeAt(0);
+            if (f >= char_0 && f <= char_9) {
+                return "_" + name;
+            } else {
+                return name;
+            }
+        }
+        function createNamedFunction(name, body) {
+            name = makeLegalFunctionName(name);
+            return new Function("body", "return function " + name + "() {\n" + '    "use strict";' + "    return body.apply(this, arguments);\n" + "};\n")(body);
+        }
+        function extendError(baseErrorType, errorName) {
+            var errorClass = createNamedFunction(errorName, function(message) {
+                this.name = errorName;
+                this.message = message;
+                var stack = new Error(message).stack;
+                if (stack !== undefined) {
+                    this.stack = this.toString() + "\n" + stack.replace(/^Error(:[^\n]*)?\n/, "");
+                }
+            });
+            errorClass.prototype = Object.create(baseErrorType.prototype);
+            errorClass.prototype.constructor = errorClass;
+            errorClass.prototype.toString = function() {
+                if (this.message === undefined) {
+                    return this.name;
+                } else {
+                    return this.name + ": " + this.message;
+                }
+            };
+            return errorClass;
+        }
+        var InternalError = undefined;
+        function throwInternalError(message) {
+            throw new InternalError(message);
+        }
+        function whenDependentTypesAreResolved(myTypes, dependentTypes, getTypeConverters) {
+            myTypes.forEach(function(type) {
+                typeDependencies[type] = dependentTypes;
+            });
+            function onComplete(typeConverters) {
+                var myTypeConverters = getTypeConverters(typeConverters);
+                if (myTypeConverters.length !== myTypes.length) {
+                    throwInternalError("Mismatched type converter count");
+                }
+                for(var i = 0; i < myTypes.length; ++i){
+                    registerType(myTypes[i], myTypeConverters[i]);
+                }
+            }
+            var typeConverters = new Array(dependentTypes.length);
+            var unregisteredTypes = [];
+            var registered = 0;
+            dependentTypes.forEach(function(dt, i) {
+                if (registeredTypes.hasOwnProperty(dt)) {
+                    typeConverters[i] = registeredTypes[dt];
+                } else {
+                    unregisteredTypes.push(dt);
+                    if (!awaitingDependencies.hasOwnProperty(dt)) {
+                        awaitingDependencies[dt] = [];
+                    }
+                    awaitingDependencies[dt].push(function() {
+                        typeConverters[i] = registeredTypes[dt];
+                        ++registered;
+                        if (registered === unregisteredTypes.length) {
+                            onComplete(typeConverters);
+                        }
+                    });
+                }
+            });
+            if (0 === unregisteredTypes.length) {
+                onComplete(typeConverters);
+            }
+        }
+        function __embind_finalize_value_object(structType) {
+            var reg = structRegistrations[structType];
+            delete structRegistrations[structType];
+            var rawConstructor = reg.rawConstructor;
+            var rawDestructor = reg.rawDestructor;
+            var fieldRecords = reg.fields;
+            var fieldTypes = fieldRecords.map(function(field) {
+                return field.getterReturnType;
+            }).concat(fieldRecords.map(function(field) {
+                return field.setterArgumentType;
+            }));
+            whenDependentTypesAreResolved([
+                structType
+            ], fieldTypes, function(fieldTypes) {
+                var fields = {};
+                fieldRecords.forEach(function(field, i) {
+                    var fieldName = field.fieldName;
+                    var getterReturnType = fieldTypes[i];
+                    var getter = field.getter;
+                    var getterContext = field.getterContext;
+                    var setterArgumentType = fieldTypes[i + fieldRecords.length];
+                    var setter = field.setter;
+                    var setterContext = field.setterContext;
+                    fields[fieldName] = {
+                        read: function(ptr) {
+                            return getterReturnType["fromWireType"](getter(getterContext, ptr));
+                        },
+                        write: function(ptr, o) {
+                            var destructors = [];
+                            setter(setterContext, ptr, setterArgumentType["toWireType"](destructors, o));
+                            runDestructors(destructors);
+                        }
+                    };
+                });
+                return [
+                    {
+                        name: reg.name,
+                        fromWireType: function(ptr) {
+                            var rv = {};
+                            for(var i in fields){
+                                rv[i] = fields[i].read(ptr);
+                            }
+                            rawDestructor(ptr);
+                            return rv;
+                        },
+                        toWireType: function(destructors, o) {
+                            for(var fieldName in fields){
+                                if (!(fieldName in o)) {
+                                    throw new TypeError('Missing field:  "' + fieldName + '"');
+                                }
+                            }
+                            var ptr = rawConstructor();
+                            for(fieldName in fields){
+                                fields[fieldName].write(ptr, o[fieldName]);
+                            }
+                            if (destructors !== null) {
+                                destructors.push(rawDestructor, ptr);
+                            }
+                            return ptr;
+                        },
+                        argPackAdvance: 8,
+                        readValueFromPointer: simpleReadValueFromPointer,
+                        destructorFunction: rawDestructor
+                    }
+                ];
+      
